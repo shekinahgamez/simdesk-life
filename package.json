@@ -1,0 +1,32 @@
+{
+  "name": "simdesk",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc -b",
+    "import-workbook": "node scripts/import-workbook.mjs"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "2.1.10",
+    "@supabase/supabase-js": "2.118.0",
+    "idb-keyval": "6.2.2",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "7.18.5",
+    "zustand": "5.0.16"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.27",
+    "@types/react-dom": "18.3.7",
+    "@vitejs/plugin-react": "4.7.0",
+    "typescript": "5.9.3",
+    "vite": "6.4.5",
+    "vitest": "5.0.5",
+    "xlsx": "0.18.5"
+  }
+}

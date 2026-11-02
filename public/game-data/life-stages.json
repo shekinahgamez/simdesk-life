@@ -1,0 +1,66 @@
+[
+ {
+  "id": "newborn",
+  "name": "Newborn",
+  "short": 0.5,
+  "normal": 1,
+  "long": 4,
+  "notes": ""
+ },
+ {
+  "id": "infant",
+  "name": "Infant",
+  "short": 2.5,
+  "normal": 5,
+  "long": 20,
+  "notes": ""
+ },
+ {
+  "id": "toddler",
+  "name": "Toddler",
+  "short": 3.5,
+  "normal": 7,
+  "long": 28,
+  "notes": ""
+ },
+ {
+  "id": "child",
+  "name": "Child",
+  "short": 7,
+  "normal": 14,
+  "long": 56,
+  "notes": ""
+ },
+ {
+  "id": "teen",
+  "name": "Teen",
+  "short": 10.5,
+  "normal": 21,
+  "long": 84,
+  "notes": ""
+ },
+ {
+  "id": "youngAdult",
+  "name": "Young Adult",
+  "short": 14,
+  "normal": 28,
+  "long": 112,
+  "notes": ""
+ },
+ {
+  "id": "adult",
+  "name": "Adult",
+  "short": 21,
+  "normal": 42,
+  "long": 168,
+  "notes": ""
+ },
+ {
+  "id": "elder",
+  "name": "Elder",
+  "short": 7,
+  "normal": 14,
+  "long": 56,
+  "notes": "Minimum guaranteed days before a Sim can die of old age"
+ }
+]

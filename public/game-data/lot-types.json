@@ -1,0 +1,314 @@
+[
+ {
+  "id": "residential",
+  "name": "Residential",
+  "pack": "base-game",
+  "kind": "residential"
+ },
+ {
+  "id": "apartment",
+  "name": "Apartment",
+  "pack": "base-game",
+  "kind": "residential"
+ },
+ {
+  "id": "bar",
+  "name": "Bar",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "rental",
+  "name": "Rental",
+  "pack": "base-game",
+  "kind": "residential"
+ },
+ {
+  "id": "lounge",
+  "name": "Lounge",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "park",
+  "name": "Park",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "museum",
+  "name": "Museum",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "library",
+  "name": "Library",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "university-housing",
+  "name": "University Housing",
+  "pack": "base-game",
+  "kind": "residential"
+ },
+ {
+  "id": "nightclub",
+  "name": "Nightclub",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "gym",
+  "name": "Gym",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "national-park",
+  "name": "National Park",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "community-space",
+  "name": "Community Space",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "retail",
+  "name": "Retail",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "vacation-rental",
+  "name": "Vacation Rental",
+  "pack": "base-game",
+  "kind": "residential"
+ },
+ {
+  "id": "custom-venue",
+  "name": "Custom Venue",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "secret-lot",
+  "name": "Secret Lot",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "karaoke-bar",
+  "name": "Karaoke Bar",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "penthouse",
+  "name": "Penthouse",
+  "pack": "base-game",
+  "kind": "residential"
+ },
+ {
+  "id": "beach",
+  "name": "Beach",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "residential-rental",
+  "name": "Residential Rental",
+  "pack": "base-game",
+  "kind": "residential"
+ },
+ {
+  "id": "cafe",
+  "name": "Cafe",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "vet-clinic",
+  "name": "Vet Clinic",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "ubrite-commons",
+  "name": "UBrite Commons",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "foxbury-commons",
+  "name": "Foxbury Commons",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "thrift-and-bubble-tea-store",
+  "name": "Thrift and Bubble Tea Store",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "auditorium",
+  "name": "Auditorium",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "high-school",
+  "name": "High School",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "acting-studio",
+  "name": "Acting Studio",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "playground",
+  "name": "Playground",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "the-magic-realm",
+  "name": "The Magic Realm",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "hermit-s-hut",
+  "name": "Hermit's Hut",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "alien-party-lot",
+  "name": "Alien Party Lot",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "police-station",
+  "name": "Police Station",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "futuresim-labs",
+  "name": "FutureSim Labs",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "hospital",
+  "name": "Hospital",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "mount-komorebi-summit",
+  "name": "Mount Komorebi Summit",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "onsen-bathhouse",
+  "name": "Onsen Bathhouse",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "small-business-venue",
+  "name": "Small Business Venue",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "backroom",
+  "name": "Backroom",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "market",
+  "name": "Market",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "headless-quarter",
+  "name": "Headless Quarter",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "cemetery",
+  "name": "Cemetery",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "arts-center",
+  "name": "Arts Center",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "central-park",
+  "name": "Central Park",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "recreation-center",
+  "name": "Recreation Center",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "secret-lab",
+  "name": "Secret Lab",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "wedding-venue",
+  "name": "Wedding Venue",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "ancient-ruins",
+  "name": "Ancient Ruins",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "island-bluff",
+  "name": "Island Bluff",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "chalet-gardens",
+  "name": "Chalet Gardens",
+  "pack": "base-game",
+  "kind": "special"
+ },
+ {
+  "id": "pool",
+  "name": "Pool",
+  "pack": "base-game",
+  "kind": "community"
+ }
+]

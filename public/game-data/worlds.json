@@ -1,0 +1,219 @@
+[
+ {
+  "id": "batuu",
+  "name": "Batuu",
+  "pack": "journey-to-batuu",
+  "type": "vacation-only",
+  "notes": ""
+ },
+ {
+  "id": "brindleton-bay",
+  "name": "Brindleton Bay",
+  "pack": "cats-and-dogs",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "britechester",
+  "name": "Britechester",
+  "pack": "discover-university",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "chestnut-ridge",
+  "name": "Chestnut Ridge",
+  "pack": "horse-ranch",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "ciudad-enamorada",
+  "name": "Ciudad Enamorada",
+  "pack": "lovestruck",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "copperdale",
+  "name": "Copperdale",
+  "pack": "high-school-years",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "del-sol-valley",
+  "name": "Del Sol Valley",
+  "pack": "get-famous",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "evergreen-harbor",
+  "name": "Evergreen Harbor",
+  "pack": "eco-lifestyle",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "forgotten-hollow",
+  "name": "Forgotten Hollow",
+  "pack": "vampires",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "gibbi-point",
+  "name": "Gibbi Point",
+  "pack": "adventure-awaits",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "glimmerbrook",
+  "name": "Glimmerbrook",
+  "pack": "realm-of-magic",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "granite-falls",
+  "name": "Granite Falls",
+  "pack": "outdoor-retreat",
+  "type": "vacation-only",
+  "notes": ""
+ },
+ {
+  "id": "henford-on-bagley",
+  "name": "Henford-on-Bagley",
+  "pack": "cottage-living",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "innisgreen",
+  "name": "Innisgreen",
+  "pack": "enchanted-by-nature",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "magnolia-promenade",
+  "name": "Magnolia Promenade",
+  "pack": "get-to-work",
+  "type": "neighborhood-only",
+  "notes": ""
+ },
+ {
+  "id": "moonwood-mill",
+  "name": "Moonwood Mill",
+  "pack": "werewolves",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "mt-komorebi",
+  "name": "Mt. Komorebi",
+  "pack": "snowy-escape",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "newcrest",
+  "name": "Newcrest",
+  "pack": "base-game",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "nordhaven",
+  "name": "Nordhaven",
+  "pack": "businesses-and-hobbies",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "oasis-springs",
+  "name": "Oasis Springs",
+  "pack": "base-game",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "ondarion",
+  "name": "Ondarion",
+  "pack": "royalty-and-legacy",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "ravenwood",
+  "name": "Ravenwood",
+  "pack": "life-and-death",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "san-myshuno",
+  "name": "San Myshuno",
+  "pack": "city-living",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "san-sequoia",
+  "name": "San Sequoia",
+  "pack": "growing-together",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "selvadorada",
+  "name": "Selvadorada",
+  "pack": "jungle-adventure",
+  "type": "vacation-only",
+  "notes": ""
+ },
+ {
+  "id": "strangerville",
+  "name": "StrangerVille",
+  "pack": "strangerville",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "sulani",
+  "name": "Sulani",
+  "pack": "island-living",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "tartosa",
+  "name": "Tartosa",
+  "pack": "my-wedding-stories",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "tomarang",
+  "name": "Tomarang",
+  "pack": "for-rent",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "willow-creek",
+  "name": "Willow Creek",
+  "pack": "base-game",
+  "type": "residential",
+  "notes": ""
+ },
+ {
+  "id": "windenburg",
+  "name": "Windenburg",
+  "pack": "get-together",
+  "type": "residential",
+  "notes": ""
+ }
+]
