@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../store/store';
 import { APP } from '../config/app';
-import { AppIcon, Sparkle, Wordmark } from '../components/brand';
-import { CATEGORIES, ObjIcon } from '../components/categories';
+import { Sparkle, Wordmark } from '../components/brand';
+import { CATEGORIES } from '../components/categories';
 import { Field, Seg } from '../components/ui';
 
 export function AuthPage() {
@@ -43,18 +43,15 @@ export function AuthPage() {
     <div style={{ minHeight: '100%', display: 'grid', placeItems: 'center', padding: '32px 16px' }}>
       <div style={{ width: '100%', maxWidth: 940, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 28, alignItems: 'center' }}>
         <div className="stack" style={{ gap: 18 }}>
-          <div className="row" style={{ gap: 12 }}>
-            <AppIcon size={48} />
-          </div>
           <Wordmark size={64} />
-          <p style={{ fontSize: 18, margin: 0, color: 'var(--muted)', maxWidth: 420 }}>
-            {APP.tagline} Every Sim, household, world, lot, club and holiday in your save, in one tidy place.
+          <p style={{ fontFamily: 'var(--font-head)', fontSize: 22, fontWeight: 700, letterSpacing: '-0.01em', margin: '-12px 0 0', color: 'var(--muted)' }}>
+            {APP.tagline}
           </p>
           <div className="row" style={{ gap: 8 }}>
-            {CATEGORIES.filter((c) => !c.module).map((c) => (
-              <span key={c.id} className={`tag ${c.id}`} style={{ height: 30, paddingLeft: 4 }}>
-                <ObjIcon cat={c.id} />
-                {c.label}
+            {CATEGORIES.filter((c) => !c.module && c.id !== 'clubs').map((c) => (
+              <span key={c.id} className={`tag ${c.id} pill-lg`}>
+                <c.icon size={15} weight="duotone" color={`var(--${c.id}-ink)`} aria-hidden="true" />
+                {c.id === 'worlds' ? 'Worlds' : c.label /* one word per pill on this page only */}
               </span>
             ))}
           </div>
