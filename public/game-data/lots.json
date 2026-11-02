@@ -606,7 +606,7 @@
   "id": "del-sol-valley--studio",
   "name": "Studio",
   "world": "del-sol-valley",
-  "neighborhood": "Hidden lot",
+  "neighborhood": "Career buildings",
   "size": "50x50",
   "lotType": "Acting Studio",
   "pack": "get-famous"
@@ -849,7 +849,7 @@
   "id": "forgotten-hollow--fledermaus-bend",
   "name": "Fledermaus Bend",
   "world": "forgotten-hollow",
-  "neighborhood": "Secret area",
+  "neighborhood": "Forgotten Hollow",
   "size": "30x30",
   "lotType": "Residential",
   "pack": "vampires"
@@ -858,7 +858,7 @@
   "id": "forgotten-hollow--garliclauter-place",
   "name": "Garliclauter Place",
   "world": "forgotten-hollow",
-  "neighborhood": "Secret area",
+  "neighborhood": "Forgotten Hollow",
   "size": "30x20",
   "lotType": "Residential",
   "pack": "vampires"
@@ -867,7 +867,7 @@
   "id": "forgotten-hollow--straud-mansion",
   "name": "Straud Mansion",
   "world": "forgotten-hollow",
-  "neighborhood": "Secret area",
+  "neighborhood": "Forgotten Hollow",
   "size": "40x30",
   "lotType": "Residential",
   "pack": "vampires"
@@ -876,7 +876,7 @@
   "id": "forgotten-hollow--widowshild-townhome",
   "name": "Widowshild Townhome",
   "world": "forgotten-hollow",
-  "neighborhood": "Secret area",
+  "neighborhood": "Forgotten Hollow",
   "size": "30x20",
   "lotType": "Residential",
   "pack": "vampires"
@@ -885,7 +885,7 @@
   "id": "forgotten-hollow--wolfsbane-manor",
   "name": "Wolfsbane Manor",
   "world": "forgotten-hollow",
-  "neighborhood": "Secret area",
+  "neighborhood": "Forgotten Hollow",
   "size": "30x30",
   "lotType": "Residential",
   "pack": "vampires"
@@ -1056,10 +1056,11 @@
   "id": "glimmerbrook--the-magic-realm",
   "name": "The Magic Realm",
   "world": "glimmerbrook",
-  "neighborhood": "Hidden lot",
+  "neighborhood": "Secret lots",
   "size": "50x40",
   "lotType": "The Magic Realm",
-  "pack": "realm-of-magic"
+  "pack": "realm-of-magic",
+  "secret": true
  },
  {
   "id": "granite-falls--campground",
@@ -1119,10 +1120,11 @@
   "id": "granite-falls--hermit-s-house",
   "name": "Hermit's House",
   "world": "granite-falls",
-  "neighborhood": "Hidden lot",
+  "neighborhood": "Secret lots",
   "size": "30x20",
   "lotType": "Hermit's Hut",
-  "pack": "outdoor-retreat"
+  "pack": "outdoor-retreat",
+  "secret": true
  },
  {
   "id": "henford-on-bagley--1-cobblebottom-street",
@@ -1362,7 +1364,7 @@
   "id": "magnolia-promenade--futuresim-labs",
   "name": "FutureSim Labs",
   "world": "magnolia-promenade",
-  "neighborhood": "Hidden lot",
+  "neighborhood": "Career buildings",
   "size": "50x50",
   "lotType": "FutureSim Labs",
   "pack": "get-to-work"
@@ -1371,7 +1373,7 @@
   "id": "magnolia-promenade--police-station",
   "name": "Police Station",
   "world": "magnolia-promenade",
-  "neighborhood": "Hidden lot",
+  "neighborhood": "Career buildings",
   "size": "40x30",
   "lotType": "Police Station",
   "pack": "get-to-work"
@@ -1380,16 +1382,17 @@
   "id": "magnolia-promenade--sixam",
   "name": "Sixam",
   "world": "magnolia-promenade",
-  "neighborhood": "Hidden lot",
+  "neighborhood": "Secret lots",
   "size": "20x20",
   "lotType": "Alien Party Lot",
-  "pack": "get-to-work"
+  "pack": "get-to-work",
+  "secret": true
  },
  {
   "id": "magnolia-promenade--willow-creek-hospital",
   "name": "Willow Creek Hospital",
   "world": "magnolia-promenade",
-  "neighborhood": "Hidden lot",
+  "neighborhood": "Career buildings",
   "size": "50x50",
   "lotType": "Hospital",
   "pack": "get-to-work"
@@ -1398,7 +1401,7 @@
   "id": "magnolia-promenade--jfands-clothiers",
   "name": "JF&S Clothiers",
   "world": "magnolia-promenade",
-  "neighborhood": "Secret area",
+  "neighborhood": "Magnolia Promenade",
   "size": "20x20",
   "lotType": "Retail",
   "pack": "get-to-work"
@@ -1407,7 +1410,7 @@
   "id": "magnolia-promenade--paddywack-s-emporium",
   "name": "Paddywack's Emporium",
   "world": "magnolia-promenade",
-  "neighborhood": "Secret area",
+  "neighborhood": "Magnolia Promenade",
   "size": "20x20",
   "lotType": "Retail",
   "pack": "get-to-work"
@@ -1416,7 +1419,7 @@
   "id": "magnolia-promenade--preeminent-domain",
   "name": "Preeminent Domain",
   "world": "magnolia-promenade",
-  "neighborhood": "Secret area",
+  "neighborhood": "Magnolia Promenade",
   "size": "30x20",
   "lotType": "Residential",
   "pack": "get-to-work"
@@ -1425,7 +1428,7 @@
   "id": "magnolia-promenade--the-roadstead",
   "name": "The Roadstead",
   "world": "magnolia-promenade",
-  "neighborhood": "Secret area",
+  "neighborhood": "Magnolia Promenade",
   "size": "40x30",
   "lotType": "Retail",
   "pack": "get-to-work"
@@ -1434,7 +1437,7 @@
   "id": "moonwood-mill--new-moon-shack",
   "name": "New Moon Shack",
   "world": "moonwood-mill",
-  "neighborhood": "Secret area",
+  "neighborhood": "Moonwood Mill",
   "size": "20x15",
   "lotType": "Residential",
   "pack": "werewolves"
@@ -1443,7 +1446,7 @@
   "id": "moonwood-mill--prowler-s-patch",
   "name": "Prowler's Patch",
   "world": "moonwood-mill",
-  "neighborhood": "Secret area",
+  "neighborhood": "Moonwood Mill",
   "size": "30x30",
   "lotType": "Residential",
   "pack": "werewolves"
@@ -1452,7 +1455,7 @@
   "id": "moonwood-mill--the-collective-cabin",
   "name": "The Collective Cabin",
   "world": "moonwood-mill",
-  "neighborhood": "Secret area",
+  "neighborhood": "Moonwood Mill",
   "size": "40x30",
   "lotType": "Residential",
   "pack": "werewolves"
@@ -1461,7 +1464,7 @@
   "id": "moonwood-mill--the-grimtooth-bar-and-bunker",
   "name": "The Grimtooth Bar & Bunker",
   "world": "moonwood-mill",
-  "neighborhood": "Secret area",
+  "neighborhood": "Moonwood Mill",
   "size": "50x40",
   "lotType": "Bar",
   "pack": "werewolves"
@@ -1470,7 +1473,7 @@
   "id": "moonwood-mill--the-moonwood-mill-library",
   "name": "The Moonwood Mill Library",
   "world": "moonwood-mill",
-  "neighborhood": "Secret area",
+  "neighborhood": "Moonwood Mill",
   "size": "40x30",
   "lotType": "Library",
   "pack": "werewolves"
@@ -1479,10 +1482,11 @@
   "id": "mt-komorebi--mt-komorebi-peak",
   "name": "Mt. Komorebi Peak",
   "world": "mt-komorebi",
-  "neighborhood": "Hidden lot",
+  "neighborhood": "Secret lots",
   "size": "20x20",
   "lotType": "Mount Komorebi Summit",
-  "pack": "snowy-escape"
+  "pack": "snowy-escape",
+  "secret": true
  },
  {
   "id": "mt-komorebi--5-3-1-shinrinyoku",
@@ -1701,8 +1705,8 @@
   "pack": "base-game"
  },
  {
-  "id": "newcrest--cicic-cliffs",
-  "name": "Cicic Cliffs",
+  "id": "newcrest--civic-cliffs",
+  "name": "Civic Cliffs",
   "world": "newcrest",
   "neighborhood": "Ridgeline Drive",
   "size": "30x20",
@@ -2010,10 +2014,11 @@
   "id": "oasis-springs--forgotten-grotto",
   "name": "Forgotten Grotto",
   "world": "oasis-springs",
-  "neighborhood": "Secret area",
+  "neighborhood": "Secret lots",
   "size": "15x10",
   "lotType": "Secret Lot",
-  "pack": "base-game"
+  "pack": "base-game",
+  "secret": true
  },
  {
   "id": "oasis-springs--arid-ridge",
@@ -2262,10 +2267,11 @@
   "id": "ravenwood--netherworld-department-of-death",
   "name": "Netherworld Department of Death",
   "world": "ravenwood",
-  "neighborhood": "Hidden lot",
+  "neighborhood": "Secret lots",
   "size": "",
   "lotType": "Headless Quarter",
-  "pack": "life-and-death"
+  "pack": "life-and-death",
+  "secret": true
  },
  {
   "id": "ravenwood--club-eternity",
@@ -2784,10 +2790,11 @@
   "id": "strangerville--the-lab",
   "name": "The Lab",
   "world": "strangerville",
-  "neighborhood": "Hidden lot",
+  "neighborhood": "Secret lots",
   "size": "64x64",
   "lotType": "Secret Lab",
-  "pack": "strangerville"
+  "pack": "strangerville",
+  "secret": true
  },
  {
   "id": "strangerville--cliff-side-crest",
@@ -3369,10 +3376,11 @@
   "id": "willow-creek--sylvan-glade",
   "name": "Sylvan Glade",
   "world": "willow-creek",
-  "neighborhood": "Secret area",
+  "neighborhood": "Secret lots",
   "size": "15x10",
   "lotType": "Secret Lot",
-  "pack": "base-game"
+  "pack": "base-game",
+  "secret": true
  },
  {
   "id": "windenburg--ancient-ruins",
@@ -3616,5 +3624,15 @@
   "size": "40x30",
   "lotType": "Residential",
   "pack": "get-together"
+ },
+ {
+  "id": "granite-falls--deep-woods",
+  "name": "Deep Woods",
+  "world": "granite-falls",
+  "neighborhood": "Secret lots",
+  "size": "",
+  "lotType": "Secret Lot",
+  "pack": "outdoor-retreat",
+  "secret": true
  }
 ]
