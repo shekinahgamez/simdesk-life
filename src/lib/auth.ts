@@ -16,7 +16,7 @@ const MESSAGES: Record<string, string> = {
   email_not_confirmed: 'Confirm your email first. Check your inbox for the link we sent.',
   rate_limited: 'Too many tries just now. Wait a minute, then try again.',
   email_rate_limited: 'We’ve sent a lot of emails in the last hour. Try again a bit later.',
-  email_taken: 'There’s already an account with that email. Log in instead?',
+  email_taken: 'There’s already an account with that email. Log in or reset your password.',
   username_taken: 'That username is taken. Try another.',
   username_change_limit: 'You’ve changed your username twice in the last 14 days.',
   weak_password: `Pick a stronger password, at least ${MIN_PASSWORD} characters.`,
@@ -64,12 +64,15 @@ export async function usernameAvailable(name: string): Promise<boolean> {
 }
 
 export async function signUp(username: string, email: string, password: string) {
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: { data: { username }, emailRedirectTo: backHere() },
   });
   if (error) fail(error);
+  // Supabase doesn't create a second account or send an email when the address is already confirmed;
+  // it answers with a user that has no identities. Tell the player instead of leaving them waiting.
+  if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) throw new AuthError('email_taken');
 }
 
 /** Log in with a username or an email. */

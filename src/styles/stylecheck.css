@@ -31,3 +31,6 @@
 .gd-st { font-size: 12px; font-weight: 700; white-space: nowrap; padding: 3px 8px; border-radius: 999px; }
 .gd-st.on { background: var(--worlds-tint); color: var(--worlds-ink); }
 .gd-st.off { background: var(--sidebar); color: var(--muted); }
+.time-today { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.time-today b { font-family: var(--font-head); font-size: 20px; }
+.time-bdays { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }

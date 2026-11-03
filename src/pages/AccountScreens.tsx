@@ -1,12 +1,20 @@
-import { useEffect, useId, useState, type FormEvent } from 'react';
-import { CheckCircle, Gear, Palette, SignOut } from '@phosphor-icons/react';
-import { Wordmark } from '../components/brand';
+import { useEffect, useId, useState, type FormEvent, type ReactNode } from 'react';
+import { Gear, Palette, SignOut } from '@phosphor-icons/react';
 import { PasswordInput } from '../components/PasswordInput';
 import { Confirm, Field, Modal, toast } from '../components/ui';
-import { SyncCloud, SyncLine } from '../components/sync';
-import { SyncProvider, useStore } from '../lib/sync/react';
+import { SaveTrash } from '../components/sync';
+import { BackLink, Shell } from '../components/Shell';
+import type { CategoryId } from '../components/categories';
+import { go, savePath, useRoute } from '../lib/router';
+import { getLastSave, setLastSave } from '../lib/saves';
+import { useIsPhone } from '../lib/useIsPhone';
+import { HomeDeck, More, OnItsWay, PhoneToday } from './InApp';
+import { SaveSettings } from './SaveSettings';
+import { Setup } from './Setup';
+import { SyncProvider, useSaves, useStore, useStoreVersion } from '../lib/sync/react';
 import { SyncStore } from '../lib/sync/store';
 import { supabaseBackend } from '../lib/sync/supabaseBackend';
+import { MemoryBackend } from '../lib/sync/memoryBackend';
 import { NetworkError } from '../lib/sync/types';
 import {
   AuthError, changeUsername, claimUsername, loadProfile, logOut, MIN_PASSWORD, nextUsernameChange, recentUsernameChanges,
@@ -147,40 +155,59 @@ function ChangeUsername({ profile, onClose, onSaved }: { profile: Profile; onClo
   );
 }
 
-/** Placeholder for the signed-in app until setup and navigation are built (Phase 2). */
-function SignedInHome({ profile, onProfile }: { profile: Profile; onProfile(p: Profile): void }) {
+/** Account page: username, log out, app settings and deleted saves. (The full Account page comes in Phase 9.) */
+function AccountPage({ profile, onProfile, pretend }: { profile: Profile; onProfile(p: Profile): void; pretend?: boolean }) {
   const [changing, setChanging] = useState(false);
   const [askLogOut, setAskLogOut] = useState(false);
   const store = useStore();
+  const { trashed } = useSaves();
+  const phone = useIsPhone();
   const leave = async () => {
+    if (pretend) { endPretend(); return; }
     await store.wipe();
     localStorage.removeItem(PROFILE_KEY);
     await logOut();
   };
   const tryLogOut = () => (store.hasPending() ? setAskLogOut(true) : leave());
-  return (
-    <main className="signed-in">
-      <Wordmark size={40} />
-      <div className="card stack signed-in-card">
-        <div className="row" style={{ justifyContent: 'space-between' }}>
-          <div className="form-ok"><CheckCircle size={18} weight="fill" /> You’re logged in.</div>
-          <SyncCloud />
-        </div>
-        <SyncLine />
+  const back = store.openId ? savePath(store.openId, phone ? 'more' : '') : '#/';
+  const body = (
+    <>
+      <div className="card stack">
         <div>
           <div className="small muted">Username</div>
           <div className="signed-in-name">{profile.username}</div>
         </div>
-        <p className="small muted" style={{ margin: 0 }}>Your saves come next. For now this page just shows that your account works.</p>
         <div className="row">
-          <button type="button" className="btn" onClick={() => setChanging(true)}>Change username</button>
-          <button type="button" className="btn danger" onClick={tryLogOut}><SignOut size={16} weight="duotone" /> Log out</button>
+          {!pretend && <button type="button" className="btn" onClick={() => setChanging(true)}>Change username</button>}
+          <button type="button" className="btn danger" onClick={tryLogOut}><SignOut size={16} weight="duotone" /> {pretend ? 'Leave the pretend account' : 'Log out'}</button>
         </div>
         <div className="row">
           <a className="btn ghost sm" href="#app-settings"><Gear size={16} weight="duotone" /> App settings</a>
           <a className="btn ghost sm" href="#style-check"><Palette size={16} weight="duotone" /> Style check</a>
         </div>
       </div>
+      <div className="card stack">
+        <div className="card-head" style={{ margin: 0 }}><h2>Deleted saves</h2></div>
+        {trashed.length === 0
+          ? <p className="small muted" style={{ margin: 0 }}>None. A deleted save stays here for 7 days, then it’s gone for good.</p>
+          : <><p className="small muted" style={{ margin: 0 }}>A deleted save stays here for 7 days, then it’s gone for good.</p><SaveTrash saves={trashed} /></>}
+      </div>
+    </>
+  );
+  return (
+    <>
+      {phone ? (
+        <div className="m-stack">
+          {store.openId && <BackLink href={back} label="More" />}
+          <h1 className="m-h1">Account</h1>
+          {body}
+        </div>
+      ) : (
+        <div className="page" style={{ maxWidth: 640 }}>
+          <div className="page-head"><div><h1>Account</h1><div className="sub">Signed in as {profile.username}</div></div></div>
+          {body}
+        </div>
+      )}
       {askLogOut && (
         <Confirm title="Some changes haven’t synced yet"
           text={store.isOnline() ? 'They’re still sending. If you log out now, they’ll be lost.' : 'You’re offline, so they’re only on this device. If you log out now, they’ll be lost.'}
@@ -194,11 +221,89 @@ function SignedInHome({ profile, onProfile }: { profile: Profile; onProfile(p: P
         <ChangeUsername profile={profile} onClose={() => setChanging(false)}
           onSaved={(name) => { setChanging(false); onProfile({ ...profile, username: name }); toast(`You’re now ${name}`); }} />
       )}
-    </main>
+    </>
   );
 }
 
+const SECTION_CATS: Record<string, CategoryId> = { sims: 'sims', households: 'households', worlds: 'worlds', lots: 'worlds', calendar: 'calendar', clubs: 'clubs', storylines: 'storylines' };
+
+/** Everything after logging in: picks the page from the address and keeps the right save open. */
+export function AppRoot({ userId, profile, onProfile, pretend }: { userId: string; profile: Profile; onProfile(p: Profile): void; pretend?: boolean }) {
+  const route = useRoute();
+  const store = useStore();
+  useStoreVersion();
+  const { active } = useSaves();
+  const phone = useIsPhone();
+  const ready = store.savesState === 'ready';
+  const routeSave = route.page === 'save' ? active.find((s) => s.id === route.saveId) ?? null : null;
+
+  useEffect(() => {
+    if (!ready) return;
+    if (route.page === 'home') {
+      if (active.length === 0) return go('#/setup', { replace: true });
+      const last = getLastSave(userId);
+      const target = active.find((s) => s.id === last) ?? active[0];
+      return go(savePath(target.id, phone ? 'today' : ''), { replace: true });
+    }
+    if (route.page === 'save') {
+      if (!routeSave) return go('#/', { replace: true });
+      if (phone && route.section === '') return go(savePath(routeSave.id, 'today'), { replace: true });
+      if (!phone && (route.section === 'today' || route.section === 'more')) return go(savePath(routeSave.id), { replace: true });
+      setLastSave(userId, routeSave.id);
+      if (store.openId !== routeSave.id) void store.openSave(routeSave.id);
+    }
+  }, [ready, route, routeSave, active.length, phone, userId, store]);
+
+  if (store.savesState === 'error') {
+    return (
+      <AuthShell title="Can’t reach SimDesk">
+        <p className="muted" style={{ margin: 0 }}>Check your connection, then try again. Once your saves have loaded on this device, they open even without internet.</p>
+        <div className="row" style={{ marginTop: 16 }}>
+          <button type="button" className="btn primary" onClick={() => void store.retry()}>Try again</button>
+          <button type="button" className="btn ghost" onClick={() => logOut()}>Log out</button>
+        </div>
+      </AuthShell>
+    );
+  }
+  if (!ready) return <div className="loading" role="status">Loading your saves…</div>;
+  if (route.page === 'setup') return <Setup userKey={userId} />;
+
+  const shellSave = routeSave ?? (store.openId ? active.find((s) => s.id === store.openId) ?? null : null);
+  if (route.page === 'account') return <Shell save={shellSave} route={route}><AccountPage profile={profile} onProfile={onProfile} pretend={pretend} /></Shell>;
+  if (!routeSave || route.page !== 'save') return <div className="loading" role="status">Opening your save…</div>;
+
+  const sec = route.section;
+  let page: ReactNode;
+  if (sec === 'settings') page = <SaveSettings save={routeSave} />;
+  else if (sec === 'today') page = <PhoneToday save={routeSave} />;
+  else if (sec === 'more') page = <More save={routeSave} />;
+  else if (SECTION_CATS[sec]) page = <OnItsWay cat={SECTION_CATS[sec]} />;
+  else page = <HomeDeck save={routeSave} />;
+  return <Shell save={routeSave} route={route}>{page}</Shell>;
+}
+
 const PROFILE_KEY = 'sd:profile';
+
+// ---------- pretend account (for trying the app where Supabase can't be reached, like a preview link) ----------
+const PRETEND_KEY = 'sd:pretend';
+export function isPretend() { try { return sessionStorage.getItem(PRETEND_KEY) === '1'; } catch { return false; } }
+export function startPretend() { try { sessionStorage.setItem(PRETEND_KEY, '1'); } catch { /* ignore */ } location.hash = '#/'; location.reload(); }
+function endPretend() { try { sessionStorage.removeItem(PRETEND_KEY); } catch { /* ignore */ } location.hash = '#style-check'; location.reload(); }
+
+export function PretendApp() {
+  const [store] = useState(() => {
+    const s = new SyncStore(new MemoryBackend('sd:pretend-account'), 'pretend');
+    void s.start({ listenToWindow: true });
+    return s;
+  });
+  const [profile, setProfile] = useState<Profile>({ user_id: 'pretend', username: 'PretendSimmer', plan: 'free' });
+  return (
+    <SyncProvider store={store}>
+      <div className="pretend-bar">Pretend account · saved in this browser only</div>
+      <AppRoot userId="pretend" profile={profile} onProfile={setProfile} pretend />
+    </SyncProvider>
+  );
+}
 
 /** Remembers the account on this device so the app can open with no internet. */
 function cachedProfile(userId: string): Profile | null {
@@ -228,8 +333,11 @@ export function SignedIn({ userId }: { userId: string }) {
   };
   const load = () => {
     setError('');
-    loadProfile().then(remember).catch((e) => {
-      const cached = cachedProfile(userId);
+    const cached = cachedProfile(userId);
+    // A slow or hanging connection: after 4 seconds, open with what this device remembers.
+    const slow = cached ? setTimeout(() => setProfile((p) => p ?? cached), 4000) : undefined;
+    loadProfile().then((p) => { clearTimeout(slow); remember(p); }).catch((e) => {
+      clearTimeout(slow);
       // Offline: open with what this device remembers instead of an error.
       if (cached && (e instanceof NetworkError || !navigator.onLine || /reach/i.test(errText(e)))) setProfile(cached);
       else setError(errText(e));
@@ -251,7 +359,7 @@ export function SignedIn({ userId }: { userId: string }) {
   if (profile === null) return <PickUsername onDone={load} />;
   return (
     <SyncProvider store={store}>
-      <SignedInHome profile={profile} onProfile={remember} />
+      <AppRoot userId={userId} profile={profile} onProfile={remember} />
     </SyncProvider>
   );
 }

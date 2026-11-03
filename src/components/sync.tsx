@@ -127,7 +127,7 @@ export function TrashList({ items, describe }: { items: Rec[]; describe(r: Rec):
 }
 
 /** Asks before deleting a whole save, and offers a backup download first. */
-export function DeleteSaveDialog({ save, onClose }: { save: SaveRow; onClose(): void }) {
+export function DeleteSaveDialog({ save, onClose, onDeleted }: { save: SaveRow; onClose(): void; onDeleted?(): void }) {
   const store = useStore();
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
@@ -140,14 +140,14 @@ export function DeleteSaveDialog({ save, onClose }: { save: SaveRow; onClose(): 
   };
   return (
     <Confirm
-      title={`Delete ${save.data.name}?`}
+      title={`Delete ${save.data.name || 'this save'}?`}
       text="It goes to Trash for 7 days, then it’s gone for good, with every Sim, household and lot in it. Want a backup file first?"
       onCancel={onClose}
       actions={[
         { label: done ? <><CheckCircle size={18} weight="fill" /> Backup downloaded</> : <><DownloadSimple size={18} weight="bold" /> {busy ? 'Making backup…' : 'Download a backup first'}</>,
           kind: done ? undefined : 'primary', disabled: busy || done, run: backup },
         { label: 'Cancel', run: onClose },
-        { label: 'Delete save', kind: 'danger', run: () => { store.trashSave(save.id); onClose(); } },
+        { label: 'Delete save', kind: 'danger', run: () => { store.trashSave(save.id); onClose(); onDeleted?.(); } },
       ]}
     />
   );

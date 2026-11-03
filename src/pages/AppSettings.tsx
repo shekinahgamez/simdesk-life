@@ -38,8 +38,7 @@ export function AppSettings() {
     return (
       <main className="m-main">
         <div className="m-stack">
-          {/* Back goes to the account screen for now; it becomes "‹ More" once navigation is built. */}
-          <a className="m-back" href="#"><CaretLeft size={20} weight="bold" /> Back</a>
+          <a className="m-back" href="#/account"><CaretLeft size={20} weight="bold" /> Account</a>
           <h1 className="m-h1">App settings</h1>
           <div className="m-label">Theme</div>
           <ThemeRows value={theme} onPick={pick} />
@@ -52,7 +51,7 @@ export function AppSettings() {
   return (
     <main className="main">
       <div className="page" style={{ maxWidth: 640 }}>
-        <div className="crumbs"><a href="#">Back</a> / App settings</div>
+        <div className="crumbs"><a href="#/account">Account</a> / App settings</div>
         <div className="page-head">
           <div>
             <h1>App settings</h1>

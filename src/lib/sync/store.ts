@@ -66,6 +66,8 @@ export class SyncStore {
   drafts = new Map<string, DraftRow>();
   status: Status = 'synced';
   error = '';
+  /** Whether the save list is known yet (from this device or the account). 'error' = nothing to show and can't reach the account. */
+  savesState: 'loading' | 'ready' | 'error' = 'loading';
   /** Counts changes that came from another device, per item, so open forms can notice. */
   remoteHits = new Map<string, number>();
   version = 0;
@@ -116,8 +118,10 @@ export class SyncStore {
       this.drafts = new Map(saved.drafts.map((d) => [d.key, d]));
       this.draftOut = new Map(saved.draftOut);
     }
+    if (saved) this.savesState = 'ready';
     if (this.openId) await this.loadCachedRecords(this.openId);
     if (!this.online) this.status = 'offline';
+    if (!this.online && !saved) this.savesState = 'error';
     this.emit();
 
     if (opts.listenToWindow) {
@@ -201,6 +205,7 @@ export class SyncStore {
     try {
       const [saves, drafts] = await Promise.all([this.backend.listSaves(), this.backend.listDrafts()]);
       this.mergeSaves(saves);
+      this.savesState = 'ready';
       this.mergeDrafts(drafts);
       if (this.openId) {
         const id = this.openId;
@@ -210,8 +215,16 @@ export class SyncStore {
       this.persist();
       this.emit();
     } catch (e) {
+      if (this.savesState === 'loading') { this.savesState = 'error'; this.emit(); }
       this.onFail(e);
     }
+  }
+
+  /** Try loading again after "Can't reach SimDesk". */
+  retry() {
+    if (this.savesState === 'error') { this.savesState = 'loading'; this.emit(); }
+    this.online = typeof navigator === 'undefined' ? true : navigator.onLine;
+    return this.refresh();
   }
 
   private mergeSaves(rows: SaveRow[]) {
@@ -433,6 +446,16 @@ export class SyncStore {
     return id;
   }
 
+  /** Changes every thing of one kind (Trash included) in the open save. Return null to leave one alone. */
+  updateAll(kind: string, change: (data: Record<string, unknown>) => Record<string, unknown> | null) {
+    const saveId = this.needOpen();
+    for (const r of [...this.records.values()]) {
+      if (r.kind !== kind) continue;
+      const data = change(r.data);
+      if (data) this.putRec(saveId, { ...r, data, edited_at: now() });
+    }
+  }
+
   /** Moves a thing to Trash with an Undo message. `name` is what the message calls it. */
   moveToTrash(id: string, name: string) {
     const saveId = this.needOpen();
@@ -522,8 +545,8 @@ export class SyncStore {
   async flush(): Promise<void> {
     if (this.stopped) return;
     if (this.flushing) { this.flushAgain = true; return; }
-    if (!this.hasPending()) { this.setStatus('synced'); return; }
     if (!this.online) { this.setStatus('offline'); return; }
+    if (!this.hasPending()) { this.setStatus('synced'); return; }
     this.flushing = true;
     if (this.status !== 'error') this.setStatus('saving');
     try {

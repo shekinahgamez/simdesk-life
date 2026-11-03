@@ -60,11 +60,14 @@ export function useUsernameCheck(name: string) {
   return state;
 }
 
+const CANT_CHECK = 'Can’t check usernames right now. SimDesk can’t be reached. Check your internet and try again.';
+
 export function UsernameHint({ id, state }: { id: string; state: ReturnType<typeof useUsernameCheck> }) {
   if (state === 'free') return <div id={id} className="hint ok"><CheckCircle size={14} weight="fill" /> Available</div>;
   if (state === 'taken') return <div id={id} className="hint bad">That username is taken. Try another.</div>;
   if (state === 'invalid') return <div id={id} className="hint bad">{USERNAME_RULES}</div>;
   if (state === 'checking') return <div id={id} className="hint">Checking…</div>;
+  if (state === 'error') return <div id={id} className="hint bad">{CANT_CHECK}</div>;
   return <div id={id} className="hint">{USERNAME_RULES}</div>;
 }
 
@@ -78,6 +81,7 @@ export function Auth({ confirmed }: { confirmed?: boolean }) {
   const [confirmTouched, setConfirmTouched] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [emailTaken, setEmailTaken] = useState(false);
   const [done, setDone] = useState<'' | 'signup' | 'reset'>('');
   const ids = { u: useId(), uh: useId(), l: useId(), e: useId(), p: useId(), ph: useId(), c: useId(), ch: useId() };
   const check = useUsernameCheck(mode === 'signup' ? username : '');
@@ -85,6 +89,7 @@ export function Auth({ confirmed }: { confirmed?: boolean }) {
   const switchTo = (m: Mode) => {
     setMode(m);
     setError('');
+    setEmailTaken(false);
     setPassword('');
     setConfirm('');
     setConfirmTouched(false);
@@ -97,9 +102,13 @@ export function Auth({ confirmed }: { confirmed?: boolean }) {
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    setEmailTaken(false);
     if (mode === 'signup' && !canSignUp) {
       setConfirmTouched(true);
-      if (check !== 'free') return setError(check === 'taken' ? 'That username is taken. Try another.' : `Pick a username: ${USERNAME_RULES}`);
+      if (check === 'taken') return setError('That username is taken. Try another.');
+      if (check === 'error') return setError(CANT_CHECK);
+      if (check === 'checking') return setError('One sec, still checking that username.');
+      if (check !== 'free') return setError(`Pick a username: ${USERNAME_RULES}`);
       if (password.length < MIN_PASSWORD) return setError(`Your password needs at least ${MIN_PASSWORD} characters.`);
       if (confirm !== password) return setError('Passwords don’t match.');
       return setError('Fill in every box.');
@@ -117,6 +126,7 @@ export function Auth({ confirmed }: { confirmed?: boolean }) {
       }
     } catch (err) {
       setError(err instanceof AuthError ? err.message : 'Something went wrong. Try again?');
+      setEmailTaken(err instanceof AuthError && err.code === 'email_taken');
     } finally {
       setBusy(false);
     }
@@ -195,6 +205,12 @@ export function Auth({ confirmed }: { confirmed?: boolean }) {
           </div>
         )}
         {error && <FormError>{error}</FormError>}
+        {emailTaken && (
+          <div className="row">
+            <button type="button" className="btn" onClick={() => { const em = email.trim(); switchTo('login'); setLogin(em); }}>Log in</button>
+            <button type="button" className="btn" onClick={() => switchTo('reset')}>Reset your password</button>
+          </div>
+        )}
         <button type="submit" className="btn primary lg auth-wide" disabled={busy}>
           {busy ? 'One sec…' : mode === 'signup' ? 'Sign up' : mode === 'login' ? 'Log in' : 'Send reset link'}
         </button>

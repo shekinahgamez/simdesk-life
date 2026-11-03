@@ -23,7 +23,7 @@ export function effectiveTheme(pref: ThemePref = getTheme()): 'light' | 'dark' {
 }
 
 function paint(pref: ThemePref) {
-  document.documentElement.setAttribute('data-theme', pref);
+  document.documentElement.setAttribute('data-sd-theme', pref);
   // The browser bar / status bar color follows the page.
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', BG[effectiveTheme(pref)]);
 }

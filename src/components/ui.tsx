@@ -441,3 +441,33 @@ export function Seg<T extends string | number>({ value, options, onChange, label
     </div>
   );
 }
+
+/** A number with − and + buttons. Typing works too; it snaps into range when you leave the box. */
+export function Stepper({ id, value, onChange, min, max, label, unit }: {
+  id?: string; value: number; onChange(v: number): void; min: number; max: number; label: string; unit?: string;
+}) {
+  // While typing, show what was typed; otherwise always show the real value.
+  const [text, setText] = useState<string | null>(null);
+  const clampTo = (n: number) => Math.min(max, Math.max(min, Math.round(n)));
+  const commit = () => {
+    if (text === null) return;
+    const n = Number(text);
+    const v = Number.isFinite(n) && text.trim() !== '' ? clampTo(n) : value;
+    setText(null);
+    if (v !== value) onChange(v);
+  };
+  return (
+    <div className="stepper">
+      <button type="button" className="btn icon" aria-label={`Fewer ${unit ?? ''}`.trim()} disabled={value <= min} onClick={() => onChange(clampTo(value - 1))}>−</button>
+      <input id={id} className="input" inputMode="numeric" aria-label={label} value={text ?? String(value)}
+        onChange={(e) => {
+          setText(e.target.value);
+          const n = Number(e.target.value);
+          if (e.target.value.trim() !== '' && Number.isFinite(n) && n >= min && n <= max) onChange(Math.round(n));
+        }}
+        onBlur={commit} onKeyDown={(e) => e.key === 'Enter' && commit()} />
+      <button type="button" className="btn icon" aria-label={`More ${unit ?? ''}`.trim()} disabled={value >= max} onClick={() => onChange(clampTo(value + 1))}>+</button>
+      {unit && <span className="stepper-unit">{unit}</span>}
+    </div>
+  );
+}

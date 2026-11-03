@@ -36,7 +36,7 @@
 
 /* Light is the default. Dark applies only when picked in settings, or "Match device settings" on a dark device. */
 @media (prefers-color-scheme: dark) {
-  :root[data-theme='system'] {
+  :root[data-sd-theme='system'] {
     --bg: #1A1418; --surface: #241C21; --sidebar: #1F181C; --text: #F5EEF2; --muted: #B5A6AE; --line: #3A2E35;
     --accent: #F07DB0; --accent-ink: #1A1418; --accent-soft: #3A2230; --toggle-off: #4A3D44; --danger: #FF8A80; --field: #1F181C;
     --sims-tint: #45271F; --sims-ink: #FF9B85;
@@ -51,7 +51,7 @@
     color-scheme: dark;
   }
 }
-:root[data-theme='dark'] {
+:root[data-sd-theme='dark'] {
   --bg: #1A1418; --surface: #241C21; --sidebar: #1F181C; --text: #F5EEF2; --muted: #B5A6AE; --line: #3A2E35;
   --accent: #F07DB0; --accent-ink: #1A1418; --accent-soft: #3A2230; --toggle-off: #4A3D44; --danger: #FF8A80; --field: #1F181C;
   --sims-tint: #45271F; --sims-ink: #FF9B85;
@@ -382,3 +382,25 @@ table.table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .trash-txt b { font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .trash-txt span { font-size: 13px; color: var(--muted); }
 .confirm-actions .btn { gap: 6px; }
+
+/* ---------- stepper ---------- */
+.stepper { display: flex; align-items: center; gap: 6px; }
+.stepper .input { width: 64px; text-align: center; font-variant-numeric: tabular-nums; }
+.stepper .btn.icon { font-size: 20px; font-weight: 600; }
+.stepper-unit { font-weight: 600; color: var(--muted); }
+.age-preview { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--calendar-ink); }
+.final-chapter { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 700; color: var(--storylines-ink); }
+
+/* ---------- sidebar links + save switcher ---------- */
+.nav-link { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 600; color: var(--text); }
+.nav-link:hover { background: color-mix(in srgb, var(--text) 5%, transparent); }
+.nav-link.active { background: var(--surface); box-shadow: var(--shadow-sm); }
+.save-switch { width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; font: inherit; color: var(--text); }
+.save-dot { width: 10px; height: 10px; border-radius: 4px; flex-shrink: 0; display: inline-block; }
+.save-switch-name { display: block; font-size: 14px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.save-switch-date { display: block; font-size: 12px; color: var(--muted); }
+.on-its-way { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 64px 16px; max-width: 480px; margin: 0 auto; }
+.on-its-way h1 { font-size: 26px; }
+.on-its-way p { margin: 0; color: var(--muted); }
+.home-head { text-align: center; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.pretend-bar { position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 900; background: var(--storylines-tint); color: var(--storylines-ink); font-size: 12px; font-weight: 700; padding: calc(4px + env(safe-area-inset-top, 0px)) 12px 4px; border-radius: 0 0 10px 10px; pointer-events: none; }

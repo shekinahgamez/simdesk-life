@@ -9,7 +9,9 @@ import { CATEGORIES, ObjIcon } from '../components/categories';
 import { effectiveTheme } from '../lib/theme';
 import { SharedDemo } from '../demo/SharedDemo';
 import { SavingDemo } from '../demo/SavingDemo';
+import { startPretend } from './AccountScreens';
 import { GameDataDemo } from '../demo/GameDataDemo';
+import { TimeDemo } from '../demo/TimeDemo';
 
 /**
  * Style check: one page with every color, font, button, field and icon, for checking the look on
@@ -93,6 +95,14 @@ export function StyleCheck() {
         <b>Style check.</b> This page shows every color, font, button, field and icon so you can check them on iPad and
         iPhone. It isn’t part of the app and goes away before launch. Switch between light and dark on the App settings page.
       </div>
+
+      <section>
+        <h2>Try the app (Phase 2)</h2>
+        <p className="muted small" style={{ marginTop: 0 }}>Opens the real app with a pretend account kept in this browser: new save setup, the deck, the sidebar and tabs, and Save settings. Leave it from Account.</p>
+        <div><button type="button" className="btn primary" onClick={startPretend}>Try the app with a pretend account</button></div>
+      </section>
+
+      <TimeDemo />
 
       <GameDataDemo />
 

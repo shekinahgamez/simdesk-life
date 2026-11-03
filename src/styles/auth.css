@@ -26,8 +26,8 @@
 .hint { display: flex; align-items: center; gap: 5px; }
 .hint.ok { color: #2E8B57; }
 .hint.bad { color: var(--danger); }
-:root[data-theme='dark'] .hint.ok { color: #6FCFB9; }
-@media (prefers-color-scheme: dark) { :root[data-theme='system'] .hint.ok { color: #6FCFB9; } }
+:root[data-sd-theme='dark'] .hint.ok { color: #6FCFB9; }
+@media (prefers-color-scheme: dark) { :root[data-sd-theme='system'] .hint.ok { color: #6FCFB9; } }
 .form-error { background: color-mix(in srgb, var(--danger) 10%, var(--surface)); color: var(--danger); border-radius: var(--r-sm); padding: 10px 12px; font-size: 14px; font-weight: 600; }
 .form-ok { display: flex; align-items: center; gap: 8px; background: var(--worlds-tint); color: var(--worlds-ink); border-radius: var(--r-sm); padding: 10px 12px; font-size: 14px; font-weight: 600; margin-bottom: 14px; }
 .input[aria-invalid='true'] { border-color: var(--danger); }
