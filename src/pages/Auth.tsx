@@ -1,105 +1,206 @@
-import { useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { useStore } from '../store/store';
+import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { CheckCircle, EnvelopeSimple } from '@phosphor-icons/react';
 import { APP } from '../config/app';
 import { Sparkle, Wordmark } from '../components/brand';
-import { CATEGORIES } from '../components/categories';
-import { Field, Seg } from '../components/ui';
+import { CATEGORIES, ObjIcon } from '../components/categories';
+import { PasswordInput } from '../components/PasswordInput';
+import {
+  AuthError, logIn, MIN_PASSWORD, sendReset, signUp, usernameAvailable, USERNAME_RE, USERNAME_RULES,
+} from '../lib/auth';
 
-export function AuthPage() {
-  const startGuest = useStore((s) => s.startGuest);
-  const [mode, setMode] = useState<'in' | 'up' | 'reset'>('up');
+type Mode = 'signup' | 'login' | 'reset';
+const HEADINGS: Record<Mode, string> = { signup: 'Make your account', login: 'Welcome back', reset: 'Reset your password' };
+
+/** The brand side plus a card. Used by every account screen. */
+export function AuthShell({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <main className="auth">
+      <div className="auth-brand">
+        <Wordmark size={64} />
+        <p className="auth-tag">{APP.tagline}</p>
+        <div className="auth-pills">
+          {CATEGORIES.map((c) => (
+            <span key={c.id} className={`tag pill-lg ${c.id}`} title={c.label}>
+              <ObjIcon cat={c.id} /> <span className="auth-pill-label">{c.label}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="auth-card">
+        <div className="auth-card-head">
+          <h1>{title}</h1>
+          <Sparkle size={22} />
+        </div>
+        {children}
+      </div>
+    </main>
+  );
+}
+
+export function FormError({ children }: { children: ReactNode }) {
+  return <div className="form-error" role="alert">{children}</div>;
+}
+
+/** Checks the username while typing (after a short pause). */
+export function useUsernameCheck(name: string) {
+  const [state, setState] = useState<'idle' | 'checking' | 'free' | 'taken' | 'invalid' | 'error'>('idle');
+  const latest = useRef(name);
+  useEffect(() => {
+    latest.current = name;
+    if (!name) return setState('idle');
+    if (!USERNAME_RE.test(name)) return setState('invalid');
+    setState('checking');
+    const t = setTimeout(() => {
+      usernameAvailable(name)
+        .then((ok) => latest.current === name && setState(ok ? 'free' : 'taken'))
+        .catch(() => latest.current === name && setState('error'));
+    }, 400);
+    return () => clearTimeout(t);
+  }, [name]);
+  return state;
+}
+
+export function UsernameHint({ id, state }: { id: string; state: ReturnType<typeof useUsernameCheck> }) {
+  if (state === 'free') return <div id={id} className="hint ok"><CheckCircle size={14} weight="fill" /> Available</div>;
+  if (state === 'taken') return <div id={id} className="hint bad">That username is taken. Try another.</div>;
+  if (state === 'invalid') return <div id={id} className="hint bad">{USERNAME_RULES}</div>;
+  if (state === 'checking') return <div id={id} className="hint">Checking…</div>;
+  return <div id={id} className="hint">{USERNAME_RULES}</div>;
+}
+
+export function Auth({ confirmed }: { confirmed?: boolean }) {
+  const [mode, setMode] = useState<Mode>(confirmed ? 'login' : 'signup');
+  const [username, setUsername] = useState('');
+  const [login, setLogin] = useState('');
   const [email, setEmail] = useState('');
-  const [pw, setPw] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [confirmTouched, setConfirmTouched] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<{ kind: 'ok' | 'err'; text: string } | null>(null);
+  const [error, setError] = useState('');
+  const [done, setDone] = useState<'' | 'signup' | 'reset'>('');
+  const ids = { u: useId(), uh: useId(), l: useId(), e: useId(), p: useId(), ph: useId(), c: useId(), ch: useId() };
+  const check = useUsernameCheck(mode === 'signup' ? username : '');
 
-  const submit = async (e: React.FormEvent) => {
+  const switchTo = (m: Mode) => {
+    setMode(m);
+    setError('');
+    setPassword('');
+    setConfirm('');
+    setConfirmTouched(false);
+  };
+
+  const tooShort = password.length > 0 && password.length < MIN_PASSWORD;
+  const mismatch = confirm.length > 0 && confirmTouched && confirm !== password;
+  const canSignUp = check === 'free' && email.trim() !== '' && password.length >= MIN_PASSWORD && confirm === password;
+
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!supabase) return;
+    setError('');
+    if (mode === 'signup' && !canSignUp) {
+      setConfirmTouched(true);
+      if (check !== 'free') return setError(check === 'taken' ? 'That username is taken. Try another.' : `Pick a username: ${USERNAME_RULES}`);
+      if (password.length < MIN_PASSWORD) return setError(`Your password needs at least ${MIN_PASSWORD} characters.`);
+      if (confirm !== password) return setError('Passwords don’t match.');
+      return setError('Fill in every box.');
+    }
     setBusy(true);
-    setMsg(null);
     try {
-      if (mode === 'up') {
-        const { data, error } = await supabase.auth.signUp({ email, password: pw, options: { emailRedirectTo: window.location.origin + import.meta.env.BASE_URL } });
-        if (error) throw error;
-        if (!data.session) setMsg({ kind: 'ok', text: `Check your email to confirm your account, then come back and log in.` });
-      } else if (mode === 'in') {
-        const { error } = await supabase.auth.signInWithPassword({ email, password: pw });
-        if (error) throw error;
+      if (mode === 'signup') {
+        await signUp(username, email.trim(), password);
+        setDone('signup');
+      } else if (mode === 'login') {
+        await logIn(login, password);
       } else {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + import.meta.env.BASE_URL });
-        if (error) throw error;
-        setMsg({ kind: 'ok', text: 'If that email has an account, a reset link is on its way.' });
+        await sendReset(email);
+        setDone('reset');
       }
     } catch (err) {
-      setMsg({ kind: 'err', text: err instanceof Error ? err.message : 'Something went wrong. Try again?' });
+      setError(err instanceof AuthError ? err.message : 'Something went wrong. Try again?');
     } finally {
       setBusy(false);
     }
   };
 
-  return (
-    <div style={{ minHeight: '100%', display: 'grid', placeItems: 'center', padding: '32px 16px' }}>
-      <div style={{ width: '100%', maxWidth: 940, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 28, alignItems: 'center' }}>
-        <div className="stack" style={{ gap: 18 }}>
-          <Wordmark size={64} />
-          <p style={{ fontFamily: 'var(--font-head)', fontSize: 22, fontWeight: 700, letterSpacing: '-0.01em', margin: '-12px 0 0', color: 'var(--muted)' }}>
-            {APP.tagline}
-          </p>
-          <div className="row" style={{ gap: 8 }}>
-            {CATEGORIES.filter((c) => !c.module && c.id !== 'clubs').map((c) => (
-              <span key={c.id} className={`tag ${c.id} pill-lg`}>
-                <c.icon size={15} weight="duotone" color={`var(--${c.id}-ink)`} aria-hidden="true" />
-                {c.id === 'worlds' ? 'Worlds' : c.label /* one word per pill on this page only */}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <form className="card" style={{ padding: 28, borderRadius: 'var(--r-xl)', boxShadow: 'var(--shadow)' }} onSubmit={submit}>
-          <div className="row" style={{ justifyContent: 'space-between', marginBottom: 18 }}>
-            <h1 style={{ fontSize: 24 }}>{mode === 'up' ? 'Make your account' : mode === 'in' ? 'Welcome back' : 'Reset your password'}</h1>
-            <Sparkle size={22} />
-          </div>
-          {!supabase ? (
-            <p className="small muted">Accounts aren’t set up on this copy of {APP.name} yet. You can still try it on this device.</p>
+  if (done) {
+    return (
+      <AuthShell title={done === 'signup' ? 'Check your email' : 'Check your email'}>
+        <div className="auth-done">
+          <span className="obj lg berry"><EnvelopeSimple size={24} weight="duotone" /></span>
+          {done === 'signup' ? (
+            <p>We sent a link to <b>{email.trim()}</b>. Tap it to confirm your account, then come back and log in.</p>
           ) : (
-            <div className="stack" style={{ gap: 14 }}>
-              {mode !== 'reset' && (
-                <Seg label="Account" value={mode} onChange={(v) => { setMode(v); setMsg(null); }} options={[{ v: 'up', label: 'Sign up' }, { v: 'in', label: 'Log in' }]} />
-              )}
-              <Field label="Email">
-                {(id) => <input id={id} className="input" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />}
-              </Field>
-              {mode !== 'reset' && (
-                <Field label="Password" hint={mode === 'up' ? 'At least 8 characters.' : undefined}>
-                  {(id) => (
-                    <input id={id} className="input" type="password" minLength={mode === 'up' ? 8 : undefined} autoComplete={mode === 'up' ? 'new-password' : 'current-password'} required value={pw} onChange={(e) => setPw(e.target.value)} />
-                  )}
-                </Field>
-              )}
-              {msg && (
-                <div className="small" role="alert" style={{ padding: '10px 12px', borderRadius: 10, background: msg.kind === 'ok' ? 'var(--worlds-tint)' : 'var(--sims-tint)' }}>
-                  {msg.text}
-                </div>
-              )}
-              <button className="btn primary lg" disabled={busy}>
-                {busy ? 'One sec…' : mode === 'up' ? 'Sign up' : mode === 'in' ? 'Log in' : 'Send reset link'}
-              </button>
-              <div className="row small" style={{ justifyContent: 'space-between' }}>
-                {mode === 'in' && <button type="button" className="btn ghost sm" onClick={() => setMode('reset')}>Forgot password?</button>}
-                {mode === 'reset' && <button type="button" className="btn ghost sm" onClick={() => setMode('in')}>Back to log in</button>}
-              </div>
-            </div>
+            <p>If <b>{email.trim()}</b> has an account, a reset link is on its way.</p>
           )}
-          <div className="divider" />
-          <button type="button" className="btn ghost" style={{ width: '100%' }} onClick={() => void startGuest()}>
-            Try it without an account
-          </button>
-          <p className="tiny muted" style={{ textAlign: 'center', margin: '6px 0 0' }}>Guest saves stay on this device only.</p>
-        </form>
-      </div>
-    </div>
+          <p className="muted small">It can take a minute. Check your spam folder too.</p>
+          <button type="button" className="btn lg auth-wide" onClick={() => { setDone(''); switchTo('login'); }}>Back to log in</button>
+        </div>
+      </AuthShell>
+    );
+  }
+
+  return (
+    <AuthShell title={HEADINGS[mode]}>
+      {confirmed && mode === 'login' && <div className="form-ok" role="status"><CheckCircle size={18} weight="fill" /> Your email is confirmed. Log in to start.</div>}
+      {mode !== 'reset' && (
+        <div className="seg auth-switch" role="group" aria-label="Account">
+          <button type="button" aria-pressed={mode === 'signup'} onClick={() => switchTo('signup')}>Sign up</button>
+          <button type="button" aria-pressed={mode === 'login'} onClick={() => switchTo('login')}>Log in</button>
+        </div>
+      )}
+      <form className="auth-form" onSubmit={submit} noValidate>
+        {mode === 'signup' && (
+          <div className="field">
+            <label htmlFor={ids.u}>Username</label>
+            <input id={ids.u} className="input" value={username} onChange={(e) => setUsername(e.target.value.trim())}
+              autoComplete="username" autoCapitalize="none" autoCorrect="off" spellCheck={false} maxLength={30}
+              aria-describedby={ids.uh} aria-invalid={check === 'taken' || check === 'invalid' || undefined} />
+            <UsernameHint id={ids.uh} state={check} />
+          </div>
+        )}
+        {mode === 'login' ? (
+          <div className="field">
+            <label htmlFor={ids.l}>Username or email</label>
+            <input id={ids.l} className="input" value={login} onChange={(e) => setLogin(e.target.value)}
+              autoComplete="username" autoCapitalize="none" autoCorrect="off" spellCheck={false} />
+          </div>
+        ) : (
+          <div className="field">
+            <label htmlFor={ids.e}>Email</label>
+            <input id={ids.e} className="input" type="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} />
+          </div>
+        )}
+        {mode !== 'reset' && (
+          <div className="field">
+            <label htmlFor={ids.p}>Password</label>
+            <PasswordInput id={ids.p} value={password} onChange={setPassword}
+              autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+              invalid={mode === 'signup' && tooShort} describedBy={mode === 'signup' ? ids.ph : undefined} />
+            {mode === 'signup' && (
+              <div id={ids.ph} className={`hint ${password.length >= MIN_PASSWORD ? 'ok' : ''}`}>
+                {password.length >= MIN_PASSWORD ? <><CheckCircle size={14} weight="fill" /> Long enough</> : `At least ${MIN_PASSWORD} characters.`}
+              </div>
+            )}
+          </div>
+        )}
+        {mode === 'signup' && (
+          <div className="field">
+            <label htmlFor={ids.c}>Confirm password</label>
+            <PasswordInput id={ids.c} value={confirm} onChange={(v) => { setConfirm(v); if (v.length >= password.length) setConfirmTouched(true); }}
+              autoComplete="new-password" invalid={mismatch} describedBy={ids.ch} />
+            <div id={ids.ch} className={`hint ${mismatch ? 'bad' : confirm && confirm === password ? 'ok' : ''}`}>
+              {mismatch ? 'Passwords don’t match.' : confirm && confirm === password ? <><CheckCircle size={14} weight="fill" /> Matches</> : 'Type it again.'}
+            </div>
+          </div>
+        )}
+        {error && <FormError>{error}</FormError>}
+        <button type="submit" className="btn primary lg auth-wide" disabled={busy}>
+          {busy ? 'One sec…' : mode === 'signup' ? 'Sign up' : mode === 'login' ? 'Log in' : 'Send reset link'}
+        </button>
+        {mode === 'login' && <button type="button" className="btn ghost auth-link" onClick={() => switchTo('reset')}>Forgot password?</button>}
+        {mode === 'reset' && <button type="button" className="btn ghost auth-link" onClick={() => switchTo('login')}>Back to log in</button>}
+      </form>
+    </AuthShell>
   );
 }

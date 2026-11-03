@@ -1,100 +1,263 @@
-import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
-import { create } from 'zustand';
-import { Camera, MagnifyingGlass, Plus, X } from '@phosphor-icons/react';
-import { useStore } from '../store/store';
+import {
+  useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent, type ReactNode,
+} from 'react';
+import { createPortal } from 'react-dom';
+import { MagnifyingGlass, Plus, X } from '@phosphor-icons/react';
+import { useLayer } from '../lib/layers';
+import { isPhone } from '../lib/useIsPhone';
+import { matches, normalize } from '../lib/text';
 
-// ---------- toast ----------
-const useToastStore = create<{ msg: string | null; show(m: string): void }>((set) => {
-  let t: ReturnType<typeof setTimeout> | undefined;
-  return {
-    msg: null,
-    show(m) {
-      set({ msg: m });
-      clearTimeout(t);
-      t = setTimeout(() => set({ msg: null }), 3600);
-    },
-  };
-});
-export const toast = (m: string) => useToastStore.getState().show(m);
-export function Toaster() {
-  const msg = useToastStore((s) => s.msg);
-  return msg ? (
-    <div className="toast" role="status">
-      {msg}
-    </div>
-  ) : null;
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const FIRST_FIELD = 'input:not([disabled]), select:not([disabled]), textarea:not([disabled])';
+
+/** Keeps Tab and Shift+Tab inside `el`. */
+function trapTab(e: ReactKeyboardEvent, el: HTMLElement | null) {
+  if (e.key !== 'Tab' || !el) return;
+  const items = Array.from(el.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((x) => x.offsetParent !== null);
+  if (items.length === 0) return;
+  const first = items[0];
+  const last = items[items.length - 1];
+  if (e.shiftKey && (document.activeElement === first || !el.contains(document.activeElement))) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
 }
 
-// ---------- toggle ----------
-export function Toggle({ on, onChange, label }: { on: boolean; onChange(v: boolean): void; label: string }) {
-  return (
-    <button type="button" className="toggle" aria-pressed={on} aria-label={label} onClick={() => onChange(!on)}>
-      <span />
-    </button>
-  );
-}
-
-export function SwitchRow({ title, desc, on, onChange }: { title: string; desc?: ReactNode; on: boolean; onChange(v: boolean): void }) {
-  return (
-    <div className="switch-row">
-      <div className="grow">
-        <div style={{ fontWeight: 600 }}>{title}</div>
-        {desc && <div className="small muted" style={{ marginTop: 2 }}>{desc}</div>}
-      </div>
-      <Toggle on={on} onChange={onChange} label={title} />
-    </div>
-  );
-}
-
-// ---------- segmented ----------
-export function Seg<T extends string | number>({ value, options, onChange, label }: { value: NoInfer<T>; options: { v: T; label: string }[]; onChange(v: T): void; label: string }) {
-  return (
-    <div className="seg" role="group" aria-label={label}>
-      {options.map((o) => (
-        <button key={String(o.v)} type="button" aria-pressed={o.v === value} onClick={() => onChange(o.v)}>
-          {o.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// ---------- modal ----------
-export function Modal({ title, onClose, children, footer, wide }: { title: ReactNode; onClose(): void; children: ReactNode; footer?: ReactNode; wide?: boolean }) {
-  const id = useId();
-  const ref = useRef<HTMLDivElement>(null);
+/**
+ * Opens with focus on the first field (desktop only, so phones don't pop the keyboard up),
+ * and hands focus back to whatever had it when it closes. Runs once: typing never moves focus.
+ */
+function useOpenFocus(ref: React.RefObject<HTMLElement | null>, focusFirstField: boolean) {
   useEffect(() => {
     const prev = document.activeElement as HTMLElement | null;
-    const first = ref.current?.querySelector<HTMLElement>('input, select, textarea, button:not(.modal-close)');
-    first?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-      prev?.focus?.();
-    };
-  }, [onClose]);
-  return (
-    <div className="modal-scrim" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className={`modal ${wide ? 'wide' : ''}`} role="dialog" aria-modal="true" aria-labelledby={id} ref={ref}>
+    const el = ref.current;
+    if (el) {
+      const first = focusFirstField && !isPhone() ? el.querySelector<HTMLElement>(FIRST_FIELD) : null;
+      (first ?? el).focus({ preventScroll: true });
+    }
+    return () => prev?.focus?.({ preventScroll: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+}
+
+/** Closes only when the press both starts and ends on the dimmed backdrop. */
+function useBackdrop(onTap: () => void) {
+  const downOnScrim = useRef(false);
+  return {
+    onPointerDown: (e: React.PointerEvent) => {
+      downOnScrim.current = e.target === e.currentTarget;
+    },
+    onClick: (e: React.MouseEvent) => {
+      if (downOnScrim.current && e.target === e.currentTarget) onTap();
+      downOnScrim.current = false;
+    },
+  };
+}
+
+// ---------- pop-up ----------
+export function Modal({
+  title, onClose, dirty = false, onSaveDraft, children, footer, wide,
+}: {
+  title: ReactNode;
+  /** Actually closes the pop-up. Called straight away when nothing changed, or after the player picks Discard. */
+  onClose(): void;
+  /** True when the form has changes that would be lost. Closing then asks first. */
+  dirty?: boolean;
+  /** Only pass this once drafts really save. The "Save draft" button shows only when it's set. */
+  onSaveDraft?: () => void;
+  children: ReactNode;
+  /** Buttons at the bottom. Pass a function to get `close`, which asks first when there are changes (for Cancel). */
+  footer?: ReactNode | ((close: () => void) => ReactNode);
+  wide?: boolean;
+}) {
+  const id = useId();
+  const ref = useRef<HTMLDivElement>(null);
+  const [asking, setAsking] = useState(false);
+  const latest = useRef({ onClose, dirty });
+  latest.current = { onClose, dirty };
+  const requestClose = () => (latest.current.dirty ? setAsking(true) : latest.current.onClose());
+  const { isTop } = useLayer(requestClose);
+  useOpenFocus(ref, true);
+  const backdrop = useBackdrop(requestClose);
+
+  return createPortal(
+    <div className="modal-scrim" {...backdrop}>
+      <div
+        className={`modal ${wide ? 'wide' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={id}
+        ref={ref}
+        tabIndex={-1}
+        onKeyDown={(e) => isTop() && trapTab(e, ref.current)}
+      >
         <div className="modal-head">
           <h2 id={id}>{title}</h2>
-          <button type="button" className="btn ghost icon sm modal-close" aria-label="Close" onClick={onClose}>
+          <button type="button" className="btn ghost icon sm" aria-label="Close" onClick={requestClose}>
             <X size={18} weight="bold" />
           </button>
         </div>
         {children}
-        {footer && <div className="modal-foot">{footer}</div>}
+        {footer && <div className="modal-foot">{typeof footer === 'function' ? footer(requestClose) : footer}</div>}
       </div>
+      {asking && (
+        <DiscardChanges
+          onKeep={() => setAsking(false)}
+          onSaveDraft={onSaveDraft && (() => { setAsking(false); onSaveDraft(); })}
+          onDiscard={() => { setAsking(false); latest.current.onClose(); }}
+        />
+      )}
+    </div>,
+    document.body,
+  );
+}
+
+/** The in-app "unsaved changes" message. Escape or tapping outside means Keep editing. */
+function DiscardChanges({ onKeep, onSaveDraft, onDiscard }: { onKeep(): void; onSaveDraft?: () => void; onDiscard(): void }) {
+  return (
+    <Confirm title="Discard changes?" text="You have changes that haven’t been saved." onCancel={onKeep}
+      actions={[
+        { label: 'Keep editing', kind: 'primary', run: onKeep },
+        ...(onSaveDraft ? [{ label: 'Save draft', run: onSaveDraft }] : []),
+        { label: 'Discard', kind: 'danger' as const, run: onDiscard },
+      ]} />
+  );
+}
+
+export type ConfirmAction = { label: ReactNode; kind?: 'primary' | 'danger'; run(): void; disabled?: boolean };
+
+/** A small in-app question (never the browser's pop-up). Escape or tapping outside = onCancel. First button gets focus. */
+export function Confirm({ title, text, actions, onCancel, children }: {
+  title: ReactNode; text?: ReactNode; actions: ConfirmAction[]; onCancel(): void; children?: ReactNode;
+}) {
+  const id = useId();
+  const ref = useRef<HTMLDivElement>(null);
+  const cancel = useRef(onCancel);
+  cancel.current = onCancel;
+  const { isTop } = useLayer(() => cancel.current());
+  useEffect(() => {
+    ref.current?.querySelector<HTMLElement>('.confirm-actions button')?.focus({ preventScroll: true });
+  }, []);
+  const backdrop = useBackdrop(() => cancel.current());
+  return createPortal(
+    <div className="modal-scrim confirm-scrim" {...backdrop}>
+      <div className="modal confirm" role="alertdialog" aria-modal="true" aria-labelledby={id} ref={ref}
+        onKeyDown={(e) => isTop() && trapTab(e, ref.current)}>
+        <h2 id={id}>{title}</h2>
+        {text && <p className="muted" style={{ margin: '8px 0 0' }}>{text}</p>}
+        {children}
+        <div className="confirm-actions">
+          {actions.map((a, i) => (
+            <button key={i} type="button" className={`btn ${a.kind ?? ''}`} disabled={a.disabled} onClick={a.run}>{a.label}</button>
+          ))}
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+// ---------- bottom sheet (phone menus) ----------
+export function Sheet({ title, onClose, children }: { title?: ReactNode; onClose(): void; children: ReactNode }) {
+  const id = useId();
+  const ref = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  const [closing, setClosing] = useState(false);
+  const close = () => setClosing(true);
+  const { isTop } = useLayer(close);
+  useOpenFocus(ref, false);
+  const backdrop = useBackdrop(close);
+
+  // Swipe down to close. Works from anywhere on the sheet once its content is scrolled to the top.
+  useEffect(() => {
+    const el = ref.current!;
+    let startY = 0;
+    let startT = 0;
+    let dy = 0;
+    let dragging = false;
+    const start = (y: number) => { startY = y; startT = Date.now(); dy = 0; dragging = el.scrollTop <= 0; };
+    const move = (y: number, e?: Event) => {
+      if (!dragging) return;
+      dy = Math.max(0, y - startY);
+      if (dy > 0 && e?.cancelable) e.preventDefault();
+      el.style.transition = 'none';
+      el.style.transform = `translateY(${dy}px)`;
+    };
+    const end = () => {
+      if (!dragging) return;
+      dragging = false;
+      const fast = dy > 40 && dy / Math.max(1, Date.now() - startT) > 0.5;
+      el.style.transition = '';
+      if (dy > 110 || fast) setClosing(true);
+      else el.style.transform = '';
+    };
+    const ts = (e: TouchEvent) => start(e.touches[0].clientY);
+    const tm = (e: TouchEvent) => move(e.touches[0].clientY, e);
+    el.addEventListener('touchstart', ts, { passive: true });
+    el.addEventListener('touchmove', tm, { passive: false });
+    el.addEventListener('touchend', end);
+    el.addEventListener('touchcancel', end);
+    return () => {
+      el.removeEventListener('touchstart', ts);
+      el.removeEventListener('touchmove', tm);
+      el.removeEventListener('touchend', end);
+      el.removeEventListener('touchcancel', end);
+    };
+  }, []);
+
+  return createPortal(
+    <div className={`m-sheet-scrim ${closing ? 'out' : ''}`} {...backdrop}
+      onAnimationEnd={(e) => closing && e.target === e.currentTarget && closeRef.current()}>
+      <div className={`m-sheet ${closing ? 'out' : ''}`} role="dialog" aria-modal="true" aria-labelledby={title ? id : undefined}
+        aria-label={title ? undefined : 'Menu'} ref={ref} tabIndex={-1} onKeyDown={(e) => isTop() && trapTab(e, ref.current)}>
+        <div className="grab" aria-hidden="true" />
+        {title && <h2 id={id} className="sheet-title">{title}</h2>}
+        {children}
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+// ---------- message at the bottom of the screen ----------
+type ToastMsg = { id: number; text: string; action?: { label: string; run(): void } };
+let toastState: ToastMsg | null = null;
+let toastTimer: ReturnType<typeof setTimeout> | undefined;
+const toastSubs = new Set<() => void>();
+const emitToast = () => toastSubs.forEach((f) => f());
+
+/** Shows one message. A new one replaces the old. With a button (like Undo) it stays 6 seconds, otherwise 3.6. */
+export function toast(text: string, action?: ToastMsg['action']) {
+  toastState = { id: Date.now(), text, action };
+  emitToast();
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toastState = null; emitToast(); }, action ? 6000 : 3600);
+}
+function dismissToast() {
+  clearTimeout(toastTimer);
+  toastState = null;
+  emitToast();
+}
+export function Toaster() {
+  const msg = useSyncExternalStore((f) => (toastSubs.add(f), () => toastSubs.delete(f)), () => toastState);
+  if (!msg) return null;
+  return (
+    <div className="toast" role="status" key={msg.id}>
+      <span>{msg.text}</span>
+      {msg.action && (
+        <button type="button" className="toast-btn" onClick={() => { const run = msg.action!.run; dismissToast(); run(); }}>
+          {msg.action.label}
+        </button>
+      )}
     </div>
   );
 }
 
-// ---------- field ----------
+// ---------- fields ----------
 export function Field({ label, hint, children, full }: { label: string; hint?: ReactNode; children: (id: string) => ReactNode; full?: boolean }) {
   const id = useId();
   return (
@@ -106,288 +269,175 @@ export function Field({ label, hint, children, full }: { label: string; hint?: R
   );
 }
 
-// ---------- avatar ----------
-export function initials(name: string) {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase())
-    .join('');
-}
-export function Avatar({ name, src, size = 32 }: { name: string; src?: string; size?: number }) {
-  return (
-    <span className="avatar" style={{ width: size, height: size, fontSize: Math.max(10, size * 0.36) }} title={name}>
-      {src ? <img src={src} alt="" loading="lazy" decoding="async" /> : initials(name)}
-    </span>
-  );
-}
-
-// ---------- empty ----------
-export function Empty({ icon, title, children, action }: { icon?: ReactNode; title: string; children?: ReactNode; action?: ReactNode }) {
-  return (
-    <div className="empty">
-      {icon}
-      <h2>{title}</h2>
-      {children && <p>{children}</p>}
-      {action}
-    </div>
-  );
+/** Text box. `name` fields capitalize each word and never autocorrect. */
+export function TextInput({ kind = 'text', ...rest }: { kind?: 'text' | 'name' } & React.InputHTMLAttributes<HTMLInputElement>) {
+  const extra = kind === 'name' ? { autoCapitalize: 'words', autoCorrect: 'off', spellCheck: false, autoComplete: 'off' } : {};
+  return <input className="input" {...extra} {...rest} />;
 }
 
 // ---------- search ----------
-export function SearchBox({ value, onChange, placeholder }: { value: string; onChange(v: string): void; placeholder: string }) {
+export function SearchBox({ value, onChange, placeholder, id }: { value: string; onChange(v: string): void; placeholder: string; id?: string }) {
   return (
-    <div className="search" style={{ minWidth: 200, flex: '1 1 240px', maxWidth: 360 }}>
-      <MagnifyingGlass size={16} weight="bold" />
-      <input className="input" type="search" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} aria-label={placeholder} />
+    <div className="search">
+      <MagnifyingGlass size={16} />
+      <input id={id} className="input" type="search" value={value} placeholder={placeholder} aria-label={placeholder}
+        autoCapitalize="none" autoCorrect="off" spellCheck={false} autoComplete="off" onChange={(e) => onChange(e.target.value)} />
     </div>
   );
 }
-
-// ---------- picker (combobox) ----------
-export interface PickOption {
-  id: string;
-  label: string;
-  group?: string;
-  hint?: string;
+export function NoMatches({ query }: { query: string }) {
+  return <div className="no-matches">No matches for “{query.trim()}”.</div>;
 }
 
-/** Search-as-you-type picker. Multi mode shows chosen items as removable tags. */
+// ---------- chooser (search as you type) ----------
+export type Option = { id: string; label: string; group?: string };
+
 export function Picker({
-  options,
-  value,
-  onChange,
-  multi,
-  placeholder = 'Search…',
-  label,
-  max,
-  allowCreate,
-  tagClass = '',
+  id, options, value, onChange, multiple = false, placeholder, onAdd, max,
 }: {
-  options: PickOption[];
+  id?: string;
+  options: Option[];
   value: string[];
-  onChange(v: string[]): void;
-  multi?: boolean;
+  onChange(ids: string[]): void;
+  /** One pick (Occult, Aspiration) or several (Traits). */
+  multiple?: boolean;
   placeholder?: string;
-  label: string;
+  /** Lets the player add what they typed as a new option. Return the new option's id. */
+  onAdd?: (label: string) => string;
   max?: number;
-  allowCreate?: (text: string) => string | null; // returns new id or null
-  tagClass?: string;
 }) {
+  const autoId = useId();
+  const inputId = id ?? autoId;
+  const listId = `${inputId}-list`;
   const [q, setQ] = useState('');
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState(0);
-  const listId = useId();
+  const [editing, setEditing] = useState(false);
+  const [hi, setHi] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
   const byId = useMemo(() => new Map(options.map((o) => [o.id, o])), [options]);
-  const results = useMemo(() => {
-    const s = q.trim().toLowerCase();
-    const pool = options.filter((o) => !value.includes(o.id));
-    const hits = s ? pool.filter((o) => o.label.toLowerCase().includes(s) || o.group?.toLowerCase().includes(s)) : pool;
-    return hits.slice(0, 80);
-  }, [q, options, value]);
-  const full = max != null && value.length >= max;
-  const canCreate = allowCreate && q.trim() && !options.some((o) => o.label.toLowerCase() === q.trim().toLowerCase());
+  const labelOf = (vid: string) => byId.get(vid)?.label ?? 'Removed item';
 
-  const choose = (id: string) => {
-    onChange(multi ? [...value, id] : [id]);
+  const results = useMemo(
+    () => options.filter((o) => !value.includes(o.id) && (matches(o.label, q) || (!!o.group && matches(o.group, q)))).slice(0, 80),
+    [options, value, q],
+  );
+  const canAdd = !!onAdd && q.trim() !== '' && !options.some((o) => normalize(o.label) === normalize(q));
+  const rows = results.length + (canAdd ? 1 : 0);
+  const full = multiple && max !== undefined && value.length >= max;
+  const single = !multiple ? value[0] : undefined;
+
+  const pick = (oid: string) => {
+    onChange(multiple ? [...value, oid] : [oid]);
     setQ('');
-    setActive(0);
-    if (!multi) setOpen(false);
+    setHi(0);
+    if (!multiple) { setOpen(false); setEditing(false); }
   };
-  const create = () => {
-    const id = allowCreate?.(q.trim());
-    if (id) choose(id);
+  const add = () => onAdd && pick(onAdd(q.trim()));
+
+  const onKey = (e: ReactKeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowDown' && rows > 0) { e.preventDefault(); setOpen(true); setHi((h) => Math.min(h + 1, rows - 1)); }
+    else if (e.key === 'ArrowUp' && rows > 0) { e.preventDefault(); setHi((h) => Math.max(h - 1, 0)); }
+    else if (e.key === 'Enter' && open && rows > 0) {
+      e.preventDefault();
+      if (hi < results.length) pick(results[hi].id);
+      else add();
+    } else if (e.key === 'Escape' && (open || editing)) {
+      // Close just the list, not the pop-up around it.
+      e.stopPropagation();
+      e.nativeEvent.stopImmediatePropagation();
+      setOpen(false);
+      setEditing(false);
+      setQ('');
+    } else if (e.key === 'Backspace' && multiple && q === '' && value.length) onChange(value.slice(0, -1));
   };
+
+  // Single pick: the choice sits inside the field itself, so it never pushes the field out of line.
+  if (!multiple && single && !editing) {
+    return (
+      <div className="picker-chosen input">
+        <button type="button" id={inputId} className="picker-chosen-label" onClick={() => {
+          setEditing(true); setOpen(true); setTimeout(() => inputRef.current?.focus(), 0);
+        }}>
+          <span className={byId.has(single) ? '' : 'muted'}>{labelOf(single)}</span>
+        </button>
+        <button type="button" className="picker-clear" aria-label={`Clear ${labelOf(single)}`} onClick={() => onChange([])}>
+          <X size={14} weight="bold" />
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="stack" style={{ gap: 8 }}>
-      {multi && value.length > 0 && (
-        <div className="tags">
-          {value.map((id) => (
-            <span key={id} className={`tag ${tagClass}`}>
-              {byId.get(id)?.label ?? id}
-              <button type="button" aria-label={`Remove ${byId.get(id)?.label ?? id}`} onClick={() => onChange(value.filter((v) => v !== id))}>
+    <div className="combo">
+      {!full && (
+        <input
+          ref={inputRef}
+          id={inputId}
+          className="input"
+          role="combobox"
+          aria-expanded={open}
+          aria-controls={listId}
+          aria-autocomplete="list"
+          value={q}
+          placeholder={placeholder}
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+          autoComplete="off"
+          onChange={(e) => { setQ(e.target.value); setOpen(true); setHi(0); }}
+          onFocus={() => setOpen(true)}
+          onBlur={() => { setOpen(false); if (!multiple) { setEditing(false); setQ(''); } }}
+          onKeyDown={onKey}
+        />
+      )}
+      {open && !full && (
+        <div className="combo-list" id={listId} role="listbox" onMouseDown={(e) => e.preventDefault()}>
+          {results.map((o, i) => (
+            <div key={o.id}>
+              {o.group && (i === 0 || results[i - 1].group !== o.group) && <div className="group">{o.group}</div>}
+              <button type="button" role="option" aria-selected={i === hi} data-active={i === hi} onClick={() => pick(o.id)}>
+                {o.label}
+              </button>
+            </div>
+          ))}
+          {canAdd && (
+            <button type="button" role="option" aria-selected={hi === results.length} data-active={hi === results.length} onClick={add}>
+              <Plus size={14} weight="bold" /> Add “{q.trim()}”
+            </button>
+          )}
+          {rows === 0 && <div className="no-matches">{q.trim() ? `No matches for “${q.trim()}”.` : 'Nothing left to pick.'}</div>}
+        </div>
+      )}
+      {multiple && value.length > 0 && (
+        <div className="tags" style={{ marginTop: 8 }}>
+          {value.map((vid) => (
+            <span key={vid} className={`tag berry ${byId.has(vid) ? '' : 'missing'}`}>
+              {labelOf(vid)}
+              <button type="button" aria-label={`Remove ${labelOf(vid)}`} onClick={() => onChange(value.filter((x) => x !== vid))}>
                 <X size={12} weight="bold" />
               </button>
             </span>
           ))}
         </div>
       )}
-      {!full && (
-        <div className="combo">
-          <input
-            className="input"
-            role="combobox"
-            aria-expanded={open}
-            aria-controls={listId}
-            aria-label={label}
-            placeholder={!multi && value[0] ? byId.get(value[0])?.label ?? placeholder : placeholder}
-            value={q}
-            onChange={(e) => {
-              setQ(e.target.value);
-              setOpen(true);
-              setActive(0);
-            }}
-            onFocus={() => setOpen(true)}
-            onBlur={() => setTimeout(() => setOpen(false), 150)}
-            onKeyDown={(e) => {
-              if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                setActive((a) => Math.min(a + 1, results.length - 1));
-              } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                setActive((a) => Math.max(a - 1, 0));
-              } else if (e.key === 'Enter') {
-                e.preventDefault();
-                if (results[active]) choose(results[active].id);
-                else if (canCreate) create();
-              } else if (e.key === 'Backspace' && !q && multi && value.length) {
-                onChange(value.slice(0, -1));
-              }
-            }}
-          />
-          {open && (results.length > 0 || canCreate) && (
-            <div className="combo-list" id={listId} role="listbox">
-              {results.map((o, i) => (
-                <div key={o.id}>
-                  {o.group && o.group !== results[i - 1]?.group && <div className="group">{o.group}</div>}
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={i === active}
-                    data-active={i === active}
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => choose(o.id)}
-                  >
-                    <span className="grow">{o.label}</span>
-                    {o.hint && <span className="tiny muted">{o.hint}</span>}
-                  </button>
-                </div>
-              ))}
-              {canCreate && (
-                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={create}>
-                  <Plus size={14} weight="bold" /> Add “{q.trim()}”
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-      {!multi && value[0] && (
-        <div>
-          <button type="button" className="btn ghost sm" onClick={() => onChange([])}>
-            Clear
-          </button>
-        </div>
-      )}
     </div>
   );
 }
 
-// ---------- photo picker ----------
-export function PhotoPicker({
-  value,
-  onChange,
-  label = 'Add photo',
-  height = 160,
-  width = '100%',
-  round,
-  maxSide,
-}: {
-  value?: string;
-  onChange(url: string | undefined): void;
-  label?: string;
-  height?: number | string;
-  width?: number | string;
-  round?: boolean;
-  maxSide?: number;
-}) {
-  const upload = useStore((s) => s.uploadImage);
-  const [busy, setBusy] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const onFile = async (f?: File) => {
-    if (!f) return;
-    setBusy(true);
-    try {
-      onChange(await upload(f, { maxSide }));
-    } catch (e) {
-      toast(`That photo didn’t upload: ${e instanceof Error ? e.message : 'unknown error'}`);
-    } finally {
-      setBusy(false);
-    }
-  };
+// ---------- on/off and pick-one ----------
+export function Toggle({ on, onChange, label }: { on: boolean; onChange(v: boolean): void; label: string }) {
   return (
-    <div style={{ position: 'relative', width, flexShrink: 0 }}>
-      <button
-        type="button"
-        className="photo-drop"
-        style={{ height, width: '100%', borderRadius: round ? '50%' : undefined }}
-        onClick={() => inputRef.current?.click()}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => {
-          e.preventDefault();
-          void onFile(e.dataTransfer.files[0]);
-        }}
-        aria-label={value ? 'Change photo' : label}
-      >
-        {value ? (
-          <img src={value} alt="" />
-        ) : (
-          <span className="row" style={{ gap: 6 }}>
-            <Camera size={18} weight="duotone" /> {busy ? 'Uploading…' : label}
-          </span>
-        )}
-      </button>
-      {value && (
-        <button type="button" className="btn sm icon" style={{ position: 'absolute', top: 8, right: 8 }} aria-label="Remove photo" onClick={() => onChange(undefined)}>
-          <X size={14} weight="bold" />
-        </button>
-      )}
-      <input ref={inputRef} type="file" accept="image/*" hidden onChange={(e) => void onFile(e.target.files?.[0])} />
+    <button type="button" className="toggle" aria-pressed={on} aria-label={label} onClick={() => onChange(!on)}>
+      <span />
+    </button>
+  );
+}
+export function Seg<T extends string | number>({ value, options, onChange, label }: { value: T; options: { v: T; label: string }[]; onChange(v: T): void; label: string }) {
+  return (
+    <div className="seg" role="group" aria-label={label}>
+      {options.map((o) => (
+        <button key={String(o.v)} type="button" aria-pressed={o.v === value} onClick={() => onChange(o.v)}>{o.label}</button>
+      ))}
     </div>
   );
-}
-
-/** Small "add another photo" button used in photo strips. */
-export function AddPhotoButton({ onAdd, label = 'Add photo', size = 88, maxSide }: { onAdd(url: string): void; label?: string; size?: number; maxSide?: number }) {
-  const upload = useStore((s) => s.uploadImage);
-  const ref = useRef<HTMLInputElement>(null);
-  const [busy, setBusy] = useState(false);
-  return (
-    <>
-      <button type="button" className="photo-drop" style={{ width: size, height: size, flexDirection: 'column', gap: 4 }} onClick={() => ref.current?.click()}>
-        <Plus size={18} weight="bold" />
-        <span className="tiny">{busy ? 'Uploading…' : label}</span>
-      </button>
-      <input
-        ref={ref}
-        type="file"
-        accept="image/*"
-        multiple
-        hidden
-        onChange={async (e) => {
-          const files = [...(e.target.files ?? [])];
-          e.target.value = '';
-          setBusy(true);
-          try {
-            for (const f of files) onAdd(await upload(f, { maxSide }));
-          } catch (err) {
-            toast(`That photo didn’t upload: ${err instanceof Error ? err.message : 'unknown error'}`);
-          } finally {
-            setBusy(false);
-          }
-        }}
-      />
-    </>
-  );
-}
-
-export function useDebounced<T>(value: T, ms = 150) {
-  const [v, setV] = useState(value);
-  useEffect(() => {
-    const t = setTimeout(() => setV(value), ms);
-    return () => clearTimeout(t);
-  }, [value, ms]);
-  return v;
 }

@@ -1,37 +1,19 @@
-import {
-  CalendarBlank,
-  HouseSimple,
-  MapPin,
-  Path,
-  User,
-  UsersThree,
-  type Icon,
-} from '@phosphor-icons/react';
-import type { ModuleId } from '../lib/types';
+import { CalendarBlank, HouseSimple, MapPin, Path, User, UsersThree, type Icon } from '@phosphor-icons/react';
 
 export type CategoryId = 'sims' | 'households' | 'worlds' | 'calendar' | 'clubs' | 'storylines';
 
-export interface Category {
-  id: CategoryId;
-  label: string;
-  icon: Icon;
-  path: string;
-  nudge: string;
-  module?: ModuleId; // only shown when this module is on
-}
-
-export const CATEGORIES: Category[] = [
-  { id: 'sims', label: 'Sims', icon: User, path: 'sims', nudge: 'Add your first Sim and their photo.' },
-  { id: 'households', label: 'Households', icon: HouseSimple, path: 'households', nudge: 'Group Sims into homes.' },
-  { id: 'worlds', label: 'Worlds & lots', icon: MapPin, path: 'worlds', nudge: 'Rename worlds and give every lot a job.' },
-  { id: 'calendar', label: 'Calendar', icon: CalendarBlank, path: 'calendar', nudge: 'Clear the slate and add your holidays.' },
-  { id: 'clubs', label: 'Clubs', icon: UsersThree, path: 'clubs', nudge: 'Set up clubs, roles and meeting spots.' },
-  { id: 'storylines', label: 'Storylines', icon: Path, path: 'storylines', nudge: 'Thread drama through your Sims.', module: 'storylines' },
+/** Each main section's name, icon and color. (Pages and nudge text get added as each section is built.) */
+export const CATEGORIES: { id: CategoryId; label: string; icon: Icon }[] = [
+  { id: 'sims', label: 'Sims', icon: User },
+  { id: 'households', label: 'Households', icon: HouseSimple },
+  { id: 'worlds', label: 'Worlds & lots', icon: MapPin },
+  { id: 'calendar', label: 'Calendar', icon: CalendarBlank },
+  { id: 'clubs', label: 'Clubs', icon: UsersThree },
+  { id: 'storylines', label: 'Storylines', icon: Path },
 ];
 
 export function ObjIcon({ cat, size = 'md' }: { cat: CategoryId; size?: 'md' | 'lg' }) {
-  const c = CATEGORIES.find((x) => x.id === cat)!;
-  const I = c.icon;
+  const I = CATEGORIES.find((x) => x.id === cat)!.icon;
   return (
     <span className={`obj ${cat} ${size === 'lg' ? 'lg' : ''}`} aria-hidden="true">
       <I size={size === 'lg' ? 24 : 16} weight="duotone" />

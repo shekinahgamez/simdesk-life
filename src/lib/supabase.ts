@@ -1,7 +1,6 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
+import { SUPABASE } from '../config/supabase';
 
-const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
-
-export const supabase: SupabaseClient | null = url && key ? createClient(url, key, { auth: { persistSession: true } }) : null;
-export const MEDIA_BUCKET = 'sd-media';
+export const supabase = createClient(SUPABASE.url, SUPABASE.publishableKey, {
+  auth: { flowType: 'pkce', detectSessionInUrl: true, persistSession: true, autoRefreshToken: true },
+});

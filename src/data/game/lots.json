@@ -1,0 +1,3396 @@
+[
+ {
+  "id": "brindleton-bay--bedlington-boathouse",
+  "name": "Bedlington Boathouse",
+  "world": "brindleton-bay",
+  "neighborhood": "Cavalier Cove",
+  "size": "20x20",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "brindleton-bay--chateau-frise",
+  "name": "Chateau Frise",
+  "world": "brindleton-bay",
+  "neighborhood": "Cavalier Cove",
+  "size": "40x40",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "brindleton-bay--dachschund-s-creek",
+  "name": "Dachschund's Creek",
+  "world": "brindleton-bay",
+  "neighborhood": "Cavalier Cove",
+  "size": "30x20",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "brindleton-bay--hindquarter-hideaway",
+  "name": "Hindquarter Hideaway",
+  "world": "brindleton-bay",
+  "neighborhood": "Cavalier Cove",
+  "size": "30x20",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "brindleton-bay--hound-s-head",
+  "name": "Hound's Head",
+  "world": "brindleton-bay",
+  "neighborhood": "Cavalier Cove",
+  "size": "64x64",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "brindleton-bay--deadgrass-discoveries",
+  "name": "Deadgrass Discoveries",
+  "world": "brindleton-bay",
+  "neighborhood": "Deadgrass Isle",
+  "size": "30x30",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "brindleton-bay--bridleton-pawspital",
+  "name": "Bridleton Pawspital",
+  "world": "brindleton-bay",
+  "neighborhood": "Sable Square",
+  "size": "40x30",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "brindleton-bay--domus-familiaris",
+  "name": "Domus Familiaris",
+  "world": "brindleton-bay",
+  "neighborhood": "Sable Square",
+  "size": "30x30",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "brindleton-bay--it-s-a-good-house",
+  "name": "It's A Good House",
+  "world": "brindleton-bay",
+  "neighborhood": "Sable Square",
+  "size": "40x40",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "brindleton-bay--pupperstone-park",
+  "name": "Pupperstone Park",
+  "world": "brindleton-bay",
+  "neighborhood": "Sable Square",
+  "size": "40x30",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "brindleton-bay--sporting-space",
+  "name": "Sporting Space",
+  "world": "brindleton-bay",
+  "neighborhood": "Sable Square",
+  "size": "20x20",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "brindleton-bay--catscratch-cottage",
+  "name": "Catscratch Cottage",
+  "world": "brindleton-bay",
+  "neighborhood": "Whiskerman's Wharf",
+  "size": "20x15",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "brindleton-bay--club-calico",
+  "name": "Club Calico",
+  "world": "brindleton-bay",
+  "neighborhood": "Whiskerman's Wharf",
+  "size": "40x30",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "brindleton-bay--ragdoll-refurb",
+  "name": "Ragdoll Refurb",
+  "world": "brindleton-bay",
+  "neighborhood": "Whiskerman's Wharf",
+  "size": "20x20",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "brindleton-bay--salty-paws-saloon",
+  "name": "Salty Paws Saloon",
+  "world": "brindleton-bay",
+  "neighborhood": "Whiskerman's Wharf",
+  "size": "20x15",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "brindleton-bay--tail-s-end",
+  "name": "Tail's End",
+  "world": "brindleton-bay",
+  "neighborhood": "Whiskerman's Wharf",
+  "size": "40x30",
+  "pack": "cats-and-dogs"
+ },
+ {
+  "id": "britechester--brinny-tower",
+  "name": "Brinny Tower",
+  "world": "britechester",
+  "neighborhood": "Foxbury Institute",
+  "size": "30x20",
+  "pack": "discover-university"
+ },
+ {
+  "id": "britechester--larry-s-lagoon",
+  "name": "Larry's Lagoon",
+  "world": "britechester",
+  "neighborhood": "Foxbury Institute",
+  "size": "40x30",
+  "pack": "discover-university"
+ },
+ {
+  "id": "britechester--maritime-manor",
+  "name": "Maritime Manor",
+  "world": "britechester",
+  "neighborhood": "Foxbury Institute",
+  "size": "30x20",
+  "pack": "discover-university"
+ },
+ {
+  "id": "britechester--tidal-tower",
+  "name": "Tidal Tower",
+  "world": "britechester",
+  "neighborhood": "Foxbury Institute",
+  "size": "30x20",
+  "pack": "discover-university"
+ },
+ {
+  "id": "britechester--honeydew-fields",
+  "name": "Honeydew Fields",
+  "world": "britechester",
+  "neighborhood": "Gibbs Hill",
+  "size": "20x15",
+  "pack": "discover-university"
+ },
+ {
+  "id": "britechester--laurel-library",
+  "name": "Laurel Library",
+  "world": "britechester",
+  "neighborhood": "Gibbs Hill",
+  "size": "50x40",
+  "pack": "discover-university"
+ },
+ {
+  "id": "britechester--mossy-lane",
+  "name": "Mossy Lane",
+  "world": "britechester",
+  "neighborhood": "Gibbs Hill",
+  "size": "20x15",
+  "pack": "discover-university"
+ },
+ {
+  "id": "britechester--pepper-s-pub",
+  "name": "Pepper's Pub",
+  "world": "britechester",
+  "neighborhood": "Gibbs Hill",
+  "size": "20x20",
+  "pack": "discover-university"
+ },
+ {
+  "id": "britechester--spring-steppes",
+  "name": "Spring Steppes",
+  "world": "britechester",
+  "neighborhood": "Gibbs Hill",
+  "size": "20x15",
+  "pack": "discover-university"
+ },
+ {
+  "id": "britechester--darby-s-den",
+  "name": "Darby's Den",
+  "world": "britechester",
+  "neighborhood": "University of Britechester",
+  "size": "30x20",
+  "pack": "discover-university"
+ },
+ {
+  "id": "britechester--darkwing-house",
+  "name": "Darkwing House",
+  "world": "britechester",
+  "neighborhood": "University of Britechester",
+  "size": "30x20",
+  "pack": "discover-university"
+ },
+ {
+  "id": "britechester--drake-hall",
+  "name": "Drake Hall",
+  "world": "britechester",
+  "neighborhood": "University of Britechester",
+  "size": "30x20",
+  "pack": "discover-university"
+ },
+ {
+  "id": "britechester--wyvern-hall",
+  "name": "Wyvern Hall",
+  "world": "britechester",
+  "neighborhood": "University of Britechester",
+  "size": "30x20",
+  "pack": "discover-university"
+ },
+ {
+  "id": "chestnut-ridge--big-sky-reach",
+  "name": "Big Sky Reach",
+  "world": "chestnut-ridge",
+  "neighborhood": "Galloping Gulch",
+  "size": "20x15",
+  "pack": "horse-ranch"
+ },
+ {
+  "id": "chestnut-ridge--canyon-crossing",
+  "name": "Canyon Crossing",
+  "world": "chestnut-ridge",
+  "neighborhood": "Galloping Gulch",
+  "size": "20x20",
+  "pack": "horse-ranch"
+ },
+ {
+  "id": "chestnut-ridge--palomino-junction",
+  "name": "Palomino Junction",
+  "world": "chestnut-ridge",
+  "neighborhood": "Galloping Gulch",
+  "size": "50x50",
+  "pack": "horse-ranch"
+ },
+ {
+  "id": "chestnut-ridge--champion-s-groove",
+  "name": "Champion's Groove",
+  "world": "chestnut-ridge",
+  "neighborhood": "New Appaloosa",
+  "size": "30x20",
+  "pack": "horse-ranch"
+ },
+ {
+  "id": "chestnut-ridge--duke-s-hall",
+  "name": "Duke's Hall",
+  "world": "chestnut-ridge",
+  "neighborhood": "New Appaloosa",
+  "size": "40x30",
+  "pack": "horse-ranch"
+ },
+ {
+  "id": "chestnut-ridge--the-cozy-corner-house",
+  "name": "The Cozy Corner House",
+  "world": "chestnut-ridge",
+  "neighborhood": "New Appaloosa",
+  "size": "30x20",
+  "pack": "horse-ranch"
+ },
+ {
+  "id": "chestnut-ridge--the-oak-barrel",
+  "name": "The Oak Barrel",
+  "world": "chestnut-ridge",
+  "neighborhood": "New Appaloosa",
+  "size": "30x20",
+  "pack": "horse-ranch"
+ },
+ {
+  "id": "chestnut-ridge--the-rusty-horseshoe",
+  "name": "The Rusty Horseshoe",
+  "world": "chestnut-ridge",
+  "neighborhood": "New Appaloosa",
+  "size": "30x20",
+  "pack": "horse-ranch"
+ },
+ {
+  "id": "chestnut-ridge--biscuit-s-bastion",
+  "name": "Biscuit's Bastion",
+  "world": "chestnut-ridge",
+  "neighborhood": "Riders' Glen",
+  "size": "40x30",
+  "pack": "horse-ranch"
+ },
+ {
+  "id": "chestnut-ridge--center-cottage",
+  "name": "Center Cottage",
+  "world": "chestnut-ridge",
+  "neighborhood": "Riders' Glen",
+  "size": "30x30",
+  "pack": "horse-ranch"
+ },
+ {
+  "id": "chestnut-ridge--grapevine-terrace",
+  "name": "Grapevine Terrace",
+  "world": "chestnut-ridge",
+  "neighborhood": "Riders' Glen",
+  "size": "30x20",
+  "pack": "horse-ranch"
+ },
+ {
+  "id": "chestnut-ridge--red-roan-field",
+  "name": "Red Roan Field",
+  "world": "chestnut-ridge",
+  "neighborhood": "Riders' Glen",
+  "size": "64x64",
+  "pack": "horse-ranch"
+ },
+ {
+  "id": "chestnut-ridge--sweet-nectar-glade",
+  "name": "Sweet Nectar Glade",
+  "world": "chestnut-ridge",
+  "neighborhood": "Riders' Glen",
+  "size": "30x20",
+  "pack": "horse-ranch"
+ },
+ {
+  "id": "ciudad-enamorada--la-suite-del-flechazo",
+  "name": "La Suite del Flechazo",
+  "world": "ciudad-enamorada",
+  "neighborhood": "Nuevo Corazón",
+  "size": "40x20",
+  "pack": "lovestruck"
+ },
+ {
+  "id": "ciudad-enamorada--mirador-del-amor",
+  "name": "Mirador del Amor",
+  "world": "ciudad-enamorada",
+  "neighborhood": "Nuevo Corazón",
+  "size": "30x20",
+  "pack": "lovestruck"
+ },
+ {
+  "id": "ciudad-enamorada--sudor",
+  "name": "Sudor",
+  "world": "ciudad-enamorada",
+  "neighborhood": "Nuevo Corazón",
+  "size": "30x20",
+  "pack": "lovestruck"
+ },
+ {
+  "id": "ciudad-enamorada--torres-amanecer",
+  "name": "Torres Amanecer",
+  "world": "ciudad-enamorada",
+  "neighborhood": "Nuevo Corazón",
+  "size": "20x20",
+  "pack": "lovestruck"
+ },
+ {
+  "id": "ciudad-enamorada--avenida-de-la-eternidad",
+  "name": "Avenida de la Eternidad",
+  "world": "ciudad-enamorada",
+  "neighborhood": "Plaza Mariposa",
+  "size": "30x30",
+  "pack": "lovestruck"
+ },
+ {
+  "id": "ciudad-enamorada--calle-del-ensueno",
+  "name": "Calle del Ensueño",
+  "world": "ciudad-enamorada",
+  "neighborhood": "Plaza Mariposa",
+  "size": "50x40",
+  "pack": "lovestruck"
+ },
+ {
+  "id": "ciudad-enamorada--media-naranja",
+  "name": "Media Naranja",
+  "world": "ciudad-enamorada",
+  "neighborhood": "Plaza Mariposa",
+  "size": "30x30",
+  "pack": "lovestruck"
+ },
+ {
+  "id": "ciudad-enamorada--villa-calida",
+  "name": "Villa Cálida",
+  "world": "ciudad-enamorada",
+  "neighborhood": "Plaza Mariposa",
+  "size": "30x30",
+  "pack": "lovestruck"
+ },
+ {
+  "id": "ciudad-enamorada--calle-de-la-promesa",
+  "name": "Calle de la Promesa",
+  "world": "ciudad-enamorada",
+  "neighborhood": "Vista Hermosa",
+  "size": "30x30",
+  "pack": "lovestruck"
+ },
+ {
+  "id": "ciudad-enamorada--caminito-del-deseo",
+  "name": "Caminito del Deseo",
+  "world": "ciudad-enamorada",
+  "neighborhood": "Vista Hermosa",
+  "size": "50x40",
+  "pack": "lovestruck"
+ },
+ {
+  "id": "ciudad-enamorada--casita-del-amor",
+  "name": "Casita del Amor",
+  "world": "ciudad-enamorada",
+  "neighborhood": "Vista Hermosa",
+  "size": "30x20",
+  "pack": "lovestruck"
+ },
+ {
+  "id": "ciudad-enamorada--laguna-del-abrazo",
+  "name": "Laguna del Abrazo",
+  "world": "ciudad-enamorada",
+  "neighborhood": "Vista Hermosa",
+  "size": "30x20",
+  "pack": "lovestruck"
+ },
+ {
+  "id": "ciudad-enamorada--mansion-de-la-pasion",
+  "name": "Mansión de la Pasión",
+  "world": "ciudad-enamorada",
+  "neighborhood": "Vista Hermosa",
+  "size": "30x20",
+  "pack": "lovestruck"
+ },
+ {
+  "id": "copperdale--bridge-creek-drive",
+  "name": "Bridge Creek Drive",
+  "world": "copperdale",
+  "neighborhood": "Plumbite Cove",
+  "size": "30x30",
+  "pack": "high-school-years"
+ },
+ {
+  "id": "copperdale--hillside-haven",
+  "name": "Hillside Haven",
+  "world": "copperdale",
+  "neighborhood": "Plumbite Cove",
+  "size": "30x20",
+  "pack": "high-school-years"
+ },
+ {
+  "id": "copperdale--lea-suli-point",
+  "name": "Lea Suli Point",
+  "world": "copperdale",
+  "neighborhood": "Plumbite Cove",
+  "size": "20x15",
+  "pack": "high-school-years"
+ },
+ {
+  "id": "copperdale--little-falls-nook",
+  "name": "Little Falls Nook",
+  "world": "copperdale",
+  "neighborhood": "Plumbite Cove",
+  "size": "20x20",
+  "pack": "high-school-years"
+ },
+ {
+  "id": "copperdale--totter-park",
+  "name": "Totter Park",
+  "world": "copperdale",
+  "neighborhood": "Plumbite Cove",
+  "size": "50x40",
+  "pack": "high-school-years"
+ },
+ {
+  "id": "copperdale--golden-peak",
+  "name": "Golden Peak",
+  "world": "copperdale",
+  "neighborhood": "Prescott Square",
+  "size": "30x30",
+  "pack": "high-school-years"
+ },
+ {
+  "id": "copperdale--lakeview-library",
+  "name": "Lakeview Library",
+  "world": "copperdale",
+  "neighborhood": "Prescott Square",
+  "size": "20x20",
+  "pack": "high-school-years"
+ },
+ {
+  "id": "copperdale--thrift-tea",
+  "name": "Thrift Tea",
+  "world": "copperdale",
+  "neighborhood": "Prescott Square",
+  "size": "20x15",
+  "pack": "high-school-years"
+ },
+ {
+  "id": "copperdale--town-square-terrace",
+  "name": "Town Square Terrace",
+  "world": "copperdale",
+  "neighborhood": "Prescott Square",
+  "size": "20x15",
+  "pack": "high-school-years"
+ },
+ {
+  "id": "copperdale--water-tower-way",
+  "name": "Water Tower Way",
+  "world": "copperdale",
+  "neighborhood": "Prescott Square",
+  "size": "20x15",
+  "pack": "high-school-years"
+ },
+ {
+  "id": "copperdale--auditorium",
+  "name": "Auditorium",
+  "world": "copperdale",
+  "neighborhood": "Rockridge Heights",
+  "size": "30x20",
+  "pack": "high-school-years",
+  "locked": true,
+  "lotType": "Auditorium"
+ },
+ {
+  "id": "copperdale--copperdale-high-school",
+  "name": "Copperdale High School",
+  "world": "copperdale",
+  "neighborhood": "Rockridge Heights",
+  "size": "64x64",
+  "pack": "high-school-years",
+  "locked": true,
+  "lotType": "High School"
+ },
+ {
+  "id": "del-sol-valley--studio",
+  "name": "Studio",
+  "world": "del-sol-valley",
+  "neighborhood": "Career buildings",
+  "size": "50x50",
+  "pack": "get-famous",
+  "locked": true,
+  "lotType": "Acting Studio"
+ },
+ {
+  "id": "del-sol-valley--inner-circle",
+  "name": "Inner Circle",
+  "world": "del-sol-valley",
+  "neighborhood": "Mirage Park",
+  "size": "40x30",
+  "pack": "get-famous"
+ },
+ {
+  "id": "del-sol-valley--upland-place",
+  "name": "Upland Place",
+  "world": "del-sol-valley",
+  "neighborhood": "Mirage Park",
+  "size": "40x30",
+  "pack": "get-famous"
+ },
+ {
+  "id": "del-sol-valley--vacuous-green",
+  "name": "Vacuous Green",
+  "world": "del-sol-valley",
+  "neighborhood": "Mirage Park",
+  "size": "50x40",
+  "pack": "get-famous"
+ },
+ {
+  "id": "del-sol-valley--orchid-a-go-go",
+  "name": "Orchid A Go Go",
+  "world": "del-sol-valley",
+  "neighborhood": "Starlight Boulevard",
+  "size": "30x30",
+  "pack": "get-famous"
+ },
+ {
+  "id": "del-sol-valley--pectoral-fitness",
+  "name": "Pectoral Fitness",
+  "world": "del-sol-valley",
+  "neighborhood": "Starlight Boulevard",
+  "size": "30x30",
+  "pack": "get-famous"
+ },
+ {
+  "id": "del-sol-valley--plumbob-pictures-museum",
+  "name": "Plumbob Pictures Museum",
+  "world": "del-sol-valley",
+  "neighborhood": "Starlight Boulevard",
+  "size": "40x30",
+  "pack": "get-famous"
+ },
+ {
+  "id": "del-sol-valley--studio-pbp",
+  "name": "Studio PBP",
+  "world": "del-sol-valley",
+  "neighborhood": "Starlight Boulevard",
+  "size": "40x30",
+  "pack": "get-famous"
+ },
+ {
+  "id": "del-sol-valley--ward-park",
+  "name": "Ward Park",
+  "world": "del-sol-valley",
+  "neighborhood": "Starlight Boulevard",
+  "size": "20x20",
+  "pack": "get-famous"
+ },
+ {
+  "id": "del-sol-valley--bailey-moon-manor",
+  "name": "Bailey-Moon Manor",
+  "world": "del-sol-valley",
+  "neighborhood": "The Pinnacles",
+  "size": "50x40",
+  "pack": "get-famous"
+ },
+ {
+  "id": "del-sol-valley--chateau-peak",
+  "name": "Chateau Peak",
+  "world": "del-sol-valley",
+  "neighborhood": "The Pinnacles",
+  "size": "64x64",
+  "pack": "get-famous"
+ },
+ {
+  "id": "del-sol-valley--the-ward-den",
+  "name": "The Ward Den",
+  "world": "del-sol-valley",
+  "neighborhood": "The Pinnacles",
+  "size": "50x40",
+  "pack": "get-famous"
+ },
+ {
+  "id": "evergreen-harbor--canal-corner",
+  "name": "Canal Corner",
+  "world": "evergreen-harbor",
+  "neighborhood": "Conifer Station",
+  "size": "20x15",
+  "pack": "eco-lifestyle"
+ },
+ {
+  "id": "evergreen-harbor--pigulock-manor",
+  "name": "Pigulock Manor",
+  "world": "evergreen-harbor",
+  "neighborhood": "Conifer Station",
+  "size": "30x20",
+  "pack": "eco-lifestyle"
+ },
+ {
+  "id": "evergreen-harbor--pinecrest-apartments-402",
+  "name": "Pinecrest Apartments #402",
+  "world": "evergreen-harbor",
+  "neighborhood": "Conifer Station",
+  "size": "8x12",
+  "pack": "eco-lifestyle",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "evergreen-harbor--pinecrest-apartments-404",
+  "name": "Pinecrest Apartments #404",
+  "world": "evergreen-harbor",
+  "neighborhood": "Conifer Station",
+  "size": "10x12",
+  "pack": "eco-lifestyle",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "evergreen-harbor--sprucewood-square",
+  "name": "Sprucewood Square",
+  "world": "evergreen-harbor",
+  "neighborhood": "Conifer Station",
+  "size": "40x30",
+  "pack": "eco-lifestyle"
+ },
+ {
+  "id": "evergreen-harbor--miner-mansion",
+  "name": "Miner Mansion",
+  "world": "evergreen-harbor",
+  "neighborhood": "Grims Quarry",
+  "size": "30x20",
+  "pack": "eco-lifestyle"
+ },
+ {
+  "id": "evergreen-harbor--rockridge-springs",
+  "name": "Rockridge Springs",
+  "world": "evergreen-harbor",
+  "neighborhood": "Grims Quarry",
+  "size": "30x20",
+  "pack": "eco-lifestyle"
+ },
+ {
+  "id": "evergreen-harbor--stonestreet-apartments-3",
+  "name": "Stonestreet Apartments #3",
+  "world": "evergreen-harbor",
+  "neighborhood": "Grims Quarry",
+  "size": "9x13",
+  "pack": "eco-lifestyle",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "evergreen-harbor--stonestreet-apartments-4",
+  "name": "Stonestreet Apartments #4",
+  "world": "evergreen-harbor",
+  "neighborhood": "Grims Quarry",
+  "size": "9x13",
+  "pack": "eco-lifestyle",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "evergreen-harbor--the-quarry-building",
+  "name": "The Quarry Building",
+  "world": "evergreen-harbor",
+  "neighborhood": "Grims Quarry",
+  "size": "40x30",
+  "pack": "eco-lifestyle"
+ },
+ {
+  "id": "evergreen-harbor--the-caboose",
+  "name": "The Caboose",
+  "world": "evergreen-harbor",
+  "neighborhood": "Port Promise",
+  "size": "30x20",
+  "pack": "eco-lifestyle"
+ },
+ {
+  "id": "evergreen-harbor--the-old-mill",
+  "name": "The Old Mill",
+  "world": "evergreen-harbor",
+  "neighborhood": "Port Promise",
+  "size": "30x20",
+  "pack": "eco-lifestyle"
+ },
+ {
+  "id": "evergreen-harbor--the-portsmouth-promenade",
+  "name": "The Portsmouth Promenade",
+  "world": "evergreen-harbor",
+  "neighborhood": "Port Promise",
+  "size": "30x20",
+  "pack": "eco-lifestyle"
+ },
+ {
+  "id": "evergreen-harbor--the-shipping-views",
+  "name": "The Shipping Views",
+  "world": "evergreen-harbor",
+  "neighborhood": "Port Promise",
+  "size": "30x20",
+  "pack": "eco-lifestyle"
+ },
+ {
+  "id": "evergreen-harbor--the-waterfront",
+  "name": "The Waterfront",
+  "world": "evergreen-harbor",
+  "neighborhood": "Port Promise",
+  "size": "40x30",
+  "pack": "eco-lifestyle"
+ },
+ {
+  "id": "forgotten-hollow--fledermaus-bend",
+  "name": "Fledermaus Bend",
+  "world": "forgotten-hollow",
+  "neighborhood": "Forgotten Hollow",
+  "size": "30x30",
+  "pack": "vampires"
+ },
+ {
+  "id": "forgotten-hollow--garliclauter-place",
+  "name": "Garliclauter Place",
+  "world": "forgotten-hollow",
+  "neighborhood": "Forgotten Hollow",
+  "size": "30x20",
+  "pack": "vampires"
+ },
+ {
+  "id": "forgotten-hollow--straud-mansion",
+  "name": "Straud Mansion",
+  "world": "forgotten-hollow",
+  "neighborhood": "Forgotten Hollow",
+  "size": "40x30",
+  "pack": "vampires"
+ },
+ {
+  "id": "forgotten-hollow--widowshild-townhome",
+  "name": "Widowshild Townhome",
+  "world": "forgotten-hollow",
+  "neighborhood": "Forgotten Hollow",
+  "size": "30x20",
+  "pack": "vampires"
+ },
+ {
+  "id": "forgotten-hollow--wolfsbane-manor",
+  "name": "Wolfsbane Manor",
+  "world": "forgotten-hollow",
+  "neighborhood": "Forgotten Hollow",
+  "size": "30x30",
+  "pack": "vampires"
+ },
+ {
+  "id": "gibbi-point--crystal-cottage",
+  "name": "Crystal Cottage",
+  "world": "gibbi-point",
+  "neighborhood": "Crystal Valley",
+  "size": "30x20",
+  "pack": "adventure-awaits"
+ },
+ {
+  "id": "gibbi-point--fearful-fish-lounge",
+  "name": "Fearful Fish Lounge",
+  "world": "gibbi-point",
+  "neighborhood": "Crystal Valley",
+  "size": "20x20",
+  "pack": "adventure-awaits"
+ },
+ {
+  "id": "gibbi-point--love-highland",
+  "name": "Love Highland",
+  "world": "gibbi-point",
+  "neighborhood": "Crystal Valley",
+  "size": "50x50",
+  "pack": "adventure-awaits"
+ },
+ {
+  "id": "gibbi-point--miner-s-manse",
+  "name": "Miner's Manse",
+  "world": "gibbi-point",
+  "neighborhood": "Crystal Valley",
+  "size": "30x20",
+  "pack": "adventure-awaits"
+ },
+ {
+  "id": "gibbi-point--prospector-s-paradise",
+  "name": "Prospector's Paradise",
+  "world": "gibbi-point",
+  "neighborhood": "Crystal Valley",
+  "size": "40x30",
+  "pack": "adventure-awaits"
+ },
+ {
+  "id": "gibbi-point--fletcher-s-cottage",
+  "name": "Fletcher's Cottage",
+  "world": "gibbi-point",
+  "neighborhood": "Jellyfish Junction",
+  "size": "30x20",
+  "pack": "adventure-awaits"
+ },
+ {
+  "id": "gibbi-point--jellyfish-jubilee",
+  "name": "Jellyfish Jubilee",
+  "world": "gibbi-point",
+  "neighborhood": "Jellyfish Junction",
+  "size": "40x30",
+  "pack": "adventure-awaits"
+ },
+ {
+  "id": "gibbi-point--revive-and-thrive-retreat",
+  "name": "Revive and Thrive Retreat",
+  "world": "gibbi-point",
+  "neighborhood": "Jellyfish Junction",
+  "size": "64x64",
+  "pack": "adventure-awaits"
+ },
+ {
+  "id": "gibbi-point--seabreeze-scenic",
+  "name": "Seabreeze Scenic",
+  "world": "gibbi-point",
+  "neighborhood": "Jellyfish Junction",
+  "size": "40x30",
+  "pack": "adventure-awaits"
+ },
+ {
+  "id": "gibbi-point--camp-gibbi-gibbi",
+  "name": "Camp Gibbi Gibbi",
+  "world": "gibbi-point",
+  "neighborhood": "Wanderwood Wilds",
+  "size": "50x50",
+  "pack": "adventure-awaits"
+ },
+ {
+  "id": "gibbi-point--hothead-rock-hideaway",
+  "name": "Hothead Rock Hideaway",
+  "world": "gibbi-point",
+  "neighborhood": "Wanderwood Wilds",
+  "size": "64x64",
+  "pack": "adventure-awaits"
+ },
+ {
+  "id": "gibbi-point--plumbird-park",
+  "name": "Plumbird Park",
+  "world": "gibbi-point",
+  "neighborhood": "Wanderwood Wilds",
+  "size": "40x40",
+  "pack": "adventure-awaits"
+ },
+ {
+  "id": "gibbi-point--wanderwood-wonder",
+  "name": "Wanderwood Wonder",
+  "world": "gibbi-point",
+  "neighborhood": "Wanderwood Wilds",
+  "size": "30x20",
+  "pack": "adventure-awaits"
+ },
+ {
+  "id": "glimmerbrook--brooks-bridge-borough",
+  "name": "Brooks Bridge Borough",
+  "world": "glimmerbrook",
+  "neighborhood": "Glimmerbrook Village",
+  "size": "30x20",
+  "pack": "realm-of-magic"
+ },
+ {
+  "id": "glimmerbrook--creek-side-corner",
+  "name": "Creek Side Corner",
+  "world": "glimmerbrook",
+  "neighborhood": "Glimmerbrook Village",
+  "size": "30x20",
+  "pack": "realm-of-magic"
+ },
+ {
+  "id": "glimmerbrook--elixirs-and-brews",
+  "name": "Elixirs and Brews",
+  "world": "glimmerbrook",
+  "neighborhood": "Glimmerbrook Village",
+  "size": "30x20",
+  "pack": "realm-of-magic"
+ },
+ {
+  "id": "glimmerbrook--glimmerbrook-watch",
+  "name": "Glimmerbrook Watch",
+  "world": "glimmerbrook",
+  "neighborhood": "Glimmerbrook Village",
+  "size": "30x20",
+  "pack": "realm-of-magic"
+ },
+ {
+  "id": "glimmerbrook--rock-ridge-canyon",
+  "name": "Rock Ridge Canyon",
+  "world": "glimmerbrook",
+  "neighborhood": "Glimmerbrook Village",
+  "size": "40x30",
+  "pack": "realm-of-magic"
+ },
+ {
+  "id": "glimmerbrook--the-magic-realm",
+  "name": "The Magic Realm",
+  "world": "glimmerbrook",
+  "neighborhood": "Secret lots",
+  "size": "50x40",
+  "pack": "realm-of-magic",
+  "locked": true,
+  "lotType": "The Magic Realm",
+  "secret": true
+ },
+ {
+  "id": "granite-falls--campground",
+  "name": "Campground",
+  "world": "granite-falls",
+  "neighborhood": "Campground",
+  "size": "30x20",
+  "pack": "outdoor-retreat"
+ },
+ {
+  "id": "granite-falls--forest-hideaway",
+  "name": "Forest Hideaway",
+  "world": "granite-falls",
+  "neighborhood": "Campground",
+  "size": "40x30",
+  "pack": "outdoor-retreat"
+ },
+ {
+  "id": "granite-falls--green-getaway",
+  "name": "Green Getaway",
+  "world": "granite-falls",
+  "neighborhood": "Campground",
+  "size": "30x20",
+  "pack": "outdoor-retreat"
+ },
+ {
+  "id": "granite-falls--lakeside-retreat",
+  "name": "Lakeside Retreat",
+  "world": "granite-falls",
+  "neighborhood": "Campground",
+  "size": "40x30",
+  "pack": "outdoor-retreat"
+ },
+ {
+  "id": "granite-falls--riverside-retreat",
+  "name": "Riverside Retreat",
+  "world": "granite-falls",
+  "neighborhood": "Campground",
+  "size": "30x20",
+  "pack": "outdoor-retreat"
+ },
+ {
+  "id": "granite-falls--granite-falls-forest",
+  "name": "Granite Falls Forest",
+  "world": "granite-falls",
+  "neighborhood": "Granite Falls Forest",
+  "size": "50x50",
+  "pack": "outdoor-retreat"
+ },
+ {
+  "id": "granite-falls--hermit-s-cottage",
+  "name": "Hermit's Cottage",
+  "world": "granite-falls",
+  "neighborhood": "Secret lots",
+  "size": "30x20",
+  "pack": "outdoor-retreat",
+  "locked": true,
+  "lotType": "Hermit's Hut",
+  "secret": true
+ },
+ {
+  "id": "henford-on-bagley--1-cobblebottom-street",
+  "name": "1 Cobblebottom Street",
+  "world": "henford-on-bagley",
+  "neighborhood": "Finchwick",
+  "size": "20x15",
+  "pack": "cottage-living"
+ },
+ {
+  "id": "henford-on-bagley--3-cobblebottom-street",
+  "name": "3 Cobblebottom Street",
+  "world": "henford-on-bagley",
+  "neighborhood": "Finchwick",
+  "size": "20x20",
+  "pack": "cottage-living"
+ },
+ {
+  "id": "henford-on-bagley--5-cobblebottom-street",
+  "name": "5 Cobblebottom Street",
+  "world": "henford-on-bagley",
+  "neighborhood": "Finchwick",
+  "size": "30x20",
+  "pack": "cottage-living"
+ },
+ {
+  "id": "henford-on-bagley--the-gnome-s-arms",
+  "name": "The Gnome's Arms",
+  "world": "henford-on-bagley",
+  "neighborhood": "Finchwick",
+  "size": "20x15",
+  "pack": "cottage-living"
+ },
+ {
+  "id": "henford-on-bagley--2-olde-mill-lane",
+  "name": "2 Olde Mill Lane",
+  "world": "henford-on-bagley",
+  "neighborhood": "Old New Henford",
+  "size": "50x40",
+  "pack": "cottage-living"
+ },
+ {
+  "id": "henford-on-bagley--3-olde-mill-lane",
+  "name": "3 Olde Mill Lane",
+  "world": "henford-on-bagley",
+  "neighborhood": "Old New Henford",
+  "size": "50x40",
+  "pack": "cottage-living"
+ },
+ {
+  "id": "henford-on-bagley--4-olde-mill-lane",
+  "name": "4 Olde Mill Lane",
+  "world": "henford-on-bagley",
+  "neighborhood": "Old New Henford",
+  "size": "30x20",
+  "pack": "cottage-living"
+ },
+ {
+  "id": "henford-on-bagley--olde-mill-hill",
+  "name": "Olde Mill Hill",
+  "world": "henford-on-bagley",
+  "neighborhood": "Old New Henford",
+  "size": "64x64",
+  "pack": "cottage-living"
+ },
+ {
+  "id": "henford-on-bagley--13-nettle-lane",
+  "name": "13 Nettle Lane",
+  "world": "henford-on-bagley",
+  "neighborhood": "The Bramblewood",
+  "size": "30x20",
+  "pack": "cottage-living"
+ },
+ {
+  "id": "henford-on-bagley--14-nettle-lane",
+  "name": "14 Nettle Lane",
+  "world": "henford-on-bagley",
+  "neighborhood": "The Bramblewood",
+  "size": "40x30",
+  "pack": "cottage-living"
+ },
+ {
+  "id": "henford-on-bagley--cordelia-s-secret-cottage",
+  "name": "Cordelia's Secret Cottage",
+  "world": "henford-on-bagley",
+  "neighborhood": "The Bramblewood",
+  "size": "30x20",
+  "pack": "cottage-living"
+ },
+ {
+  "id": "henford-on-bagley--isle-of-volpe-park",
+  "name": "Isle of Volpe Park",
+  "world": "henford-on-bagley",
+  "neighborhood": "The Bramblewood",
+  "size": "50x40",
+  "pack": "cottage-living"
+ },
+ {
+  "id": "innisgreen--1-mari-shores-road",
+  "name": "1 Mari Shores Road",
+  "world": "innisgreen",
+  "neighborhood": "Coast of Adhmor",
+  "size": "30x20",
+  "pack": "enchanted-by-nature"
+ },
+ {
+  "id": "innisgreen--42-normfair-drive",
+  "name": "42 Normfair Drive",
+  "world": "innisgreen",
+  "neighborhood": "Coast of Adhmor",
+  "size": "40x30",
+  "pack": "enchanted-by-nature"
+ },
+ {
+  "id": "innisgreen--8-gnome-coast-street",
+  "name": "8 Gnome Coast Street",
+  "world": "innisgreen",
+  "neighborhood": "Coast of Adhmor",
+  "size": "30x20",
+  "pack": "enchanted-by-nature"
+ },
+ {
+  "id": "innisgreen--the-gnom-exhibit",
+  "name": "The GNOM Exhibit",
+  "world": "innisgreen",
+  "neighborhood": "Coast of Adhmor",
+  "size": "40x30",
+  "pack": "enchanted-by-nature"
+ },
+ {
+  "id": "innisgreen--bard-boulevard",
+  "name": "Bard Boulevard",
+  "world": "innisgreen",
+  "neighborhood": "Everdew",
+  "size": "30x20",
+  "pack": "enchanted-by-nature"
+ },
+ {
+  "id": "innisgreen--crannamor-residential",
+  "name": "Crannamor Residential",
+  "world": "innisgreen",
+  "neighborhood": "Everdew",
+  "size": "20x20",
+  "pack": "enchanted-by-nature"
+ },
+ {
+  "id": "innisgreen--puckitt-hall",
+  "name": "Puckitt Hall",
+  "world": "innisgreen",
+  "neighborhood": "Everdew",
+  "size": "50x50",
+  "pack": "enchanted-by-nature"
+ },
+ {
+  "id": "innisgreen--starsong-lounge",
+  "name": "Starsong Lounge",
+  "world": "innisgreen",
+  "neighborhood": "Everdew",
+  "size": "30x30",
+  "pack": "enchanted-by-nature"
+ },
+ {
+  "id": "innisgreen--the-watering-hole",
+  "name": "The Watering Hole",
+  "world": "innisgreen",
+  "neighborhood": "Everdew",
+  "size": "40x30",
+  "pack": "enchanted-by-nature"
+ },
+ {
+  "id": "innisgreen--fern-and-frond-wading-pond",
+  "name": "Fern & Frond Wading Pond",
+  "world": "innisgreen",
+  "neighborhood": "Sprucederry Grove",
+  "size": "64x64",
+  "pack": "enchanted-by-nature"
+ },
+ {
+  "id": "innisgreen--gimmley-gardensbrook",
+  "name": "Gimmley Gardensbrook",
+  "world": "innisgreen",
+  "neighborhood": "Sprucederry Grove",
+  "size": "30x30",
+  "pack": "enchanted-by-nature"
+ },
+ {
+  "id": "innisgreen--greenwood-hamlet-residence",
+  "name": "Greenwood Hamlet Residence",
+  "world": "innisgreen",
+  "neighborhood": "Sprucederry Grove",
+  "size": "30x20",
+  "pack": "enchanted-by-nature"
+ },
+ {
+  "id": "innisgreen--gringle-s",
+  "name": "Gringle's",
+  "world": "innisgreen",
+  "neighborhood": "Sprucederry Grove",
+  "size": "30x30",
+  "pack": "enchanted-by-nature"
+ },
+ {
+  "id": "innisgreen--whistling-thistle-gardens",
+  "name": "Whistling Thistle Gardens",
+  "world": "innisgreen",
+  "neighborhood": "Sprucederry Grove",
+  "size": "40x30",
+  "pack": "enchanted-by-nature"
+ },
+ {
+  "id": "magnolia-promenade--futuresim-labs",
+  "name": "FutureSim Labs",
+  "world": "magnolia-promenade",
+  "neighborhood": "Career buildings",
+  "size": "50x50",
+  "pack": "get-to-work",
+  "locked": true,
+  "lotType": "FutureSim Labs"
+ },
+ {
+  "id": "magnolia-promenade--police-station",
+  "name": "Police Station",
+  "world": "magnolia-promenade",
+  "neighborhood": "Career buildings",
+  "size": "40x30",
+  "pack": "get-to-work",
+  "locked": true,
+  "lotType": "Police Station"
+ },
+ {
+  "id": "magnolia-promenade--sixam",
+  "name": "Sixam",
+  "world": "magnolia-promenade",
+  "neighborhood": "Secret lots",
+  "size": "20x20",
+  "pack": "get-to-work",
+  "locked": true,
+  "lotType": "Alien Party Lot",
+  "secret": true
+ },
+ {
+  "id": "magnolia-promenade--willow-creek-hospital",
+  "name": "Willow Creek Hospital",
+  "world": "magnolia-promenade",
+  "neighborhood": "Career buildings",
+  "size": "50x50",
+  "pack": "get-to-work",
+  "locked": true,
+  "lotType": "Hospital"
+ },
+ {
+  "id": "magnolia-promenade--jfands-clothiers",
+  "name": "JF&S Clothiers",
+  "world": "magnolia-promenade",
+  "neighborhood": "Magnolia Promenade",
+  "size": "20x20",
+  "pack": "get-to-work"
+ },
+ {
+  "id": "magnolia-promenade--paddywack-s-emporium",
+  "name": "Paddywack's Emporium",
+  "world": "magnolia-promenade",
+  "neighborhood": "Magnolia Promenade",
+  "size": "20x20",
+  "pack": "get-to-work"
+ },
+ {
+  "id": "magnolia-promenade--preeminent-domain",
+  "name": "Preeminent Domain",
+  "world": "magnolia-promenade",
+  "neighborhood": "Magnolia Promenade",
+  "size": "30x20",
+  "pack": "get-to-work"
+ },
+ {
+  "id": "magnolia-promenade--the-roadstead",
+  "name": "The Roadstead",
+  "world": "magnolia-promenade",
+  "neighborhood": "Magnolia Promenade",
+  "size": "40x30",
+  "pack": "get-to-work"
+ },
+ {
+  "id": "moonwood-mill--new-moon-shack",
+  "name": "New Moon Shack",
+  "world": "moonwood-mill",
+  "neighborhood": "Moonwood Mill",
+  "size": "20x15",
+  "pack": "werewolves"
+ },
+ {
+  "id": "moonwood-mill--prowler-s-patch",
+  "name": "Prowler's Patch",
+  "world": "moonwood-mill",
+  "neighborhood": "Moonwood Mill",
+  "size": "30x30",
+  "pack": "werewolves"
+ },
+ {
+  "id": "moonwood-mill--the-collective-cabin",
+  "name": "The Collective Cabin",
+  "world": "moonwood-mill",
+  "neighborhood": "Moonwood Mill",
+  "size": "40x30",
+  "pack": "werewolves"
+ },
+ {
+  "id": "moonwood-mill--the-grimtooth-bar-and-bunker",
+  "name": "The Grimtooth Bar & Bunker",
+  "world": "moonwood-mill",
+  "neighborhood": "Moonwood Mill",
+  "size": "50x40",
+  "pack": "werewolves"
+ },
+ {
+  "id": "moonwood-mill--the-moonwood-mill-library",
+  "name": "The Moonwood Mill Library",
+  "world": "moonwood-mill",
+  "neighborhood": "Moonwood Mill",
+  "size": "40x30",
+  "pack": "werewolves"
+ },
+ {
+  "id": "mt-komorebi--mt-komorebi-peak",
+  "name": "Mt. Komorebi Peak",
+  "world": "mt-komorebi",
+  "neighborhood": "Secret lots",
+  "size": "20x20",
+  "pack": "snowy-escape",
+  "locked": true,
+  "lotType": "Mount Komorebi Summit",
+  "secret": true
+ },
+ {
+  "id": "mt-komorebi--5-3-1-shinrinyoku",
+  "name": "5-3-1 Shinrinyoku",
+  "world": "mt-komorebi",
+  "neighborhood": "Senbamachi",
+  "size": "30x20",
+  "pack": "snowy-escape"
+ },
+ {
+  "id": "mt-komorebi--5-6-1-shinrinyoku",
+  "name": "5-6-1 Shinrinyoku",
+  "world": "mt-komorebi",
+  "neighborhood": "Senbamachi",
+  "size": "20x15",
+  "pack": "snowy-escape"
+ },
+ {
+  "id": "mt-komorebi--6-4-1-hanamigawa",
+  "name": "6-4-1 Hanamigawa",
+  "world": "mt-komorebi",
+  "neighborhood": "Senbamachi",
+  "size": "20x15",
+  "pack": "snowy-escape"
+ },
+ {
+  "id": "mt-komorebi--hanamigawa-koen",
+  "name": "Hanamigawa Koen",
+  "world": "mt-komorebi",
+  "neighborhood": "Senbamachi",
+  "size": "30x20",
+  "pack": "snowy-escape"
+ },
+ {
+  "id": "mt-komorebi--izakaya-ippai",
+  "name": "Izakaya Ippai",
+  "world": "mt-komorebi",
+  "neighborhood": "Senbamachi",
+  "size": "30x20",
+  "pack": "snowy-escape"
+ },
+ {
+  "id": "mt-komorebi--2-4-1-wakabamori",
+  "name": "2-4-1 Wakabamori",
+  "world": "mt-komorebi",
+  "neighborhood": "Wakaba",
+  "size": "20x15",
+  "pack": "snowy-escape"
+ },
+ {
+  "id": "mt-komorebi--2-4-2-wakabamori",
+  "name": "2-4-2 Wakabamori",
+  "world": "mt-komorebi",
+  "neighborhood": "Wakaba",
+  "size": "30x20",
+  "pack": "snowy-escape"
+ },
+ {
+  "id": "mt-komorebi--2-4-3-wakabamori",
+  "name": "2-4-3 Wakabamori",
+  "world": "mt-komorebi",
+  "neighborhood": "Wakaba",
+  "size": "20x15",
+  "pack": "snowy-escape"
+ },
+ {
+  "id": "mt-komorebi--2-5-1-wakabamori",
+  "name": "2-5-1 Wakabamori",
+  "world": "mt-komorebi",
+  "neighborhood": "Wakaba",
+  "size": "50x50",
+  "pack": "snowy-escape"
+ },
+ {
+  "id": "mt-komorebi--hazakura-lounge",
+  "name": "Hazakura Lounge",
+  "world": "mt-komorebi",
+  "neighborhood": "Wakaba",
+  "size": "30x20",
+  "pack": "snowy-escape"
+ },
+ {
+  "id": "mt-komorebi--5-1-1-kiyomatsu",
+  "name": "5-1-1 Kiyomatsu",
+  "world": "mt-komorebi",
+  "neighborhood": "Yukimatsu",
+  "size": "30x20",
+  "pack": "snowy-escape"
+ },
+ {
+  "id": "mt-komorebi--5-1-2-kiyomatsu",
+  "name": "5-1-2 Kiyomatsu",
+  "world": "mt-komorebi",
+  "neighborhood": "Yukimatsu",
+  "size": "30x20",
+  "pack": "snowy-escape"
+ },
+ {
+  "id": "mt-komorebi--kiyomatsu-point",
+  "name": "Kiyomatsu Point",
+  "world": "mt-komorebi",
+  "neighborhood": "Yukimatsu",
+  "size": "50x50",
+  "pack": "snowy-escape"
+ },
+ {
+  "id": "mt-komorebi--sutefani-onsen-bathhouse",
+  "name": "Sutefani Onsen Bathhouse",
+  "world": "mt-komorebi",
+  "neighborhood": "Yukimatsu",
+  "size": "30x20",
+  "pack": "snowy-escape"
+ },
+ {
+  "id": "newcrest--beech-byway",
+  "name": "Beech Byway",
+  "world": "newcrest",
+  "neighborhood": "Bridgeview",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "newcrest--comfy-cubby",
+  "name": "Comfy Cubby",
+  "world": "newcrest",
+  "neighborhood": "Bridgeview",
+  "size": "20x15",
+  "pack": "base-game"
+ },
+ {
+  "id": "newcrest--fern-park",
+  "name": "Fern Park",
+  "world": "newcrest",
+  "neighborhood": "Bridgeview",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "newcrest--midtown-meadows",
+  "name": "Midtown Meadows",
+  "world": "newcrest",
+  "neighborhood": "Bridgeview",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "newcrest--oak-alcove",
+  "name": "Oak Alcove",
+  "world": "newcrest",
+  "neighborhood": "Bridgeview",
+  "size": "20x15",
+  "pack": "base-game"
+ },
+ {
+  "id": "newcrest--asphalt-abodes",
+  "name": "Asphalt Abodes",
+  "world": "newcrest",
+  "neighborhood": "Llama Lagoon",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "newcrest--avarice-acres",
+  "name": "Avarice Acres",
+  "world": "newcrest",
+  "neighborhood": "Llama Lagoon",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "newcrest--rippling-flats",
+  "name": "Rippling Flats",
+  "world": "newcrest",
+  "neighborhood": "Llama Lagoon",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "newcrest--tranquil-crescent",
+  "name": "Tranquil Crescent",
+  "world": "newcrest",
+  "neighborhood": "Llama Lagoon",
+  "size": "30x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "newcrest--twin-oracle-point",
+  "name": "Twin Oracle Point",
+  "world": "newcrest",
+  "neighborhood": "Llama Lagoon",
+  "size": "50x40",
+  "pack": "base-game"
+ },
+ {
+  "id": "newcrest--civic-cliffs",
+  "name": "Civic Cliffs",
+  "world": "newcrest",
+  "neighborhood": "Ridgeline Drive",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "newcrest--cookout-lookout",
+  "name": "Cookout Lookout",
+  "world": "newcrest",
+  "neighborhood": "Ridgeline Drive",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "newcrest--hillside-highlands",
+  "name": "Hillside Highlands",
+  "world": "newcrest",
+  "neighborhood": "Ridgeline Drive",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "newcrest--optimist-s-outlook",
+  "name": "Optimist's Outlook",
+  "world": "newcrest",
+  "neighborhood": "Ridgeline Drive",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "newcrest--sandy-run",
+  "name": "Sandy Run",
+  "world": "newcrest",
+  "neighborhood": "Ridgeline Drive",
+  "size": "40x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "nordhaven--comfortably-canalside",
+  "name": "Comfortably Canalside",
+  "world": "nordhaven",
+  "neighborhood": "Gammelvik",
+  "size": "20x20",
+  "pack": "businesses-and-hobbies"
+ },
+ {
+  "id": "nordhaven--fisher-s-horizon",
+  "name": "Fisher's Horizon",
+  "world": "nordhaven",
+  "neighborhood": "Gammelvik",
+  "size": "30x20",
+  "pack": "businesses-and-hobbies"
+ },
+ {
+  "id": "nordhaven--koffieboon",
+  "name": "Koffieboon",
+  "world": "nordhaven",
+  "neighborhood": "Gammelvik",
+  "size": "20x20",
+  "pack": "businesses-and-hobbies"
+ },
+ {
+  "id": "nordhaven--konst-modern",
+  "name": "Konst Modern",
+  "world": "nordhaven",
+  "neighborhood": "Gammelvik",
+  "size": "50x40",
+  "pack": "businesses-and-hobbies"
+ },
+ {
+  "id": "nordhaven--old-torget-house",
+  "name": "Old Torget House",
+  "world": "nordhaven",
+  "neighborhood": "Gammelvik",
+  "size": "20x15",
+  "pack": "businesses-and-hobbies"
+ },
+ {
+  "id": "nordhaven--the-rouge-note",
+  "name": "The Rouge Note",
+  "world": "nordhaven",
+  "neighborhood": "Gammelvik",
+  "size": "20x20",
+  "pack": "businesses-and-hobbies"
+ },
+ {
+  "id": "nordhaven--inked-inlet",
+  "name": "Inked Inlet",
+  "world": "nordhaven",
+  "neighborhood": "Iverstad",
+  "size": "20x20",
+  "pack": "businesses-and-hobbies"
+ },
+ {
+  "id": "nordhaven--lighthouse-lookout",
+  "name": "Lighthouse Lookout",
+  "world": "nordhaven",
+  "neighborhood": "Iverstad",
+  "size": "50x40",
+  "pack": "businesses-and-hobbies"
+ },
+ {
+  "id": "nordhaven--new-harbor-park",
+  "name": "New Harbor Park",
+  "world": "nordhaven",
+  "neighborhood": "Iverstad",
+  "size": "50x40",
+  "pack": "businesses-and-hobbies"
+ },
+ {
+  "id": "nordhaven--spilled-neon",
+  "name": "Spilled Neon",
+  "world": "nordhaven",
+  "neighborhood": "Iverstad",
+  "size": "20x20",
+  "pack": "businesses-and-hobbies"
+ },
+ {
+  "id": "nordhaven--terra-potta",
+  "name": "Terra-Potta",
+  "world": "nordhaven",
+  "neighborhood": "Iverstad",
+  "size": "30x20",
+  "pack": "businesses-and-hobbies"
+ },
+ {
+  "id": "nordhaven--the-old-foundry",
+  "name": "The Old Foundry",
+  "world": "nordhaven",
+  "neighborhood": "Iverstad",
+  "size": "20x15",
+  "pack": "businesses-and-hobbies"
+ },
+ {
+  "id": "oasis-springs--affluista-mansion",
+  "name": "Affluista Mansion",
+  "world": "oasis-springs",
+  "neighborhood": "Acquisition Butte",
+  "size": "50x50",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--yuma-heights",
+  "name": "Yuma Heights",
+  "world": "oasis-springs",
+  "neighborhood": "Acquisition Butte",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--agave-abode",
+  "name": "Agave Abode",
+  "world": "oasis-springs",
+  "neighborhood": "Bedrock Strait",
+  "size": "20x15",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--nookstone",
+  "name": "Nookstone",
+  "world": "oasis-springs",
+  "neighborhood": "Bedrock Strait",
+  "size": "20x15",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--pebble-burrow",
+  "name": "Pebble Burrow",
+  "world": "oasis-springs",
+  "neighborhood": "Bedrock Strait",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--slipshod-mesquite",
+  "name": "Slipshod Mesquite",
+  "world": "oasis-springs",
+  "neighborhood": "Bedrock Strait",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--soundtrap-flat",
+  "name": "Soundtrap Flat",
+  "world": "oasis-springs",
+  "neighborhood": "Bedrock Strait",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--desert-bloom-park",
+  "name": "Desert Bloom Park",
+  "world": "oasis-springs",
+  "neighborhood": "Desert Bloom Park",
+  "size": "50x50",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--burners-and-builders",
+  "name": "Burners & Builders",
+  "world": "oasis-springs",
+  "neighborhood": "Mirage Canyon",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--rattlesnake-juice",
+  "name": "Rattlesnake Juice",
+  "world": "oasis-springs",
+  "neighborhood": "Mirage Canyon",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--the-futures-past",
+  "name": "The Futures Past",
+  "world": "oasis-springs",
+  "neighborhood": "Mirage Canyon",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--the-solar-flare",
+  "name": "The Solar Flare",
+  "world": "oasis-springs",
+  "neighborhood": "Mirage Canyon",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--cacti-casa",
+  "name": "Cacti Casa",
+  "world": "oasis-springs",
+  "neighborhood": "Parched Prospect",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--dusty-turf",
+  "name": "Dusty Turf",
+  "world": "oasis-springs",
+  "neighborhood": "Parched Prospect",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--rafia-quinta",
+  "name": "Rafia Quinta",
+  "world": "oasis-springs",
+  "neighborhood": "Parched Prospect",
+  "size": "20x15",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--springscape",
+  "name": "Springscape",
+  "world": "oasis-springs",
+  "neighborhood": "Parched Prospect",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--vista-quarry",
+  "name": "Vista Quarry",
+  "world": "oasis-springs",
+  "neighborhood": "Parched Prospect",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--forgotten-grotto",
+  "name": "Forgotten Grotto",
+  "world": "oasis-springs",
+  "neighborhood": "Oasis Springs",
+  "size": "15x10",
+  "pack": "base-game",
+  "locked": true,
+  "lotType": "Secret Lot",
+  "secret": true
+ },
+ {
+  "id": "oasis-springs--arid-ridge",
+  "name": "Arid Ridge",
+  "world": "oasis-springs",
+  "neighborhood": "Skyward Palms",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--granada-place",
+  "name": "Granada Place",
+  "world": "oasis-springs",
+  "neighborhood": "Skyward Palms",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--rio-verde",
+  "name": "Rio Verde",
+  "world": "oasis-springs",
+  "neighborhood": "Skyward Palms",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "oasis-springs--sultry-springside",
+  "name": "Sultry Springside",
+  "world": "oasis-springs",
+  "neighborhood": "Skyward Palms",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "ondarion--12-lakeview-apartments",
+  "name": "12 Lakeview Apartments",
+  "world": "ondarion",
+  "neighborhood": "Bellacorde",
+  "size": "",
+  "pack": "royalty-and-legacy",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "ondarion--13-lakeview-apartments",
+  "name": "13 Lakeview Apartments",
+  "world": "ondarion",
+  "neighborhood": "Bellacorde",
+  "size": "",
+  "pack": "royalty-and-legacy",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "ondarion--bellacorde-palace",
+  "name": "Bellacorde Palace",
+  "world": "ondarion",
+  "neighborhood": "Bellacorde",
+  "size": "50x50",
+  "pack": "royalty-and-legacy"
+ },
+ {
+  "id": "ondarion--giardino-del-grandioso",
+  "name": "Giardino Del Grandioso",
+  "world": "ondarion",
+  "neighborhood": "Bellacorde",
+  "size": "64x64",
+  "pack": "royalty-and-legacy"
+ },
+ {
+  "id": "ondarion--la-vivace",
+  "name": "La Vivace",
+  "world": "ondarion",
+  "neighborhood": "Bellacorde",
+  "size": "40x30",
+  "pack": "royalty-and-legacy"
+ },
+ {
+  "id": "ondarion--renaissance-road",
+  "name": "Renaissance Road",
+  "world": "ondarion",
+  "neighborhood": "Bellacorde",
+  "size": "20x15",
+  "pack": "royalty-and-legacy"
+ },
+ {
+  "id": "ondarion--17-bright-cliff",
+  "name": "17 Bright Cliff",
+  "world": "ondarion",
+  "neighborhood": "Dambele",
+  "size": "",
+  "pack": "royalty-and-legacy",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "ondarion--18-bright-cliff",
+  "name": "18 Bright Cliff",
+  "world": "ondarion",
+  "neighborhood": "Dambele",
+  "size": "",
+  "pack": "royalty-and-legacy",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "ondarion--dambele-palace",
+  "name": "Dambele Palace",
+  "world": "ondarion",
+  "neighborhood": "Dambele",
+  "size": "50x50",
+  "pack": "royalty-and-legacy"
+ },
+ {
+  "id": "ondarion--hardcover",
+  "name": "Hardcover",
+  "world": "ondarion",
+  "neighborhood": "Dambele",
+  "size": "20x20",
+  "pack": "royalty-and-legacy",
+  "locked": true,
+  "lotType": "Backroom"
+ },
+ {
+  "id": "ondarion--sankofa-residence",
+  "name": "Sankofa Residence",
+  "world": "ondarion",
+  "neighborhood": "Dambele",
+  "size": "30x20",
+  "pack": "royalty-and-legacy"
+ },
+ {
+  "id": "ondarion--zanbira-market",
+  "name": "Zanbira Market",
+  "world": "ondarion",
+  "neighborhood": "Dambele",
+  "size": "30x20",
+  "pack": "royalty-and-legacy"
+ },
+ {
+  "id": "ondarion--abrantes-estate",
+  "name": "Abrantes Estate",
+  "world": "ondarion",
+  "neighborhood": "Verdemar",
+  "size": "30x30",
+  "pack": "royalty-and-legacy"
+ },
+ {
+  "id": "ondarion--casa-do-corsario",
+  "name": "Casa Do Corsário",
+  "world": "ondarion",
+  "neighborhood": "Verdemar",
+  "size": "20x15",
+  "pack": "royalty-and-legacy"
+ },
+ {
+  "id": "ondarion--fisherman-s-hut",
+  "name": "Fisherman's Hut",
+  "world": "ondarion",
+  "neighborhood": "Verdemar",
+  "size": "20x20",
+  "pack": "royalty-and-legacy"
+ },
+ {
+  "id": "ondarion--the-lair-in-the-open-air",
+  "name": "The Lair in the Open-Air",
+  "world": "ondarion",
+  "neighborhood": "Verdemar",
+  "size": "30x20",
+  "pack": "royalty-and-legacy"
+ },
+ {
+  "id": "ondarion--verdemar-palace",
+  "name": "Verdemar Palace",
+  "world": "ondarion",
+  "neighborhood": "Verdemar",
+  "size": "50x50",
+  "pack": "royalty-and-legacy"
+ },
+ {
+  "id": "ondarion--ye-olde-voyager",
+  "name": "Ye Olde Voyager",
+  "world": "ondarion",
+  "neighborhood": "Verdemar",
+  "size": "30x20",
+  "pack": "royalty-and-legacy"
+ },
+ {
+  "id": "ravenwood--crow-s-perch",
+  "name": "Crow's Perch",
+  "world": "ravenwood",
+  "neighborhood": "Crow's Crossing",
+  "size": "30x30",
+  "pack": "life-and-death"
+ },
+ {
+  "id": "ravenwood--eternal-hollow",
+  "name": "Eternal Hollow",
+  "world": "ravenwood",
+  "neighborhood": "Crow's Crossing",
+  "size": "64x64",
+  "pack": "life-and-death"
+ },
+ {
+  "id": "ravenwood--moppy-manor",
+  "name": "Moppy Manor",
+  "world": "ravenwood",
+  "neighborhood": "Crow's Crossing",
+  "size": "30x20",
+  "pack": "life-and-death"
+ },
+ {
+  "id": "ravenwood--old-ravenwood-estate",
+  "name": "Old Ravenwood Estate",
+  "world": "ravenwood",
+  "neighborhood": "Crow's Crossing",
+  "size": "50x50",
+  "pack": "life-and-death"
+ },
+ {
+  "id": "ravenwood--specter-family-manor",
+  "name": "Specter Family Manor",
+  "world": "ravenwood",
+  "neighborhood": "Crow's Crossing",
+  "size": "30x20",
+  "pack": "life-and-death"
+ },
+ {
+  "id": "ravenwood--netherworld-department-of-death",
+  "name": "Netherworld Department of Death",
+  "world": "ravenwood",
+  "neighborhood": "Secret lots",
+  "size": "20x20",
+  "pack": "life-and-death",
+  "locked": true,
+  "lotType": "Headless Quarter",
+  "secret": true
+ },
+ {
+  "id": "ravenwood--club-eternity",
+  "name": "Club Eternity",
+  "world": "ravenwood",
+  "neighborhood": "Mourningvale",
+  "size": "30x30",
+  "pack": "life-and-death"
+ },
+ {
+  "id": "ravenwood--mourning-mist-manor",
+  "name": "Mourning Mist Manor",
+  "world": "ravenwood",
+  "neighborhood": "Mourningvale",
+  "size": "20x20",
+  "pack": "life-and-death"
+ },
+ {
+  "id": "ravenwood--mystic-crossroads",
+  "name": "Mystic Crossroads",
+  "world": "ravenwood",
+  "neighborhood": "Mourningvale",
+  "size": "30x30",
+  "pack": "life-and-death"
+ },
+ {
+  "id": "ravenwood--the-cozy-casket-house",
+  "name": "The Cozy Casket House",
+  "world": "ravenwood",
+  "neighborhood": "Mourningvale",
+  "size": "30x20",
+  "pack": "life-and-death"
+ },
+ {
+  "id": "ravenwood--hay-hill-landing",
+  "name": "Hay Hill Landing",
+  "world": "ravenwood",
+  "neighborhood": "Whispering Glen",
+  "size": "64x64",
+  "pack": "life-and-death"
+ },
+ {
+  "id": "ravenwood--teardrop-cottage",
+  "name": "Teardrop Cottage",
+  "world": "ravenwood",
+  "neighborhood": "Whispering Glen",
+  "size": "30x30",
+  "pack": "life-and-death"
+ },
+ {
+  "id": "ravenwood--the-final-draught",
+  "name": "The Final Draught",
+  "world": "ravenwood",
+  "neighborhood": "Whispering Glen",
+  "size": "30x30",
+  "pack": "life-and-death"
+ },
+ {
+  "id": "ravenwood--the-marigold-chateau",
+  "name": "The Marigold Chateau",
+  "world": "ravenwood",
+  "neighborhood": "Whispering Glen",
+  "size": "50x50",
+  "pack": "life-and-death"
+ },
+ {
+  "id": "san-myshuno--121-hakim-house",
+  "name": "121 Hakim House",
+  "world": "san-myshuno",
+  "neighborhood": "Arts Quarter",
+  "size": "11x18",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--122-hakim-house",
+  "name": "122 Hakim House",
+  "world": "san-myshuno",
+  "neighborhood": "Arts Quarter",
+  "size": "17x16",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--910-medina-studios",
+  "name": "910 Medina Studios",
+  "world": "san-myshuno",
+  "neighborhood": "Arts Quarter",
+  "size": "9x9",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--920-medina-studios",
+  "name": "920 Medina Studios",
+  "world": "san-myshuno",
+  "neighborhood": "Arts Quarter",
+  "size": "12x16",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--930-medina-studios",
+  "name": "930 Medina Studios",
+  "world": "san-myshuno",
+  "neighborhood": "Arts Quarter",
+  "size": "28x13",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--casbah-gallery",
+  "name": "Casbah Gallery",
+  "world": "san-myshuno",
+  "neighborhood": "Arts Quarter",
+  "size": "40x30",
+  "pack": "city-living"
+ },
+ {
+  "id": "san-myshuno--fountain-view-penthouse",
+  "name": "Fountain View Penthouse",
+  "world": "san-myshuno",
+  "neighborhood": "Arts Quarter",
+  "size": "30x20",
+  "pack": "city-living"
+ },
+ {
+  "id": "san-myshuno--1310-21-chic-street",
+  "name": "1310 21 Chic Street",
+  "world": "san-myshuno",
+  "neighborhood": "Fashion District",
+  "size": "6x12",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--1312-21-chic-street",
+  "name": "1312 21 Chic Street",
+  "world": "san-myshuno",
+  "neighborhood": "Fashion District",
+  "size": "9x10",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--1313-21-chic-street",
+  "name": "1313 21 Chic Street",
+  "world": "san-myshuno",
+  "neighborhood": "Fashion District",
+  "size": "16x7",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--701-zen-view",
+  "name": "701 Zen View",
+  "world": "san-myshuno",
+  "neighborhood": "Fashion District",
+  "size": "2 floor apartment",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--702-zen-view",
+  "name": "702 Zen View",
+  "world": "san-myshuno",
+  "neighborhood": "Fashion District",
+  "size": "2 floor apartment",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--planet-honey-pop",
+  "name": "Planet Honey Pop!",
+  "world": "san-myshuno",
+  "neighborhood": "Fashion District",
+  "size": "30x20",
+  "pack": "city-living"
+ },
+ {
+  "id": "san-myshuno--skye-fitness",
+  "name": "Skye Fitness",
+  "world": "san-myshuno",
+  "neighborhood": "Fashion District",
+  "size": "30x20",
+  "pack": "city-living"
+ },
+ {
+  "id": "san-myshuno--stargazer-lounge",
+  "name": "Stargazer Lounge",
+  "world": "san-myshuno",
+  "neighborhood": "Fashion District",
+  "size": "40x30",
+  "pack": "city-living"
+ },
+ {
+  "id": "san-myshuno--torendi-tower-penthouse",
+  "name": "Torendi Tower Penthouse",
+  "world": "san-myshuno",
+  "neighborhood": "Fashion District",
+  "size": "40x30",
+  "pack": "city-living"
+ },
+ {
+  "id": "san-myshuno--myshuno-meadows",
+  "name": "Myshuno Meadows",
+  "world": "san-myshuno",
+  "neighborhood": "Myshuno Meadows",
+  "size": "64x64",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Central Park"
+ },
+ {
+  "id": "san-myshuno--17-culpepper-house",
+  "name": "17 Culpepper house",
+  "world": "san-myshuno",
+  "neighborhood": "Spice Market",
+  "size": "10x12",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--18-culpepper-house",
+  "name": "18 Culpepper House",
+  "world": "san-myshuno",
+  "neighborhood": "Spice Market",
+  "size": "10x16",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--19-culpepper-house",
+  "name": "19 Culpepper House",
+  "world": "san-myshuno",
+  "neighborhood": "Spice Market",
+  "size": "18x10",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--20-culpepper-house",
+  "name": "20 Culpepper House",
+  "world": "san-myshuno",
+  "neighborhood": "Spice Market",
+  "size": "18x16",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--2a-jasmine-suites",
+  "name": "2A Jasmine Suites",
+  "world": "san-myshuno",
+  "neighborhood": "Spice Market",
+  "size": "18x6",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--2b-jasmine-suites",
+  "name": "2B Jasmine Suites",
+  "world": "san-myshuno",
+  "neighborhood": "Spice Market",
+  "size": "18x7",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--the-old-salt-house",
+  "name": "The Old Salt House",
+  "world": "san-myshuno",
+  "neighborhood": "Spice Market",
+  "size": "30x30",
+  "pack": "city-living"
+ },
+ {
+  "id": "san-myshuno--waterside-warble",
+  "name": "Waterside Warble",
+  "world": "san-myshuno",
+  "neighborhood": "Spice Market",
+  "size": "30x30",
+  "pack": "city-living"
+ },
+ {
+  "id": "san-myshuno--1010-alto-apartments",
+  "name": "1010 Alto Apartments",
+  "world": "san-myshuno",
+  "neighborhood": "Uptown",
+  "size": "37x18",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--1020-alto-apartments",
+  "name": "1020 Alto Apartments",
+  "world": "san-myshuno",
+  "neighborhood": "Uptown",
+  "size": "36x18",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--888-spire-apartments",
+  "name": "888 Spire Apartments",
+  "world": "san-myshuno",
+  "neighborhood": "Uptown",
+  "size": "3 floor apartment",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--ix-landgraab",
+  "name": "IX Landgraab",
+  "world": "san-myshuno",
+  "neighborhood": "Uptown",
+  "size": "2 floor apartment",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-myshuno--viii-landgraab",
+  "name": "VIII Landgraab",
+  "world": "san-myshuno",
+  "neighborhood": "Uptown",
+  "size": "2 floor apartment",
+  "pack": "city-living",
+  "locked": true,
+  "lotType": "Apartment"
+ },
+ {
+  "id": "san-sequoia--anchorpoint-abode",
+  "name": "Anchorpoint Abode",
+  "world": "san-sequoia",
+  "neighborhood": "Anchorpoint Wharf",
+  "size": "30x20",
+  "pack": "growing-together"
+ },
+ {
+  "id": "san-sequoia--anchorpoint-library",
+  "name": "Anchorpoint Library",
+  "world": "san-sequoia",
+  "neighborhood": "Anchorpoint Wharf",
+  "size": "30x20",
+  "pack": "growing-together"
+ },
+ {
+  "id": "san-sequoia--manzanita-terrace",
+  "name": "Manzanita Terrace",
+  "world": "san-sequoia",
+  "neighborhood": "Anchorpoint Wharf",
+  "size": "30x20",
+  "pack": "growing-together"
+ },
+ {
+  "id": "san-sequoia--robls-point",
+  "name": "Robls Point",
+  "world": "san-sequoia",
+  "neighborhood": "Anchorpoint Wharf",
+  "size": "50x40",
+  "pack": "growing-together"
+ },
+ {
+  "id": "san-sequoia--13-acacia-avenue",
+  "name": "13 Acacia Avenue",
+  "world": "san-sequoia",
+  "neighborhood": "Gilbert Gardens",
+  "size": "40x30",
+  "pack": "growing-together"
+ },
+ {
+  "id": "san-sequoia--18-celebration-way",
+  "name": "18 Celebration Way",
+  "world": "san-sequoia",
+  "neighborhood": "Gilbert Gardens",
+  "size": "40x20",
+  "pack": "growing-together"
+ },
+ {
+  "id": "san-sequoia--celebration-center",
+  "name": "Celebration Center",
+  "world": "san-sequoia",
+  "neighborhood": "Gilbert Gardens",
+  "size": "64x64",
+  "pack": "growing-together"
+ },
+ {
+  "id": "san-sequoia--parkside-place",
+  "name": "Parkside Place",
+  "world": "san-sequoia",
+  "neighborhood": "Gilbert Gardens",
+  "size": "30x20",
+  "pack": "growing-together"
+ },
+ {
+  "id": "san-sequoia--23-eucalyptus-lane",
+  "name": "23 Eucalyptus Lane",
+  "world": "san-sequoia",
+  "neighborhood": "Hopewell Hills",
+  "size": "30x20",
+  "pack": "growing-together"
+ },
+ {
+  "id": "san-sequoia--36-bayani-place",
+  "name": "36 Bayani Place",
+  "world": "san-sequoia",
+  "neighborhood": "Hopewell Hills",
+  "size": "30x20",
+  "pack": "growing-together"
+ },
+ {
+  "id": "san-sequoia--7-eucalpytus-lane",
+  "name": "7 Eucalpytus Lane",
+  "world": "san-sequoia",
+  "neighborhood": "Hopewell Hills",
+  "size": "50x40",
+  "pack": "growing-together"
+ },
+ {
+  "id": "san-sequoia--sequoia-cottage",
+  "name": "Sequoia Cottage",
+  "world": "san-sequoia",
+  "neighborhood": "Hopewell Hills",
+  "size": "30x20",
+  "pack": "growing-together"
+ },
+ {
+  "id": "selvadorada--bellomisia-trailhead",
+  "name": "Bellomisia Trailhead",
+  "world": "selvadorada",
+  "neighborhood": "Belomisia Jungle",
+  "size": "40x20",
+  "pack": "jungle-adventure"
+ },
+ {
+  "id": "selvadorada--belomisia-field-station",
+  "name": "Belomisia Field Station",
+  "world": "selvadorada",
+  "neighborhood": "Belomisia Jungle",
+  "size": "30x20",
+  "pack": "jungle-adventure"
+ },
+ {
+  "id": "selvadorada--jungle-bungalow",
+  "name": "Jungle Bungalow",
+  "world": "selvadorada",
+  "neighborhood": "Belomisia Jungle",
+  "size": "30x30",
+  "pack": "jungle-adventure"
+ },
+ {
+  "id": "selvadorada--alam-museum-of-archaeology",
+  "name": "Alam Museum of Archaeology",
+  "world": "selvadorada",
+  "neighborhood": "Puerto Llamante Marketplace",
+  "size": "64x64",
+  "pack": "jungle-adventure"
+ },
+ {
+  "id": "selvadorada--cantina-el-arbot-del-jaguar",
+  "name": "Cantina \"El Arbot del Jaguar\"",
+  "world": "selvadorada",
+  "neighborhood": "Puerto Llamante Marketplace",
+  "size": "40x30",
+  "pack": "jungle-adventure"
+ },
+ {
+  "id": "selvadorada--hillview-hideaway",
+  "name": "Hillview Hideaway",
+  "world": "selvadorada",
+  "neighborhood": "Puerto Llamante Marketplace",
+  "size": "20x15",
+  "pack": "jungle-adventure"
+ },
+ {
+  "id": "selvadorada--selvadorada-villa",
+  "name": "Selvadorada Villa",
+  "world": "selvadorada",
+  "neighborhood": "Puerto Llamante Marketplace",
+  "size": "30x20",
+  "pack": "jungle-adventure"
+ },
+ {
+  "id": "strangerville--the-lab",
+  "name": "The Lab",
+  "world": "strangerville",
+  "neighborhood": "Secret lots",
+  "size": "64x64",
+  "pack": "strangerville",
+  "locked": true,
+  "lotType": "Secret Lab",
+  "secret": true
+ },
+ {
+  "id": "strangerville--cliff-side-crest",
+  "name": "Cliff Side Crest",
+  "world": "strangerville",
+  "neighborhood": "Shady Acres",
+  "size": "30x20",
+  "pack": "strangerville"
+ },
+ {
+  "id": "strangerville--creek-corner-cove",
+  "name": "Creek Corner Cove",
+  "world": "strangerville",
+  "neighborhood": "Shady Acres",
+  "size": "30x20",
+  "pack": "strangerville"
+ },
+ {
+  "id": "strangerville--dream-weavers-way",
+  "name": "Dream Weavers Way",
+  "world": "strangerville",
+  "neighborhood": "Shady Acres",
+  "size": "30x20",
+  "pack": "strangerville"
+ },
+ {
+  "id": "strangerville--plateau-palace",
+  "name": "Plateau Palace",
+  "world": "strangerville",
+  "neighborhood": "Shady Acres",
+  "size": "40x30",
+  "pack": "strangerville"
+ },
+ {
+  "id": "strangerville--strangerville-overlook",
+  "name": "Strangerville Overlook",
+  "world": "strangerville",
+  "neighborhood": "Shady Acres",
+  "size": "40x30",
+  "pack": "strangerville"
+ },
+ {
+  "id": "strangerville--8-bells",
+  "name": "8 Bells",
+  "world": "strangerville",
+  "neighborhood": "StrangerVille Plaza",
+  "size": "20x20",
+  "pack": "strangerville"
+ },
+ {
+  "id": "strangerville--carpophagous-corner",
+  "name": "Carpophagous Corner",
+  "world": "strangerville",
+  "neighborhood": "StrangerVille Plaza",
+  "size": "30x20",
+  "pack": "strangerville"
+ },
+ {
+  "id": "strangerville--old-penelope",
+  "name": "Old Penelope",
+  "world": "strangerville",
+  "neighborhood": "StrangerVille Plaza",
+  "size": "50x40",
+  "pack": "strangerville"
+ },
+ {
+  "id": "strangerville--riverside-groove",
+  "name": "Riverside Groove",
+  "world": "strangerville",
+  "neighborhood": "StrangerVille Plaza",
+  "size": "30x20",
+  "pack": "strangerville"
+ },
+ {
+  "id": "strangerville--slip-42",
+  "name": "Slip 42",
+  "world": "strangerville",
+  "neighborhood": "StrangerVille Plaza",
+  "size": "20x15",
+  "pack": "strangerville"
+ },
+ {
+  "id": "strangerville--strangerville-information-center",
+  "name": "Strangerville Information Center",
+  "world": "strangerville",
+  "neighborhood": "StrangerVille Plaza",
+  "size": "20x20",
+  "pack": "strangerville"
+ },
+ {
+  "id": "sulani--journey-s-end",
+  "name": "Journey's End",
+  "world": "sulani",
+  "neighborhood": "Lani St. Taz",
+  "size": "40x30",
+  "pack": "island-living"
+ },
+ {
+  "id": "sulani--pier-perfection",
+  "name": "Pier Perfection",
+  "world": "sulani",
+  "neighborhood": "Lani St. Taz",
+  "size": "30x20",
+  "pack": "island-living"
+ },
+ {
+  "id": "sulani--reef-finery",
+  "name": "Reef Finery",
+  "world": "sulani",
+  "neighborhood": "Lani St. Taz",
+  "size": "40x30",
+  "pack": "island-living"
+ },
+ {
+  "id": "sulani--sand-simoleon-beach",
+  "name": "Sand Simoleon Beach",
+  "world": "sulani",
+  "neighborhood": "Lani St. Taz",
+  "size": "40x30",
+  "pack": "island-living"
+ },
+ {
+  "id": "sulani--sapphire-shores",
+  "name": "Sapphire Shores",
+  "world": "sulani",
+  "neighborhood": "Lani St. Taz",
+  "size": "50x50",
+  "pack": "island-living"
+ },
+ {
+  "id": "sulani--admiral-s-wreckage",
+  "name": "Admiral's Wreckage",
+  "world": "sulani",
+  "neighborhood": "Mua Pel'am",
+  "size": "50x50",
+  "pack": "island-living"
+ },
+ {
+  "id": "sulani--caldera-camp",
+  "name": "Caldera Camp",
+  "world": "sulani",
+  "neighborhood": "Mua Pel'am",
+  "size": "30x20",
+  "pack": "island-living"
+ },
+ {
+  "id": "sulani--key-point",
+  "name": "Key Point",
+  "world": "sulani",
+  "neighborhood": "Mua Pel'am",
+  "size": "40x30",
+  "pack": "island-living"
+ },
+ {
+  "id": "sulani--chieftain-s-villa",
+  "name": "Chieftain's Villa",
+  "world": "sulani",
+  "neighborhood": "Ohan'ali Town",
+  "size": "40x30",
+  "pack": "island-living"
+ },
+ {
+  "id": "sulani--kin-ship",
+  "name": "Kin-Ship",
+  "world": "sulani",
+  "neighborhood": "Ohan'ali Town",
+  "size": "30x30",
+  "pack": "island-living"
+ },
+ {
+  "id": "sulani--lagoon-look",
+  "name": "Lagoon Look",
+  "world": "sulani",
+  "neighborhood": "Ohan'ali Town",
+  "size": "30x20",
+  "pack": "island-living"
+ },
+ {
+  "id": "sulani--ohan-ali-beach",
+  "name": "Ohan'ali Beach",
+  "world": "sulani",
+  "neighborhood": "Ohan'ali Town",
+  "size": "30x30",
+  "pack": "island-living"
+ },
+ {
+  "id": "sulani--tangled-flat",
+  "name": "Tangled Flat",
+  "world": "sulani",
+  "neighborhood": "Ohan'ali Town",
+  "size": "20x20",
+  "pack": "island-living"
+ },
+ {
+  "id": "sulani--the-sand-bar",
+  "name": "The Sand Bar",
+  "world": "sulani",
+  "neighborhood": "Ohan'ali Town",
+  "size": "30x20",
+  "pack": "island-living"
+ },
+ {
+  "id": "tartosa--baia-dell-amore",
+  "name": "Baia Dell-Amore",
+  "world": "tartosa",
+  "neighborhood": "Porto Luminoso",
+  "size": "40x20",
+  "pack": "my-wedding-stories"
+ },
+ {
+  "id": "tartosa--celebrazioni-d-amore",
+  "name": "Celebrazioni d'Amore",
+  "world": "tartosa",
+  "neighborhood": "Porto Luminoso",
+  "size": "50x40",
+  "pack": "my-wedding-stories"
+ },
+ {
+  "id": "tartosa--piccola-luce",
+  "name": "Piccola Luce",
+  "world": "tartosa",
+  "neighborhood": "Porto Luminoso",
+  "size": "20x20",
+  "pack": "my-wedding-stories"
+ },
+ {
+  "id": "tartosa--thebe-estate",
+  "name": "Thebe Estate",
+  "world": "tartosa",
+  "neighborhood": "Porto Luminoso",
+  "size": "50x50",
+  "pack": "my-wedding-stories"
+ },
+ {
+  "id": "tartosa--villa-vigna",
+  "name": "Villa Vigna",
+  "world": "tartosa",
+  "neighborhood": "Porto Luminoso",
+  "size": "30x20",
+  "pack": "my-wedding-stories"
+ },
+ {
+  "id": "tartosa--la-coppia-serena",
+  "name": "La Coppia Serena",
+  "world": "tartosa",
+  "neighborhood": "Terra Amorosa",
+  "size": "50x40",
+  "pack": "my-wedding-stories"
+ },
+ {
+  "id": "tartosa--rifugio-dei-pirati",
+  "name": "Rifugio dei Pirati",
+  "world": "tartosa",
+  "neighborhood": "Terra Amorosa",
+  "size": "30x20",
+  "pack": "my-wedding-stories"
+ },
+ {
+  "id": "tartosa--the-old-wood-nectary",
+  "name": "The Old Wood Nectary",
+  "world": "tartosa",
+  "neighborhood": "Terra Amorosa",
+  "size": "40x30",
+  "pack": "my-wedding-stories"
+ },
+ {
+  "id": "tartosa--via-romanza",
+  "name": "Via Romanza",
+  "world": "tartosa",
+  "neighborhood": "Terra Amorosa",
+  "size": "40x30",
+  "pack": "my-wedding-stories"
+ },
+ {
+  "id": "tomarang--hothotok-shore",
+  "name": "Hothotok Shore",
+  "world": "tomarang",
+  "neighborhood": "Koh Sahpa",
+  "size": "20x15",
+  "pack": "for-rent"
+ },
+ {
+  "id": "tomarang--isda-riverfront",
+  "name": "Isda Riverfront",
+  "world": "tomarang",
+  "neighborhood": "Koh Sahpa",
+  "size": "20x20",
+  "pack": "for-rent"
+ },
+ {
+  "id": "tomarang--sungai-point",
+  "name": "Sungai Point",
+  "world": "tomarang",
+  "neighborhood": "Koh Sahpa",
+  "size": "30x20",
+  "pack": "for-rent"
+ },
+ {
+  "id": "tomarang--tam-nang-sands",
+  "name": "Tam Nang Sands",
+  "world": "tomarang",
+  "neighborhood": "Koh Sahpa",
+  "size": "30x20",
+  "pack": "for-rent"
+ },
+ {
+  "id": "tomarang--the-screaming-gecko",
+  "name": "The Screaming Gecko",
+  "world": "tomarang",
+  "neighborhood": "Koh Sahpa",
+  "size": "20x20",
+  "pack": "for-rent"
+ },
+ {
+  "id": "tomarang--chee-wit-chee-waa-kanto",
+  "name": "Chee-Wit Chee-Waa Kanto",
+  "world": "tomarang",
+  "neighborhood": "Morensong",
+  "size": "20x15",
+  "pack": "for-rent"
+ },
+ {
+  "id": "tomarang--ro-kaya-rockside",
+  "name": "Ro Kaya Rockside",
+  "world": "tomarang",
+  "neighborhood": "Morensong",
+  "size": "40x30",
+  "pack": "for-rent"
+ },
+ {
+  "id": "tomarang--taka-soi-15",
+  "name": "Taka Soi 15",
+  "world": "tomarang",
+  "neighborhood": "Morensong",
+  "size": "20x20",
+  "pack": "for-rent"
+ },
+ {
+  "id": "tomarang--zosul-taman-botani",
+  "name": "Zosul Taman Botani",
+  "world": "tomarang",
+  "neighborhood": "Morensong",
+  "size": "30x30",
+  "pack": "for-rent"
+ },
+ {
+  "id": "willow-creek--brook-bungalow",
+  "name": "Brook Bungalow",
+  "world": "willow-creek",
+  "neighborhood": "Courtyard Lane",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--ophelia-villa",
+  "name": "Ophelia Villa",
+  "world": "willow-creek",
+  "neighborhood": "Courtyard Lane",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--pique-hearth",
+  "name": "Pique Hearth",
+  "world": "willow-creek",
+  "neighborhood": "Courtyard Lane",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--potters-splay",
+  "name": "Potters Splay",
+  "world": "willow-creek",
+  "neighborhood": "Courtyard Lane",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--rindle-rose",
+  "name": "Rindle Rose",
+  "world": "willow-creek",
+  "neighborhood": "Courtyard Lane",
+  "size": "20x15",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--riverside-roost",
+  "name": "Riverside Roost",
+  "world": "willow-creek",
+  "neighborhood": "Courtyard Lane",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--hallow-slough",
+  "name": "Hallow Slough",
+  "world": "willow-creek",
+  "neighborhood": "Pendula View",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--municipal-muses-museum",
+  "name": "Municipal Muses Museum",
+  "world": "willow-creek",
+  "neighborhood": "Crawdad Quarter",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--the-blue-velvet-night-club",
+  "name": "The Blue Velvet Night Club",
+  "world": "willow-creek",
+  "neighborhood": "Crawdad Quarter",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--willow-creek-archive-library",
+  "name": "Willow Creek Archive Library",
+  "world": "willow-creek",
+  "neighborhood": "Crawdad Quarter",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--bargain-bend",
+  "name": "Bargain Bend",
+  "world": "willow-creek",
+  "neighborhood": "Foundry Cove",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--crick-cabana",
+  "name": "Crick Cabana",
+  "world": "willow-creek",
+  "neighborhood": "Foundry Cove",
+  "size": "20x15",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--garden-essence",
+  "name": "Garden Essence",
+  "world": "willow-creek",
+  "neighborhood": "Foundry Cove",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--streamlet-single",
+  "name": "Streamlet Single",
+  "world": "willow-creek",
+  "neighborhood": "Foundry Cove",
+  "size": "20x15",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--magnolia-blossom",
+  "name": "Magnolia Blossom",
+  "world": "willow-creek",
+  "neighborhood": "Magnolia Blossom Park",
+  "size": "50x50",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--daisy-hovel",
+  "name": "Daisy Hovel",
+  "world": "willow-creek",
+  "neighborhood": "Foundry Cove",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--movers-and-shakers-gym",
+  "name": "Movers & Shakers Gym",
+  "world": "willow-creek",
+  "neighborhood": "Crawdad Quarter",
+  "size": "30x20",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--parkshore",
+  "name": "Parkshore",
+  "world": "willow-creek",
+  "neighborhood": "Pendula View",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--umbrage-manor",
+  "name": "Umbrage Manor",
+  "world": "willow-creek",
+  "neighborhood": "Pendula View",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--cypress-terrace",
+  "name": "Cypress Terrace",
+  "world": "willow-creek",
+  "neighborhood": "Sage Estates",
+  "size": "40x30",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--oakenstead",
+  "name": "Oakenstead",
+  "world": "willow-creek",
+  "neighborhood": "Sage Estates",
+  "size": "50x50",
+  "pack": "base-game"
+ },
+ {
+  "id": "willow-creek--sylvan-glade",
+  "name": "Sylvan Glade",
+  "world": "willow-creek",
+  "neighborhood": "Willow Creek",
+  "size": "15x10",
+  "pack": "base-game",
+  "locked": true,
+  "lotType": "Secret Lot",
+  "secret": true
+ },
+ {
+  "id": "windenburg--ancient-ruins",
+  "name": "Ancient Ruins",
+  "world": "windenburg",
+  "neighborhood": "Ancient Ruins",
+  "size": "20x15",
+  "pack": "get-together",
+  "locked": true,
+  "lotType": "Ancient Ruins"
+ },
+ {
+  "id": "windenburg--bathe-de-rill",
+  "name": "Bathe de Rill",
+  "world": "windenburg",
+  "neighborhood": "Lykke Centre",
+  "size": "40x30",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--discoteque-pan-europa",
+  "name": "Discoteque Pan Europa",
+  "world": "windenburg",
+  "neighborhood": "Lykke Centre",
+  "size": "30x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--harbor-quarter-gym",
+  "name": "Harbor Quarter Gym",
+  "world": "windenburg",
+  "neighborhood": "Lykke Centre",
+  "size": "30x30",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--hare-square",
+  "name": "Hare Square",
+  "world": "windenburg",
+  "neighborhood": "Lykke Centre",
+  "size": "30x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--hare-and-hedgehog",
+  "name": "Hare and Hedgehog",
+  "world": "windenburg",
+  "neighborhood": "Lykke Centre",
+  "size": "30x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--factory-one",
+  "name": "Factory One",
+  "world": "windenburg",
+  "neighborhood": "Olde Platz",
+  "size": "30x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--havisham-house",
+  "name": "Havisham House",
+  "world": "windenburg",
+  "neighborhood": "Olde Platz",
+  "size": "20x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--old-quarter-inn",
+  "name": "Old Quarter Inn",
+  "world": "windenburg",
+  "neighborhood": "Olde Platz",
+  "size": "20x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--proprietor-s-square",
+  "name": "Proprietor's Square",
+  "world": "windenburg",
+  "neighborhood": "Olde Platz",
+  "size": "30x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--quad-manor",
+  "name": "Quad Manor",
+  "world": "windenburg",
+  "neighborhood": "Olde Platz",
+  "size": "30x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--south-square-coffee",
+  "name": "South Square Coffee",
+  "world": "windenburg",
+  "neighborhood": "Olde Platz",
+  "size": "30x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--the-nawhal-arms",
+  "name": "The Nawhal Arms",
+  "world": "windenburg",
+  "neighborhood": "Olde Platz",
+  "size": "30x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--waterlock-redoubt",
+  "name": "Waterlock Redoubt",
+  "world": "windenburg",
+  "neighborhood": "Olde Platz",
+  "size": "30x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--the-bluffs",
+  "name": "The Bluffs",
+  "world": "windenburg",
+  "neighborhood": "The Bluffs",
+  "size": "30x30",
+  "pack": "get-together",
+  "locked": true,
+  "lotType": "Island Bluff"
+ },
+ {
+  "id": "windenburg--dock-den",
+  "name": "Dock Den",
+  "world": "windenburg",
+  "neighborhood": "The Crumbling Isle",
+  "size": "30x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--mid-nowhere",
+  "name": "Mid-Nowhere",
+  "world": "windenburg",
+  "neighborhood": "The Crumbling Isle",
+  "size": "20x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--pier-palace",
+  "name": "Pier Palace",
+  "world": "windenburg",
+  "neighborhood": "The Crumbling Isle",
+  "size": "30x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--the-lighthouse",
+  "name": "The Lighthouse",
+  "world": "windenburg",
+  "neighborhood": "The Crumbling Isle",
+  "size": "40x30",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--von-windenburg-estate",
+  "name": "Von-Windenburg Estate",
+  "world": "windenburg",
+  "neighborhood": "The Crumbling Isle",
+  "size": "64x64",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--von-haunt-estate",
+  "name": "Von Haunt Estate",
+  "world": "windenburg",
+  "neighborhood": "Von Haunt Estate",
+  "size": "40x30",
+  "pack": "get-together",
+  "locked": true,
+  "lotType": "Chalet Gardens"
+ },
+ {
+  "id": "windenburg--cooringberg-cottage",
+  "name": "Cooringberg Cottage",
+  "world": "windenburg",
+  "neighborhood": "Windslar",
+  "size": "40x30",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--cottage-am-see",
+  "name": "Cottage Am See",
+  "world": "windenburg",
+  "neighborhood": "Windslar",
+  "size": "20x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--dresden-house",
+  "name": "Dresden House",
+  "world": "windenburg",
+  "neighborhood": "Windslar",
+  "size": "64x64",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--rustic-residence",
+  "name": "Rustic Residence",
+  "world": "windenburg",
+  "neighborhood": "Windslar",
+  "size": "30x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--the-shrieking-llama",
+  "name": "The Shrieking Llama",
+  "world": "windenburg",
+  "neighborhood": "Windslar",
+  "size": "20x20",
+  "pack": "get-together"
+ },
+ {
+  "id": "windenburg--the-summer-home",
+  "name": "The Summer Home",
+  "world": "windenburg",
+  "neighborhood": "Windslar",
+  "size": "40x30",
+  "pack": "get-together"
+ },
+ {
+  "id": "batuu--oga-s-cantina",
+  "name": "Oga's Cantina",
+  "world": "batuu",
+  "neighborhood": "Black Spire Outpost",
+  "size": "",
+  "pack": "journey-to-batuu",
+  "locked": true,
+  "note": "Can’t be edited in Manage Worlds"
+ },
+ {
+  "id": "batuu--first-order-cargo",
+  "name": "First Order Cargo",
+  "world": "batuu",
+  "neighborhood": "First Order District",
+  "size": "",
+  "pack": "journey-to-batuu",
+  "locked": true,
+  "note": "Can’t be edited in Manage Worlds"
+ },
+ {
+  "id": "batuu--resistance-encampment",
+  "name": "Resistance Encampment",
+  "world": "batuu",
+  "neighborhood": "Resistance Encampment",
+  "size": "",
+  "pack": "journey-to-batuu",
+  "locked": true,
+  "note": "Can’t be edited in Manage Worlds"
+ },
+ {
+  "id": "selvadorada--plane-crash-site",
+  "name": "Plane Crash Site",
+  "world": "selvadorada",
+  "neighborhood": "Jungle District",
+  "size": "",
+  "pack": "jungle-adventure",
+  "locked": true,
+  "lotType": "Secret Lot",
+  "secret": true
+ },
+ {
+  "id": "selvadorada--omiscan-royal-baths",
+  "name": "Omiscan Royal Baths",
+  "world": "selvadorada",
+  "neighborhood": "Jungle District",
+  "size": "",
+  "pack": "jungle-adventure",
+  "locked": true,
+  "lotType": "Secret Lot",
+  "secret": true
+ },
+ {
+  "id": "selvadorada--omiscan-gardens",
+  "name": "Omiscan Gardens",
+  "world": "selvadorada",
+  "neighborhood": "Jungle District",
+  "size": "",
+  "pack": "jungle-adventure",
+  "locked": true,
+  "lotType": "Secret Lot",
+  "secret": true
+ },
+ {
+  "id": "selvadorada--omiscan-temple",
+  "name": "Omiscan Temple",
+  "world": "selvadorada",
+  "neighborhood": "Jungle District",
+  "size": "",
+  "pack": "jungle-adventure",
+  "locked": true,
+  "lotType": "Secret Lot",
+  "secret": true
+ }
+]

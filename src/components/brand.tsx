@@ -41,24 +41,3 @@ export function Wordmark({ size = 22 }: { size?: number }) {
     </span>
   );
 }
-
-export function AppIcon({ size = 30, variant = 'berry' }: { size?: number; variant?: 'berry' | 'ink' | 'blush' }) {
-  const bg = variant === 'berry' ? '#B83C76' : variant === 'ink' ? '#24191F' : '#FDE7F0';
-  const fg = variant === 'blush' ? '#24191F' : '#FFFFFF';
-  const sp = variant === 'blush' ? '#B83C76' : '#FFC2DA';
-  return (
-    <span
-      aria-hidden="true"
-      style={{
-        position: 'relative', width: size, height: size, borderRadius: size * 0.3, background: bg, display: 'inline-flex',
-        alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-head)', fontWeight: 800,
-        fontSize: size * 0.6, color: fg, lineHeight: 1, flexShrink: 0,
-      }}
-    >
-      s
-      <span style={{ position: 'absolute', top: size * 0.14, right: size * 0.14, display: 'inline-flex' }}>
-        <Sparkle size={Math.max(6, size * 0.24)} color={sp} />
-      </span>
-    </span>
-  );
-}

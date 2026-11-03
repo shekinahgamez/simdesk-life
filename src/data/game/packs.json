@@ -1,0 +1,758 @@
+[
+ {
+  "id": "base-game",
+  "name": "Base Game",
+  "type": "base",
+  "year": 2014,
+  "world": "Willow Creek, Oasis Springs, Newcrest (free update)"
+ },
+ {
+  "id": "get-to-work",
+  "name": "Get to Work",
+  "type": "expansion",
+  "year": 2015,
+  "world": "Magnolia Promenade (neighborhood only)"
+ },
+ {
+  "id": "get-together",
+  "name": "Get Together",
+  "type": "expansion",
+  "year": 2015,
+  "world": "Windenburg"
+ },
+ {
+  "id": "city-living",
+  "name": "City Living",
+  "type": "expansion",
+  "year": 2016,
+  "world": "San Myshuno"
+ },
+ {
+  "id": "cats-and-dogs",
+  "name": "Cats & Dogs",
+  "type": "expansion",
+  "year": 2017,
+  "world": "Brindleton Bay"
+ },
+ {
+  "id": "seasons",
+  "name": "Seasons",
+  "type": "expansion",
+  "year": 2018,
+  "world": ""
+ },
+ {
+  "id": "get-famous",
+  "name": "Get Famous",
+  "type": "expansion",
+  "year": 2018,
+  "world": "Del Sol Valley"
+ },
+ {
+  "id": "island-living",
+  "name": "Island Living",
+  "type": "expansion",
+  "year": 2019,
+  "world": "Sulani"
+ },
+ {
+  "id": "discover-university",
+  "name": "Discover University",
+  "type": "expansion",
+  "year": 2019,
+  "world": "Britechester"
+ },
+ {
+  "id": "eco-lifestyle",
+  "name": "Eco Lifestyle",
+  "type": "expansion",
+  "year": 2020,
+  "world": "Evergreen Harbor"
+ },
+ {
+  "id": "snowy-escape",
+  "name": "Snowy Escape",
+  "type": "expansion",
+  "year": 2020,
+  "world": "Mt. Komorebi"
+ },
+ {
+  "id": "cottage-living",
+  "name": "Cottage Living",
+  "type": "expansion",
+  "year": 2021,
+  "world": "Henford-on-Bagley"
+ },
+ {
+  "id": "high-school-years",
+  "name": "High School Years",
+  "type": "expansion",
+  "year": 2022,
+  "world": "Copperdale"
+ },
+ {
+  "id": "growing-together",
+  "name": "Growing Together",
+  "type": "expansion",
+  "year": 2023,
+  "world": "San Sequoia"
+ },
+ {
+  "id": "horse-ranch",
+  "name": "Horse Ranch",
+  "type": "expansion",
+  "year": 2023,
+  "world": "Chestnut Ridge"
+ },
+ {
+  "id": "for-rent",
+  "name": "For Rent",
+  "type": "expansion",
+  "year": 2023,
+  "world": "Tomarang"
+ },
+ {
+  "id": "lovestruck",
+  "name": "Lovestruck",
+  "type": "expansion",
+  "year": 2024,
+  "world": "Ciudad Enamorada"
+ },
+ {
+  "id": "life-and-death",
+  "name": "Life & Death",
+  "type": "expansion",
+  "year": 2024,
+  "world": "Ravenwood"
+ },
+ {
+  "id": "businesses-and-hobbies",
+  "name": "Businesses & Hobbies",
+  "type": "expansion",
+  "year": 2025,
+  "world": "Nordhaven"
+ },
+ {
+  "id": "enchanted-by-nature",
+  "name": "Enchanted by Nature",
+  "type": "expansion",
+  "year": 2025,
+  "world": "Innisgreen"
+ },
+ {
+  "id": "adventure-awaits",
+  "name": "Adventure Awaits",
+  "type": "expansion",
+  "year": 2025,
+  "world": "Gibbi Point"
+ },
+ {
+  "id": "royalty-and-legacy",
+  "name": "Royalty & Legacy",
+  "type": "expansion",
+  "year": 2026,
+  "world": "Ondarion"
+ },
+ {
+  "id": "outdoor-retreat",
+  "name": "Outdoor Retreat",
+  "type": "game",
+  "year": 2015,
+  "world": "Granite Falls (vacation only)"
+ },
+ {
+  "id": "spa-day",
+  "name": "Spa Day",
+  "type": "game",
+  "year": 2015,
+  "world": ""
+ },
+ {
+  "id": "dine-out",
+  "name": "Dine Out",
+  "type": "game",
+  "year": 2016,
+  "world": ""
+ },
+ {
+  "id": "vampires",
+  "name": "Vampires",
+  "type": "game",
+  "year": 2017,
+  "world": "Forgotten Hollow"
+ },
+ {
+  "id": "parenthood",
+  "name": "Parenthood",
+  "type": "game",
+  "year": 2017,
+  "world": ""
+ },
+ {
+  "id": "jungle-adventure",
+  "name": "Jungle Adventure",
+  "type": "game",
+  "year": 2018,
+  "world": "Selvadorada (vacation only)"
+ },
+ {
+  "id": "strangerville",
+  "name": "StrangerVille",
+  "type": "game",
+  "year": 2019,
+  "world": "StrangerVille"
+ },
+ {
+  "id": "realm-of-magic",
+  "name": "Realm of Magic",
+  "type": "game",
+  "year": 2019,
+  "world": "Glimmerbrook, The Magic Realm"
+ },
+ {
+  "id": "journey-to-batuu",
+  "name": "Journey to Batuu",
+  "type": "game",
+  "year": 2020,
+  "world": "Batuu (vacation only)"
+ },
+ {
+  "id": "dream-home-decorator",
+  "name": "Dream Home Decorator",
+  "type": "game",
+  "year": 2021,
+  "world": ""
+ },
+ {
+  "id": "my-wedding-stories",
+  "name": "My Wedding Stories",
+  "type": "game",
+  "year": 2022,
+  "world": "Tartosa"
+ },
+ {
+  "id": "werewolves",
+  "name": "Werewolves",
+  "type": "game",
+  "year": 2022,
+  "world": "Moonwood Mill"
+ },
+ {
+  "id": "luxury-party",
+  "name": "Luxury Party",
+  "type": "stuff",
+  "year": 2015,
+  "world": ""
+ },
+ {
+  "id": "perfect-patio",
+  "name": "Perfect Patio",
+  "type": "stuff",
+  "year": 2015,
+  "world": ""
+ },
+ {
+  "id": "cool-kitchen",
+  "name": "Cool Kitchen",
+  "type": "stuff",
+  "year": 2015,
+  "world": ""
+ },
+ {
+  "id": "spooky",
+  "name": "Spooky",
+  "type": "stuff",
+  "year": 2015,
+  "world": ""
+ },
+ {
+  "id": "movie-hangout",
+  "name": "Movie Hangout",
+  "type": "stuff",
+  "year": 2016,
+  "world": ""
+ },
+ {
+  "id": "romantic-garden",
+  "name": "Romantic Garden",
+  "type": "stuff",
+  "year": 2016,
+  "world": ""
+ },
+ {
+  "id": "kids-room",
+  "name": "Kids Room",
+  "type": "stuff",
+  "year": 2016,
+  "world": ""
+ },
+ {
+  "id": "backyard",
+  "name": "Backyard",
+  "type": "stuff",
+  "year": 2016,
+  "world": ""
+ },
+ {
+  "id": "vintage-glamour",
+  "name": "Vintage Glamour",
+  "type": "stuff",
+  "year": 2016,
+  "world": ""
+ },
+ {
+  "id": "bowling-night",
+  "name": "Bowling Night",
+  "type": "stuff",
+  "year": 2017,
+  "world": ""
+ },
+ {
+  "id": "fitness",
+  "name": "Fitness",
+  "type": "stuff",
+  "year": 2017,
+  "world": ""
+ },
+ {
+  "id": "toddler",
+  "name": "Toddler",
+  "type": "stuff",
+  "year": 2017,
+  "world": ""
+ },
+ {
+  "id": "laundry-day",
+  "name": "Laundry Day",
+  "type": "stuff",
+  "year": 2018,
+  "world": ""
+ },
+ {
+  "id": "my-first-pet",
+  "name": "My First Pet",
+  "type": "stuff",
+  "year": 2018,
+  "world": ""
+ },
+ {
+  "id": "moschino",
+  "name": "Moschino",
+  "type": "stuff",
+  "year": 2019,
+  "world": ""
+ },
+ {
+  "id": "tiny-living",
+  "name": "Tiny Living",
+  "type": "stuff",
+  "year": 2020,
+  "world": ""
+ },
+ {
+  "id": "nifty-knitting",
+  "name": "Nifty Knitting",
+  "type": "stuff",
+  "year": 2020,
+  "world": ""
+ },
+ {
+  "id": "paranormal",
+  "name": "Paranormal",
+  "type": "stuff",
+  "year": 2021,
+  "world": ""
+ },
+ {
+  "id": "home-chef-hustle",
+  "name": "Home Chef Hustle",
+  "type": "stuff",
+  "year": 2023,
+  "world": ""
+ },
+ {
+  "id": "crystal-creations",
+  "name": "Crystal Creations",
+  "type": "stuff",
+  "year": 2024,
+  "world": ""
+ },
+ {
+  "id": "throwback-fit",
+  "name": "Throwback Fit",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "country-kitchen",
+  "name": "Country Kitchen",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "bust-the-dust",
+  "name": "Bust the Dust",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "courtyard-oasis",
+  "name": "Courtyard Oasis",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "fashion-street",
+  "name": "Fashion Street",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "industrial-loft",
+  "name": "Industrial Loft",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "incheon-arrivals",
+  "name": "Incheon Arrivals",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "modern-menswear",
+  "name": "Modern Menswear",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "blooming-rooms",
+  "name": "Blooming Rooms",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "carnaval-streetwear",
+  "name": "Carnaval Streetwear",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "decor-to-the-max",
+  "name": "Décor to the Max",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "moonlight-chic",
+  "name": "Moonlight Chic",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "little-campers",
+  "name": "Little Campers",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "first-fits",
+  "name": "First Fits",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "desert-luxe",
+  "name": "Desert Luxe",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "pastel-pop",
+  "name": "Pastel Pop",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "everyday-clutter",
+  "name": "Everyday Clutter",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "simtimates-collection",
+  "name": "Simtimates Collection",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "bathroom-clutter",
+  "name": "Bathroom Clutter",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "greenhouse-haven",
+  "name": "Greenhouse Haven",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "basement-treasures",
+  "name": "Basement Treasures",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "grunge-revival",
+  "name": "Grunge Revival",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "book-nook",
+  "name": "Book Nook",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "poolside-splash",
+  "name": "Poolside Splash",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "modern-luxe",
+  "name": "Modern Luxe",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "castle-estate",
+  "name": "Castle Estate",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "goth-galore",
+  "name": "Goth Galore",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "urban-homage",
+  "name": "Urban Homage",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "party-essentials",
+  "name": "Party Essentials",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "riviera-retreat",
+  "name": "Riviera Retreat",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "cozy-bistro",
+  "name": "Cozy Bistro",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "artist-studio",
+  "name": "Artist Studio",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "storybook-nursery",
+  "name": "Storybook Nursery",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "sweet-slumber-party",
+  "name": "Sweet Slumber Party",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "cozy-kitsch",
+  "name": "Cozy Kitsch",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "comfy-gamer",
+  "name": "Comfy Gamer",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "secret-sanctuary",
+  "name": "Secret Sanctuary",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "casanova-cave",
+  "name": "Casanova Cave",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "refined-living-room",
+  "name": "Refined Living Room",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "business-chic",
+  "name": "Business Chic",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "sleek-bathroom",
+  "name": "Sleek Bathroom",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "sweet-allure",
+  "name": "Sweet Allure",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "restoration-workshop",
+  "name": "Restoration Workshop",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "golden-years",
+  "name": "Golden Years",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "kitchen-clutter",
+  "name": "Kitchen Clutter",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "spongebob-s-house",
+  "name": "SpongeBob's House",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "autumn-apparel",
+  "name": "Autumn Apparel",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "spongebob-kid-s-room",
+  "name": "SpongeBob Kid's Room",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "grange-mudroom",
+  "name": "Grange Mudroom",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "essential-glam",
+  "name": "Essential Glam",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "modern-retreat",
+  "name": "Modern Retreat",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "garden-to-table",
+  "name": "Garden to Table",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "wonderland-playroom",
+  "name": "Wonderland Playroom",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "silver-screen-style",
+  "name": "Silver Screen Style",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "tea-time-solarium",
+  "name": "Tea Time Solarium",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "lady-bridgerton-s-masquerade-ball-fashion",
+  "name": "Lady Bridgerton's Masquerade Ball Fashion",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "lady-bridgerton-s-masquerade-ballroom",
+  "name": "Lady Bridgerton's Masquerade Ballroom",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "music-den",
+  "name": "Music Den",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "prairie-dreams",
+  "name": "Prairie Dreams",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "yard-charm",
+  "name": "Yard Charm",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "mean-girls-capsule",
+  "name": "Mean Girls Capsule",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "clueless-capsule",
+  "name": "Clueless Capsule",
+  "type": "kit",
+  "world": ""
+ },
+ {
+  "id": "coach-repurposed-capsule",
+  "name": "Coach RePurposed Capsule",
+  "type": "kit",
+  "world": ""
+ }
+]

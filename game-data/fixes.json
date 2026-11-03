@@ -1,0 +1,133 @@
+{
+  "_about": "Corrections applied on top of the workbook every time it's imported (npm run import-workbook). Owner-approved 2026-11-03. Edit the workbook for normal changes; use this file only for things the workbook gets wrong.",
+  "lockedLotTypes": [
+    "Apartment",
+    "Secret Lot",
+    "Secret Lab",
+    "The Magic Realm",
+    "Headless Quarter",
+    "Hermit's Hut",
+    "Alien Party Lot",
+    "Mount Komorebi Summit",
+    "Hospital",
+    "Police Station",
+    "FutureSim Labs",
+    "Acting Studio",
+    "High School",
+    "Auditorium",
+    "Backroom",
+    "Chalet Gardens",
+    "Ancient Ruins",
+    "Island Bluff",
+    "Central Park"
+  ],
+  "_lockedLotTypes": "The game won't let players change these lots' type, so SimDesk keeps it. Every other lot starts with no lot type (a blank slate). Secret lots are always locked.",
+  "lotNameFixes": {
+    "Ciciccliffs": "Civic Cliffs",
+    "Hermit's House": "Hermit's Cottage"
+  },
+  "lotChanges": [
+    {
+      "world": "Willow Creek",
+      "name": "Hallow Slough",
+      "neighborhood": "Pendula View"
+    },
+    {
+      "world": "Willow Creek",
+      "name": "Movers & Shakers Gym",
+      "neighborhood": "Crawdad Quarter"
+    },
+    {
+      "world": "Willow Creek",
+      "name": "Daisy Hovel",
+      "neighborhood": "Foundry Cove"
+    },
+    {
+      "world": "Ravenwood",
+      "name": "Netherworld Department of Death",
+      "size": "20x20"
+    },
+    {
+      "world": "Granite Falls",
+      "name": "Hermit's Cottage",
+      "size": "30x20"
+    }
+  ],
+  "extraLots": [
+    {
+      "name": "Oga's Cantina",
+      "world": "Batuu",
+      "neighborhood": "Black Spire Outpost",
+      "pack": "Journey to Batuu",
+      "locked": true,
+      "note": "Can’t be edited in Manage Worlds"
+    },
+    {
+      "name": "First Order Cargo",
+      "world": "Batuu",
+      "neighborhood": "First Order District",
+      "pack": "Journey to Batuu",
+      "locked": true,
+      "note": "Can’t be edited in Manage Worlds"
+    },
+    {
+      "name": "Resistance Encampment",
+      "world": "Batuu",
+      "neighborhood": "Resistance Encampment",
+      "pack": "Journey to Batuu",
+      "locked": true,
+      "note": "Can’t be edited in Manage Worlds"
+    },
+    {
+      "name": "Plane Crash Site",
+      "world": "Selvadorada",
+      "neighborhood": "Jungle District",
+      "pack": "Jungle Adventure",
+      "lotType": "Secret Lot",
+      "secret": true
+    },
+    {
+      "name": "Omiscan Royal Baths",
+      "world": "Selvadorada",
+      "neighborhood": "Jungle District",
+      "pack": "Jungle Adventure",
+      "lotType": "Secret Lot",
+      "secret": true
+    },
+    {
+      "name": "Omiscan Gardens",
+      "world": "Selvadorada",
+      "neighborhood": "Jungle District",
+      "pack": "Jungle Adventure",
+      "lotType": "Secret Lot",
+      "secret": true
+    },
+    {
+      "name": "Omiscan Temple",
+      "world": "Selvadorada",
+      "neighborhood": "Jungle District",
+      "pack": "Jungle Adventure",
+      "lotType": "Secret Lot",
+      "secret": true
+    }
+  ],
+  "aspirationChanges": [
+    {
+      "name": "Critter Hunter",
+      "notes": ""
+    },
+    {
+      "name": "Cool Kid of the Block",
+      "rewardTrait": "",
+      "notes": ""
+    },
+    {
+      "name": "Master of Grudges",
+      "notes": ""
+    },
+    {
+      "name": "Social Puppeteer",
+      "notes": ""
+    }
+  ]
+}

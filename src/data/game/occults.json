@@ -1,0 +1,102 @@
+[
+ {
+  "id": "alien",
+  "name": "Alien",
+  "pack": "get-to-work",
+  "playableInCAS": true,
+  "otherWays": "Abduction pregnancy",
+  "inherited": true,
+  "powers": "yes",
+  "notes": "Has powers like erasing minds, per the wiki overview page"
+ },
+ {
+  "id": "ghost",
+  "name": "Ghost",
+  "pack": "base-game",
+  "playableInCAS": false,
+  "otherWays": "Dying; temporary Ghostly buff",
+  "inherited": false,
+  "powers": "yes (with Life & Death)",
+  "notes": ""
+ },
+ {
+  "id": "vampire",
+  "name": "Vampire",
+  "pack": "vampires",
+  "playableInCAS": true,
+  "otherWays": "Turned by a vampire with Vampire Creation",
+  "inherited": true,
+  "powers": "yes",
+  "notes": ""
+ },
+ {
+  "id": "skeleton",
+  "name": "Skeleton",
+  "pack": "jungle-adventure",
+  "playableInCAS": false,
+  "otherWays": "Skeleton blessing; cursed relic (temporary)",
+  "inherited": false,
+  "powers": "no",
+  "notes": "Mostly NPC"
+ },
+ {
+  "id": "mermaid",
+  "name": "Mermaid",
+  "pack": "island-living",
+  "playableInCAS": true,
+  "otherWays": "Eating Mermadic Kelp",
+  "inherited": true,
+  "powers": "yes",
+  "notes": "Has water abilities and siren songs, per the wiki overview page"
+ },
+ {
+  "id": "spellcaster",
+  "name": "Spellcaster",
+  "pack": "realm-of-magic",
+  "playableInCAS": true,
+  "otherWays": "The sages in the Magic Realm; magical lineage",
+  "inherited": true,
+  "powers": "yes",
+  "notes": ""
+ },
+ {
+  "id": "servo",
+  "name": "Servo",
+  "pack": "discover-university",
+  "playableInCAS": false,
+  "otherWays": "Built at the Robotics Workstation",
+  "inherited": false,
+  "powers": "no",
+  "notes": ""
+ },
+ {
+  "id": "werewolf",
+  "name": "Werewolf",
+  "pack": "werewolves",
+  "playableInCAS": true,
+  "otherWays": "Cursed Bite; attacked by Greg",
+  "inherited": true,
+  "powers": "yes",
+  "notes": ""
+ },
+ {
+  "id": "fairy",
+  "name": "Fairy",
+  "pack": "enchanted-by-nature",
+  "playableInCAS": true,
+  "otherWays": "Contacting Mother Nature and going to Moondrop Springs",
+  "inherited": true,
+  "powers": "yes",
+  "notes": "Gemini said Fairy Circle or Fairy Nectar; the wiki overview page says Moondrop Springs"
+ },
+ {
+  "id": "plantsim",
+  "name": "PlantSim",
+  "pack": "base-game",
+  "playableInCAS": false,
+  "otherWays": "Forbidden Fruit; Plant Matter Ice Cream (temporary)",
+  "inherited": false,
+  "powers": "no",
+  "notes": ""
+ }
+]
