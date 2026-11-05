@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import {
-  ArrowLeft, Bell, CaretRight, Check, FastForward, Gear, House, MagnifyingGlass, Plus, Sparkle as SparkleIcon,
+  ArrowLeft, Bell, CaretLeft, CaretRight, Check, FastForward, Gear, House, MagnifyingGlass, Plus, Sparkle as SparkleIcon,
   Trash, User, X,
 } from '@phosphor-icons/react';
 import { APP } from '../config/app';
 import { Sparkle, Wordmark } from '../components/brand';
+import { ThemedBanner } from '../components/Banner';
+import { SeasonBanner } from '../components/SeasonArt';
 import { CATEGORIES, ObjIcon } from '../components/categories';
 import { effectiveTheme } from '../lib/theme';
 import { SharedDemo } from '../demo/SharedDemo';
@@ -97,8 +99,8 @@ export function StyleCheck() {
       </div>
 
       <section>
-        <h2>Try the app (Phase 2)</h2>
-        <p className="muted small" style={{ marginTop: 0 }}>Opens the real app with a pretend account kept in this browser: new save setup, the deck, the sidebar and tabs, and Save settings. Leave it from Account.</p>
+        <h2>Try the app</h2>
+        <p className="muted small" style={{ marginTop: 0 }}>Opens the real app with a pretend account kept in this browser. Leave it from Account.</p>
         <div><button type="button" className="btn primary" onClick={startPretend}>Try the app with a pretend account</button></div>
       </section>
 
@@ -196,6 +198,31 @@ export function StyleCheck() {
           </div>
         </section>
       </div>
+
+      <section>
+        <h2>Buttons on pictures (fog)</h2>
+        <p className="sc-why">Anything that floats over a picture is fog: see-through with a faint blush and a thin bright edge. Every button inside a banner gets it automatically, so just write a normal <code>btn</code> (or <code>btn icon</code> for arrows). Never a solid or berry button on a picture.</p>
+        <div className="stack" style={{ marginTop: 12 }}>
+          <SeasonBanner season={0} className="sm">
+            <div><h2>Spring</h2><div className="s">Year 1 · 28 days</div></div>
+            <div className="cal-nav">
+              <button type="button" className="btn"><CaretLeft size={16} weight="bold" /> Winter</button>
+              <button type="button" className="btn">Summer <CaretRight size={16} weight="bold" /></button>
+            </div>
+          </SeasonBanner>
+          <ThemedBanner art="birthday" className="sm">
+            <div><h1>Sofia’s birthday</h1><div className="s">Birthday · tomorrow</div></div>
+            <button type="button" className="btn">View Sim</button>
+          </ThemedBanner>
+          <SeasonBanner season={1} className="sm">
+            <div><h2>Summer</h2></div>
+            <div className="cal-nav">
+              <button type="button" className="btn icon" aria-label="Previous"><CaretLeft size={18} weight="bold" /></button>
+              <button type="button" className="btn icon" aria-label="Next"><CaretRight size={18} weight="bold" /></button>
+            </div>
+          </SeasonBanner>
+        </div>
+      </section>
 
       <section>
         <h2>Fields</h2>

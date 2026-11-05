@@ -1,0 +1,124 @@
+/* Worlds & lots */
+.tabs { display: inline-flex; gap: 4px; background: color-mix(in srgb, var(--text) 6%, var(--bg)); border-radius: 12px; padding: 4px; align-self: flex-start; }
+.tabs button { border: 0; background: transparent; font: inherit; font-size: 14px; font-weight: 600; color: var(--muted); padding: 7px 18px; border-radius: 9px; cursor: pointer; }
+.tabs button[aria-selected='true'] { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.worlds-tabs { max-width: 260px; }
+
+/* world tiles: the map fills the tile, name on a light frosted label */
+.world-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.worlds-phone .world-tiles { grid-template-columns: 1fr 1fr; gap: 12px; }
+.world-tile { position: relative; display: block; aspect-ratio: 4 / 3; border-radius: var(--r-xl); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); color: var(--text); text-decoration: none; background: var(--worlds-tint); }
+.world-tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.world-tile-pic { position: absolute; inset: 0; height: 100%; }
+.world-pic { background-size: cover; background-position: center; }
+.world-pic.none { background: var(--worlds-tint); color: var(--worlds-ink); display: flex; align-items: center; justify-content: center; }
+.world-tile .world-pic.none svg { margin-bottom: 44px; }
+/* Soft melt: the map fades gently into the page color and the name sits on the fade. */
+.world-tile::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent 35%, color-mix(in srgb, var(--bg) 72%, transparent) 72%, var(--bg) 100%); }
+.world-tile-name { position: absolute; left: 14px; right: 14px; bottom: 10px; z-index: 1; display: flex; flex-direction: column; }
+.world-tile-name b { font-family: var(--font-head); font-size: 18px; font-weight: 800; line-height: 1.15; }
+.world-tile-name span { font-size: 12.5px; color: var(--muted); }
+.worlds-phone .world-tile-name { left: 11px; right: 11px; bottom: 8px; }
+.worlds-phone .world-tile-name b { font-size: 15px; }
+
+/* lot table */
+.cell-main { display: block; font-weight: 600; }
+.cell-sub { display: block; font-size: 12.5px; color: var(--muted); font-weight: 400; }
+.lots-table td, .world-lots td { vertical-align: middle; }
+.tag.lot-type { background: var(--sidebar); color: var(--text); }
+.field-err { color: var(--danger); font-weight: 600; }
+.lot-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; border: 0; background: none; padding: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.lot-row-main .s { font-size: 13px; color: var(--muted); }
+.place-pill { border: 0; background: var(--accent-soft); color: var(--accent); font: inherit; font-size: 13px; font-weight: 700; border-radius: 99px; padding: 6px 14px; cursor: pointer; flex-shrink: 0; }
+
+/* asking */
+.stop-asking { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; color: var(--muted); }
+.stop-asking button { height: 28px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--accent); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+/* placing */
+.title-note { font-size: 15px; font-weight: 600; }
+.label-caps { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.place-worlds { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.place-world { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--surface); padding: 0 0 12px; font: inherit; color: var(--text); text-align: left; display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
+.place-world:hover { border-color: var(--accent); }
+.place-world-pic { height: 86px; margin-bottom: 8px; }
+.place-world b, .place-world span { padding: 0 12px; }
+.place-world span { color: var(--accent); font-weight: 600; }
+.place-sel { display: flex; flex-direction: column; min-width: 0; }
+.place-modal .modal-foot { align-items: center; }
+.spot-list { display: flex; flex-direction: column; gap: 14px; max-height: 50vh; overflow: auto; }
+.spot-group { display: flex; flex-direction: column; gap: 6px; }
+.spot-row { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 10px 12px; font: inherit; color: var(--text); text-align: left; cursor: pointer; }
+.spot-row.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.spot-state { font-size: 12px; font-weight: 700; border-radius: 99px; padding: 3px 9px; white-space: nowrap; }
+.spot-state.fit { background: var(--accent-soft); color: var(--accent); }
+.spot-state.small { border: 1.5px dashed #E48DB7; color: var(--accent); }
+.spot-state.taken { background: var(--sidebar); color: var(--muted); }
+
+.spot-name { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; }
+.world-vibe { margin: 0; color: var(--muted); max-width: 70ch; }
+
+/* world page: a scene banner, then a card for each neighborhood (they stack to fill the gaps) */
+.world-banner { position: relative; border-radius: var(--r-xl); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); aspect-ratio: 16 / 5; min-height: 150px; background: var(--worlds-tint); }
+.world-banner-pic { position: absolute; inset: 0; }
+.world-banner .world-pic svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.world-banner::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent 40%, color-mix(in srgb, var(--bg) 72%, transparent) 76%, var(--bg) 100%); }
+.world-banner-name { position: absolute; left: 20px; right: 20px; bottom: 14px; z-index: 1; }
+.world-banner-name h1 { margin: 0; font-size: 30px; overflow-wrap: anywhere; }
+.world-banner-name .sub { font-size: 13px; color: var(--muted); }
+.world-banner-edit { position: absolute; top: 12px; right: 12px; z-index: 2; }
+.m-stack .world-banner { aspect-ratio: 16 / 9; }
+.m-stack .world-banner-name { left: 14px; right: 14px; bottom: 10px; }
+.m-stack .world-banner-name h1 { font-size: 24px; }
+.hood-cols { column-count: 2; column-gap: 16px; }
+.m-stack .hood-cols { column-count: 1; }
+.hood-card { break-inside: avoid; margin: 0 0 16px; padding: 0; overflow: hidden; display: block; }
+.hood-card header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 14px 18px 12px; background: color-mix(in srgb, var(--worlds-tint) 20%, var(--surface)); border-bottom: 1px solid color-mix(in srgb, var(--worlds-tint) 45%, var(--line)); }
+.hood-card h2 { font-size: 20px; font-weight: 800; margin: 0; }
+.hood-count { font-size: 12.5px; font-weight: 600; color: var(--worlds-ink); white-space: nowrap; }
+.hood-rows { display: flex; flex-direction: column; padding: 6px 10px 10px; }
+.hood-row { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 56px; padding: 10px 8px; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: none; font: inherit; color: var(--text); text-align: left; cursor: pointer; }
+.hood-row:first-child { border-top: 0; }
+.hood-row .grow { display: flex; flex-direction: column; min-width: 0; gap: 1px; }
+.hood-row.placed b { font-size: 15.5px; font-weight: 700; }
+.hood-row.open { color: var(--muted); }
+.hood-row.open .open-name { font-size: 14px; }
+.hood-row.open .small { font-size: 12.5px; }
+.open-add { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; font-size: 12.5px; font-weight: 600; color: var(--muted); border: 1.5px dashed color-mix(in srgb, var(--text) 25%, transparent); border-radius: 99px; padding: 4px 11px; }
+.hood-row.open:hover .open-add, .hood-row.open:focus-visible .open-add { color: var(--accent); border-color: var(--accent); }
+.hood-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 10px; }
+.section-h { font-size: 19px; margin: 4px 0 0; display: flex; align-items: baseline; gap: 8px; }
+
+/* lot page */
+.lot-hero { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); padding: 0; overflow: hidden; border-radius: var(--r-xl); min-height: 300px; }
+.lot-photo { border: 0; padding: 0; margin: 0; background: var(--worlds-tint); cursor: pointer; display: block; min-height: 300px; width: 100%; }
+.lot-photo .photo-box { height: 100%; }
+.lot-photo.empty-photo { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--worlds-ink); font: inherit; font-weight: 600; }
+.lot-hero-info { padding: 24px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.lot-hero-info h1 { font-size: 32px; margin: 0; overflow-wrap: anywhere; }
+.lot-facts { margin: 0; }
+.not-placed { display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1.5px dashed var(--line); border-radius: 16px; padding: 12px 14px; background: var(--surface); }
+.lot-cols { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; align-items: start; }
+.unit-list { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.unit-row { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-top: 1px solid var(--line); min-height: 48px; }
+.unit-row:first-child { border-top: 0; }
+.history-row { display: flex; align-items: center; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.history-add { display: grid; grid-template-columns: 140px minmax(0, 1fr) auto; gap: 8px; margin-top: 10px; }
+.lot-m-facts { padding: 12px 14px; }
+@media (max-width: 860px) {
+  .lot-photo { min-height: 0; aspect-ratio: 16 / 10; border-radius: 18px; overflow: hidden; }
+  .history-add { grid-template-columns: 1fr; }
+  .lot-cols { display: flex; flex-direction: column; }
+}
+
+/* manage your own lot types */
+.link-btn { border: 0; background: none; padding: 0; font: inherit; font-weight: 700; font-size: 13px; color: var(--accent); cursor: pointer; }
+.link-btn:hover { text-decoration: underline; }
+.lt-list { display: flex; flex-direction: column; }
+.lt-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid var(--line); }
+.lt-row:first-child { border-top: 0; }
+.lt-game { border: 0; background: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; padding: 4px 0; }
+.lt-gamelist { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; max-height: 180px; overflow: auto; }
+.lt-note { background: var(--accent-soft); border-radius: 12px; padding: 10px 12px; font-size: 14px; line-height: 1.45; }

@@ -1,0 +1,65 @@
+/* Households: the Sims | Households switch, household cards, the household page, and the home picker. */
+.hh-switch { display: inline-flex; padding: 3px; border-radius: 12px; background: color-mix(in srgb, var(--text) 6%, var(--bg)); flex-shrink: 0; }
+.hh-switch a { padding: 7px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; color: var(--muted); text-decoration: none; text-align: center; }
+.hh-switch a[aria-selected='true'] { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0, 0, 0, .08); }
+.m-stack .hh-switch { display: flex; }
+.m-stack .hh-switch a { flex: 1; }
+
+.hh-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.hh-card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; min-width: 0; }
+.hh-card:hover { border-color: color-mix(in srgb, var(--households-ink) 35%, var(--line)); }
+.hh-card h3 { font-family: var(--font-head); font-size: 19px; font-weight: 800; margin: 2px 0 0; }
+.hh-card .ln { font-size: 13.5px; color: var(--muted); margin-top: -4px; }
+
+.hh-faces { display: flex; align-items: center; }
+.hh-face { width: var(--f, 44px); height: var(--f, 44px); border-radius: 50%; border: 3px solid var(--surface); margin-left: calc(var(--f, 44px) * -0.22); display: inline-flex; flex-shrink: 0; background: var(--surface); }
+.hh-face:first-child { margin-left: 0; }
+.hh-face .sim-avatar { width: 100% !important; height: 100% !important; }
+.hh-face.more { align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--muted); background: var(--sidebar); }
+
+.tag.outline-soft { background: color-mix(in srgb, var(--text) 6%, transparent); color: var(--muted); }
+.tag.hh-pill { gap: 4px; text-decoration: none; white-space: nowrap; }
+.hh-pills { display: flex; gap: 4px; flex-wrap: wrap; }
+
+.hh-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 900px) { .hh-grid { grid-template-columns: 1fr; } }
+.hh-sub { font-size: 16px; margin: 20px 0 10px; }
+.hh-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
+.m-stack .hh-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.hh-tile { display: flex; flex-direction: column; gap: 2px; min-width: 0; color: inherit; text-decoration: none; }
+.hh-tile b { font-weight: 600; font-size: 14.5px; margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hh-tile > span { font-size: 12.5px; color: var(--muted); }
+.m-stack .hh-tile b { font-size: 12.5px; }
+.m-stack .hh-tile > span { font-size: 11px; }
+.hh-tile-img { aspect-ratio: 1; width: 100%; border-radius: 18px; overflow: hidden; display: flex; }
+.hh-tile-img.initials { align-items: center; justify-content: center; background: var(--sims-tint); color: var(--sims-ink); font-family: var(--font-head); font-weight: 800; font-size: 26px; }
+.m-stack .hh-tile-img { border-radius: 14px; }
+.m-stack .hh-tile-img.initials { font-size: 18px; }
+.bd { color: var(--calendar-ink); font-weight: 700; }
+
+.hh-lots { display: flex; flex-direction: column; }
+.hh-lot { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); color: inherit; text-decoration: none; min-width: 0; }
+.hh-lot:first-child { border-top: 0; padding-top: 0; }
+.hh-lot b { display: block; font-weight: 600; }
+.hh-lot .s { display: block; font-size: 13px; color: var(--muted); }
+.hh-lot .grow { min-width: 0; }
+
+/* home picker */
+.hp-body { display: flex; flex-direction: column; gap: 9px; }
+.hp-grp { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+.hp-opt { display: flex; align-items: center; gap: 12px; padding: 11px 13px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--text); text-align: left; font: inherit; cursor: pointer; width: 100%; }
+.hp-opt:hover { border-color: var(--accent); }
+.hp-opt b { display: block; font-weight: 600; }
+.hp-opt .s { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); }
+.hp-opt .chev { color: var(--muted); flex-shrink: 0; }
+.hp-toggle { display: flex; justify-content: space-between; align-items: center; font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); padding: 10px 2px 4px; border: 0; border-top: 1px solid var(--line); background: none; cursor: pointer; margin-top: 4px; }
+.hp-taken { display: flex; align-items: center; gap: 10px; padding: 7px 12px; border: 0; background: none; color: var(--muted); font: inherit; font-size: 13.5px; text-align: left; cursor: pointer; border-radius: 10px; }
+.hp-taken:hover { background: color-mix(in srgb, var(--text) 5%, transparent); }
+.hp-add { align-self: flex-start; color: var(--accent); }
+.hp-radio { display: flex; align-items: center; gap: 12px; padding: 11px 13px; border-radius: 14px; border: 1px solid var(--line); cursor: pointer; }
+.hp-radio.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.hp-radio input { accent-color: var(--accent); width: 18px; height: 18px; margin: 0; }
+.hp-radio b { font-weight: 600; }
+.unit-row .row .tag.hh-pill { font-size: 12.5px; }
+.hh-lot .obj { width: 38px; height: 38px; border-radius: 11px; }
+.more-apts { width: 100%; }

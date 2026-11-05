@@ -3,7 +3,7 @@ import {
   CalendarBlank, CaretLeft, CaretRight, CaretUpDown, Check, DotsThreeCircle, GearSix, House, MapPin, Plus, Sparkle as SparkleIcon, User, UserCircle,
 } from '@phosphor-icons/react';
 import { Wordmark } from './brand';
-import { CATEGORIES, ObjIcon } from './categories';
+import { needsPack, ObjIcon, SECTIONS } from './categories';
 import { SyncCloud, SyncLine } from './sync';
 import { Sheet } from './ui';
 import { useLayer } from '../lib/layers';
@@ -35,8 +35,8 @@ export function Shell({ save, route, children }: { save: SaveRow | null; route: 
 
 function Sidebar({ save, route }: { save: SaveRow | null; route: Route }) {
   const d = save ? saveData(save) : null;
-  const section = route.page === 'save' ? route.section : route.page;
-  const cats = d ? CATEGORIES.filter((c) => !c.module || moduleOn(d, c.module)) : [];
+  const section = route.page === 'save' ? (route.section === 'households' ? 'sims' : route.section) : route.page;
+  const cats = d ? SECTIONS.filter((c) => (!c.module || moduleOn(d, c.module)) && needsPack(c, d.packs)) : [];
   return (
     <nav className="sidebar" aria-label="Main">
       <a href="#/" style={{ display: 'flex', alignItems: 'center', padding: '4px 8px', textDecoration: 'none' }} aria-label="SimDesk home">
@@ -116,22 +116,23 @@ function SwitcherMenu({ current, saves, onClose }: { current: string; saves: Sav
 
 // ---------- phone ----------
 const TABS = [
-  { id: 'today', label: 'Today', icon: House },
-  { id: 'sims', label: 'Sims', icon: User },
-  { id: 'calendar', label: 'Calendar', icon: CalendarBlank },
-  { id: 'worlds', label: 'Worlds', icon: MapPin },
-  { id: 'more', label: 'More', icon: DotsThreeCircle },
+  { id: 'today', label: 'Today', icon: House, ink: 'var(--accent)', tint: 'var(--accent-soft)' },
+  { id: 'sims', label: 'Sims', icon: User, ink: 'var(--sims-ink)', tint: 'var(--sims-tint)' },
+  { id: 'calendar', label: 'Calendar', icon: CalendarBlank, ink: 'var(--calendar-ink)', tint: 'var(--calendar-tint)' },
+  { id: 'worlds', label: 'Worlds', icon: MapPin, ink: 'var(--worlds-ink)', tint: 'var(--worlds-tint)' },
+  { id: 'more', label: 'More', icon: DotsThreeCircle, ink: 'var(--muted)', tint: 'color-mix(in srgb, var(--text) 8%, transparent)' },
 ] as const;
 
-/** Bottom tabs. Lots count as Worlds; Households, Clubs, Settings and Account count as More. */
+/** Floating foggy tab pill. Each tab wears its section color; the open one gets a filled icon on a soft bubble. Lots count as Worlds, Households as Sims; Clubs, Settings and Account count as More. */
 function TabBar({ saveId, route }: { saveId: string; route: Route }) {
   const section = route.page === 'save' ? route.section || 'today' : 'more';
-  const tab = section === 'lots' ? 'worlds' : ['today', 'sims', 'calendar', 'worlds'].includes(section) ? section : 'more';
+  const tab = section === 'lots' ? 'worlds' : section === 'households' ? 'sims' : ['today', 'sims', 'calendar', 'worlds'].includes(section) ? section : 'more';
   return (
     <nav className="m-tabbar" aria-label="Tabs">
       {TABS.map((t) => (
-        <a key={t.id} href={savePath(saveId, t.id)} className={tab === t.id ? 'on' : ''} aria-current={tab === t.id ? 'page' : undefined}>
-          <t.icon size={26} weight={tab === t.id ? 'fill' : 'regular'} aria-hidden="true" />
+        <a key={t.id} href={savePath(saveId, t.id)} className={tab === t.id ? 'on' : ''} aria-current={tab === t.id ? 'page' : undefined}
+          style={{ ['--ink' as string]: t.ink, ['--tint' as string]: t.tint }}>
+          <span className="bub"><t.icon size={23} weight={tab === t.id ? 'fill' : 'duotone'} aria-hidden="true" /></span>
           <span>{t.label}</span>
         </a>
       ))}

@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
 import { Sparkle, Wordmark } from '../components/brand';
-import { BUILT, CATEGORIES, type CategoryId } from '../components/categories';
+import { BUILT, CATEGORIES, needsPack, type CategoryId, DECK } from '../components/categories';
 import { DesktopDeck, PhoneDeck } from '../components/Deck';
 import { DateFields, LifespanEditor, ModuleCard, MODULES, PackPicker, SeasonLengthPicker, Swatches } from '../components/savebits';
 import { Field, Seg, Toggle } from '../components/ui';
+import { PhotoField } from '../components/photo';
+import { usePhotos, type PhotoRef } from '../lib/photos';
 import { APP } from '../config/app';
 import { go, savePath } from '../lib/router';
 import { lifespanLabel, newSaveData, SAVE_COLORS, saveData, setLastSave, todayOf, type SaveData } from '../lib/saves';
@@ -29,6 +31,8 @@ export function Setup({ userKey }: { userKey: string }) {
   // the form
   const [name, setName] = useState('');
   const [color, setColor] = useState(SAVE_COLORS[0].hex);
+  const [cover, setCover] = useState<PhotoRef | null>(null);
+  const photos = usePhotos();
   const [packs, setPacks] = useState<string[]>([]);
   const [len, setLen] = useState<SeasonLength>(7);
   const [today, setToday] = useState<SimDate>({ year: 1, season: 0, day: 1 });
@@ -36,12 +40,13 @@ export function Setup({ userKey }: { userKey: string }) {
   const [track, setTrack] = useState(true);
   const [mods, setMods] = useState<string[]>([]);
 
-  const notNow = () => go('#/');
+  const notNow = () => { if (cover) void photos.remove([cover.id]).catch(() => {}); go('#/'); };
   const back = () => (step > 1 ? setStep(step - 1) : hasSaves ? notNow() : setPhase('welcome'));
   const next = () => (step < 4 ? setStep(step + 1) : finish());
 
   const finish = () => {
     const data = newSaveData({ name, color, packs, seasonLength: len, today: track ? today : { year: 1, season: today.season, day: 1 }, lifespan, trackDate: track, modules: mods });
+    data.cover = cover;
     setPhase('leaving');
     // Saving is local-first, so this works offline too; it syncs in the background.
     const id = store.createSave(data);
@@ -52,7 +57,7 @@ export function Setup({ userKey }: { userKey: string }) {
     setTimeout(() => setPhase('summary'), 2000);
   };
 
-  const cards = useMemo(() => CATEGORIES.filter((c) => !c.module || made?.data.modules[c.module])
+  const cards = useMemo(() => DECK.filter((c) => (!c.module || made?.data.modules[c.module]) && needsPack(c, made?.data.packs ?? []))
     .map((c) => ({ id: c.id, label: c.label, icon: c.icon, text: c.nudge, built: BUILT.has(c.id) })), [made]);
   const noneBuilt = cards.every((c) => !c.built);
   const toSettings = () => made && go(savePath(made.id, 'settings'));
@@ -65,7 +70,7 @@ export function Setup({ userKey }: { userKey: string }) {
         <div className="ms-flow">
           <div className="ms-welcome">
             <div className="ms-iconrow" aria-hidden="true">
-              {CATEGORIES.map((c, i) => {
+              {DECK.map((c, i) => {
                 const I = c.icon;
                 return <span key={c.id} className={`obj ${c.id}`} style={{ animationDelay: `${0.15 + i * 0.09}s`, ['--r' as string]: `${[-6, 4, -3, 5, -4, 3][i]}deg` }}><I size={20} weight="duotone" /></span>;
               })}
@@ -86,7 +91,7 @@ export function Setup({ userKey }: { userKey: string }) {
       // Clicking anywhere during the intro skips straight to the buttons.
       <div className={`flow ${skip ? 'skip-intro' : ''}`} onClick={() => setSkip(true)}>
         <div className="welcome">
-          {CATEGORIES.map((c, i) => {
+          {DECK.map((c, i) => {
             const I = c.icon;
             return (
               <div key={c.id} className={`fly obj ${c.id}`} aria-hidden="true"
@@ -155,6 +160,11 @@ export function Setup({ userKey }: { userKey: string }) {
         {(id) => <input id={id} className="input" placeholder="My forever save" value={name} onChange={(e) => setName(e.target.value)} maxLength={60} style={{ height: 48, fontSize: 18 }} />}
       </Field>
       <div className="field">
+        <span className="label">Cover photo <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></span>
+        <PhotoField value={cover} saveId={null} aspect={4} label="Cover photo" emptyText="Add a cover photo"
+          onChange={(p) => { if (cover && cover.id !== p?.id) void photos.remove([cover.id]).catch(() => {}); setCover(p); }} />
+      </div>
+      <div className="field">
         <span className="label">Save color</span>
         <Swatches value={color} onChange={setColor} />
       </div>
@@ -181,7 +191,7 @@ export function Setup({ userKey }: { userKey: string }) {
       {track ? (
         <div className="field">
           <span className="label">Today in your game</span>
-          <DateFields value={today} onChange={setToday} seasonLength={len} />
+          <DateFields label="Today in your game" value={today} onChange={setToday} seasonLength={len} />
           <span className="hint">Starting fresh? Leave it on Day 1. Already playing? Match your game’s calendar.</span>
         </div>
       ) : (

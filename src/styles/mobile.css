@@ -1,12 +1,11 @@
 /* Mobile layouts (SimDesk Mobile mockups). Only used under 860px wide. */
-:root { --tabbar-h: 56px; --m-pad: 20px; }
+:root { --tabbar-h: 62px; --m-pad: 20px; }
 
 .m-main {
   min-height: 100vh; padding: max(env(safe-area-inset-top), 12px) var(--m-pad) calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 96px);
   font-size: 17px;
 }
 .m-main.flush { padding-top: 0; }
-.m-bleed { margin-left: calc(var(--m-pad) * -1); margin-right: calc(var(--m-pad) * -1); }
 .m-stack { display: flex; flex-direction: column; gap: 14px; }
 
 .m-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 6px; }
@@ -35,8 +34,6 @@ button.m-row:active, a.m-row:active { background: color-mix(in srgb, var(--text)
 .m-row .t { font-size: 16px; font-weight: 600; }
 .m-row .s { font-size: 14px; color: var(--muted); }
 .m-row .v { font-size: 16px; color: var(--muted); margin-left: auto; white-space: nowrap; }
-.m-row .meta { font-size: 13px; font-weight: 700; color: var(--muted); margin-left: auto; white-space: nowrap; }
-.m-row .meta.hot { color: var(--accent); }
 .m-row .chev { color: var(--muted); flex-shrink: 0; }
 
 .m-bigbtn {
@@ -50,11 +47,6 @@ button.m-row:active, a.m-row:active { background: color-mix(in srgb, var(--text)
   width: 56px; height: 56px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--text);
   display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer;
 }
-.m-float {
-  position: absolute; z-index: 10; width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,.88);
-  color: #24191F; display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none;
-}
-.m-float.pill { width: auto; padding: 0 16px; border-radius: 999px; font: inherit; font-size: 15px; font-weight: 700; }
 
 .m-chips { display: flex; gap: 8px; overflow-x: auto; padding: 0 var(--m-pad); margin: 0 calc(var(--m-pad) * -1); scrollbar-width: none; }
 .m-chips::-webkit-scrollbar { display: none; }
@@ -79,16 +71,17 @@ button.m-row:active, a.m-row:active { background: color-mix(in srgb, var(--text)
 
 /* tab bar + floating add button */
 .m-tabbar {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: flex; height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
-  padding-bottom: env(safe-area-inset-bottom); background: color-mix(in srgb, var(--surface) 94%, transparent);
-  border-top: 1px solid var(--line); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  position: fixed; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom) + 12px); z-index: 50; height: var(--tabbar-h);
+  display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; padding: 0 6px; border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(36,25,31,.12);
 }
-.m-tabbar a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #8E848A; min-height: 44px; }
-.m-tabbar a span { font-size: 11px; font-weight: 600; }
-.m-tabbar a.on { color: var(--accent); }
-.m-tabbar a.on span { font-weight: 700; }
+.m-tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; text-decoration: none; color: var(--ink); min-height: 44px; border-radius: 999px; }
+.m-tabbar .bub { width: 46px; height: 32px; border-radius: 999px; display: flex; align-items: center; justify-content: center; transition: background .2s; }
+.m-tabbar a.on .bub { background: var(--tint); }
+.m-tabbar a span:last-child { font-size: 10.5px; font-weight: 600; color: var(--muted); }
+.m-tabbar a.on span:last-child { color: var(--ink); font-weight: 700; }
 .m-fab {
-  position: fixed; right: 18px; bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 18px); z-index: 45; width: 58px; height: 58px;
+  position: fixed; right: 18px; bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 28px); z-index: 45; width: 58px; height: 58px;
   border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); box-shadow: 0 8px 20px rgba(184,60,118,.35);
   display: flex; align-items: center; justify-content: center; cursor: pointer;
 }

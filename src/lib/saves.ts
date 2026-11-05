@@ -1,8 +1,9 @@
 import { ArrowsClockwise, Briefcase, Coins, Crown, Lightbulb, Notebook, Path, Storefront, type Icon } from '@phosphor-icons/react';
 import { BY_ID, GAME, ownedFrom } from '../data/game';
 import type { SaveRow } from './sync/types';
+import type { PhotoRef } from './photos';
 import {
-  dateOf, newCalendar, stageTable, type Calendar, type Lifespan, type Season, type SeasonLength, type SimDate, type StageId,
+  dateOf, newCalendar, stageTable, type Calendar, type Lifespan, type SeasonLength, type SimDate, type StageId,
 } from './time';
 
 /** Everything a save remembers about itself (stored as the save row's data). */
@@ -18,7 +19,11 @@ export type SaveData = {
   /** Custom stage days are kept even after picking a preset, so going back to Custom restores them. */
   customDays?: Partial<Record<StageId, number>>;
   trackDate: boolean;
+  /** Show Sims' ages the way a person's would read (see realAges.ts). Needs the date tracked. */
+  realAges?: boolean;
   modules: Record<string, boolean>;
+  /** Optional cover photo (setup step 1, Save settings, the desktop home page). */
+  cover?: PhotoRef | null;
 };
 
 export const SAVE_COLORS: { label: string; hex: string }[] = [
@@ -47,7 +52,9 @@ export function saveData(row: SaveRow | undefined): SaveData {
     lifespan: d.lifespan ?? { preset: 'normal' },
     customDays: d.customDays,
     trackDate: d.trackDate ?? true,
+    realAges: d.realAges ?? false,
     modules: d.modules ?? {},
+    cover: d.cover ?? null,
   };
 }
 
@@ -75,7 +82,6 @@ export function newSaveData(input: {
 
 export const seasonLengthLabel = (l: SeasonLength, long = false) => (l === 7 ? '1 week' : l === 21 ? (long ? '3 weeks (mod)' : '3 weeks') : `${l / 7} weeks`);
 export const lifespanLabel = (l: Lifespan) => l.preset[0].toUpperCase() + l.preset.slice(1);
-export const startSeasonOf = (d: SaveData): Season => d.calendar.anchorDate.season;
 
 // ---------- modules ----------
 export type ModuleDef = { id: string; label: string; desc: string; icon: Icon; tint: string; ready: boolean };

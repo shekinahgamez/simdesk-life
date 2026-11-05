@@ -42,8 +42,6 @@
 
 .loading { min-height: 100dvh; display: flex; align-items: center; justify-content: center; color: var(--muted); font-weight: 600; }
 .signed-in { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 24px 16px; }
-.signed-in-card { width: 100%; max-width: 440px; }
-.signed-in-card .form-ok { margin: 0; }
 .signed-in-name { font-family: var(--font-head); font-weight: 800; font-size: 26px; }
 
 @media (max-width: 860px) {

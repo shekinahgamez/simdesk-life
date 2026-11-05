@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } fr
 import { CheckCircle, EnvelopeSimple } from '@phosphor-icons/react';
 import { APP } from '../config/app';
 import { Sparkle, Wordmark } from '../components/brand';
-import { CATEGORIES, ObjIcon } from '../components/categories';
+import { ObjIcon, DECK } from '../components/categories';
 import { PasswordInput } from '../components/PasswordInput';
 import {
   AuthError, logIn, MIN_PASSWORD, sendReset, signUp, usernameAvailable, USERNAME_RE, USERNAME_RULES,
@@ -19,7 +19,7 @@ export function AuthShell({ title, children }: { title: string; children: ReactN
         <Wordmark size={64} />
         <p className="auth-tag">{APP.tagline}</p>
         <div className="auth-pills">
-          {CATEGORIES.map((c) => (
+          {DECK.map((c) => (
             <span key={c.id} className={`tag pill-lg ${c.id}`} title={c.label}>
               <ObjIcon cat={c.id} /> <span className="auth-pill-label">{c.label}</span>
             </span>

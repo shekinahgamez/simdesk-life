@@ -18,12 +18,6 @@
   "kind": "community"
  },
  {
-  "id": "rental",
-  "name": "Rental",
-  "pack": "base-game",
-  "kind": "residential"
- },
- {
   "id": "lounge",
   "name": "Lounge",
   "pack": "base-game",
@@ -87,7 +81,7 @@
   "id": "vacation-rental",
   "name": "Vacation Rental",
   "pack": "base-game",
-  "kind": "residential"
+  "kind": "community"
  },
  {
   "id": "custom-venue",
@@ -106,12 +100,6 @@
   "name": "Karaoke Bar",
   "pack": "base-game",
   "kind": "community"
- },
- {
-  "id": "penthouse",
-  "name": "Penthouse",
-  "pack": "base-game",
-  "kind": "residential"
  },
  {
   "id": "beach",
@@ -309,6 +297,24 @@
   "id": "pool",
   "name": "Pool",
   "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "general",
+  "name": "General",
+  "pack": "base-game",
+  "kind": "community"
+ },
+ {
+  "id": "spa",
+  "name": "Spa",
+  "pack": "spa-day",
+  "kind": "community"
+ },
+ {
+  "id": "restaurant",
+  "name": "Restaurant",
+  "pack": "dine-out",
   "kind": "community"
  }
 ]

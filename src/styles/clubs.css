@@ -1,0 +1,59 @@
+/* Clubs */
+.cnt { margin-left: 6px; font-size: 12px; font-weight: 700; letter-spacing: .02em; text-transform: none; color: var(--muted); font-family: var(--font-body); }
+.ph-ft-n { margin-left: 2px; }
+.ph-seg.three button { padding: 10px 4px; }
+.ph-pk-sim:disabled { opacity: .5; cursor: default; }
+
+/* the form */
+.club-act { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.club-act-row { display: flex; gap: 8px; align-items: center; }
+.club-act-row .input { flex: 1; min-width: 0; }
+.club-x { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--sidebar); color: var(--muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex: none; padding: 0; }
+.club-x.flat { width: 32px; height: 32px; background: none; }
+.club-sug { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); overflow: hidden; }
+.club-sug button { display: block; width: 100%; padding: 10px 14px; border: 0; background: none; text-align: left; font: inherit; font-weight: 600; font-size: 15px; color: var(--text); cursor: pointer; }
+.club-sug button + button { border-top: 1px solid var(--line); }
+.club-sug button:hover { background: color-mix(in srgb, var(--text) 4%, transparent); }
+.club-sug small { color: var(--muted); font-weight: 500; margin-left: 6px; }
+.club-aim { margin-left: 14px; width: calc(100% - 14px); height: 42px; }
+.club-aim-l { color: var(--muted); font-weight: 500; }
+.club-aim-add { align-self: flex-start; margin-left: 14px; }
+.club-add { align-self: flex-start; }
+.club-chip { cursor: default; margin-bottom: 8px; height: 46px; }
+.club-chip > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* on phones the whole club window slides up from the bottom, like the other sheets */
+@media (max-width: 860px) {
+  .modal-scrim:has(.club-form) { align-items: flex-end; padding: 0; }
+  .modal.club-form { width: 100%; max-width: none; border-radius: 22px 22px 0 0; max-height: 92dvh; }
+  .club-form .modal-foot { flex-direction: column-reverse; align-items: stretch; }
+  .club-form .modal-foot .btn.primary { height: 48px; border-radius: 12px; font-size: 16px; }
+  .club-form .modal-foot .btn.danger { margin-right: 0 !important; }
+}
+
+/* a club's page */
+.club-head { display: flex; gap: 14px; align-items: flex-start; }
+.club-head .grow { flex: 1; min-width: 0; }
+.club-head h1 { overflow-wrap: anywhere; }
+.club-card .card-head h2 { font-size: 17px; }
+.club-members { display: flex; flex-direction: column; }
+.club-member { display: flex; align-items: center; gap: 12px; padding: 10px 4px; border-bottom: 1px solid var(--line); color: var(--text); text-decoration: none; font-weight: 600; font-size: 16px; min-width: 0; }
+.club-member:last-child { border-bottom: 0; }
+.club-member .grow { flex: 1; min-width: 0; }
+.club-member small { display: block; font-size: 13px; color: var(--muted); font-weight: 500; }
+.club-chev { color: var(--muted); flex: none; }
+.club-sub { margin: 14px 0 4px; font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.club-sub:first-child { margin-top: 0; }
+.club-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.club-kv { display: flex; gap: 10px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.club-kv:last-child { border-bottom: 0; }
+.club-kv b { width: 84px; flex: none; font-size: 13px; font-weight: 600; color: var(--muted); }
+.club-kv span { font-weight: 600; }
+.club-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 11px 3px 8px; vertical-align: middle; font-weight: 600; color: var(--text); text-decoration: none; }
+.club-pill svg { color: var(--clubs-ink); }
+.club-arrow { color: var(--muted); }
+
+/* clubs wear their own pink, not the Photos purple */
+.club-item:hover { border-color: color-mix(in srgb, var(--clubs-ink) 35%, var(--line)); }
+.club-form .ph-pk-tick { color: var(--clubs-ink); }
+.club-form .ph-pk-tick.club-chev-t { color: var(--muted); }

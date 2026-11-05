@@ -19,9 +19,12 @@ export type SaveRow = {
   created_at?: string;
 };
 
+/** Account-wide things (custom traits, display choices). One per account; the newest edit wins. */
+export type AccountDoc = { data: Record<string, unknown>; edited_at: string };
+
 export type DraftRow = { key: string; save_id: string | null; data: Record<string, unknown>; updated_at: string };
 
-export type RemoteEvent = { type: 'record'; saveId: string; rec: Rec } | { type: 'save'; save: SaveRow };
+export type RemoteEvent = { type: 'record'; saveId: string; rec: Rec } | { type: 'save'; save: SaveRow } | { type: 'account'; doc: AccountDoc };
 
 /** Thrown when the internet (or Supabase) can't be reached. Edits stay waiting and retry. */
 export class NetworkError extends Error {}
@@ -39,6 +42,8 @@ export interface Backend {
   listDrafts(): Promise<DraftRow[]>;
   putDraft(d: DraftRow): Promise<void>;
   deleteDraft(key: string): Promise<void>;
+  loadAccount(): Promise<AccountDoc | null>;
+  pushAccount(doc: AccountDoc): Promise<AccountDoc>;
   /** Live changes from other devices. Returns a function that stops listening. */
   subscribe(onEvent: (e: RemoteEvent) => void, onReconnect: () => void): () => void;
 }

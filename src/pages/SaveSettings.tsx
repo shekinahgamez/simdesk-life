@@ -5,6 +5,8 @@ import { ObjIcon, type CategoryId } from '../components/categories';
 import { DateFields, LifespanEditor, MODULES, NewFromPacks, PackPicker, SeasonLengthPicker, Swatches } from '../components/savebits';
 import { DeleteSaveDialog, TrashList } from '../components/sync';
 import { Field, Modal, toast, Toggle } from '../components/ui';
+import { PhotoField } from '../components/photo';
+import { usePhotos, type PhotoRef } from '../lib/photos';
 import { available, BY_ID, GAME } from '../data/game';
 import { go, savePath } from '../lib/router';
 import { DEFAULT_NAME, lifespanLabel, ownedOf, saveData, seasonLengthLabel, tableOf, todayOf, type SaveData } from '../lib/saves';
@@ -14,10 +16,10 @@ import { plural } from '../lib/text';
 import { changeSeasonLength, formatDate, rescaleBornDay, stageTable, type Lifespan, type SeasonLength, type SimDate } from '../lib/time';
 import { useIsPhone } from '../lib/useIsPhone';
 
-const KIND_CAT: Record<string, CategoryId> = { sim: 'sims', household: 'households', lot: 'worlds', world: 'worlds', holiday: 'calendar', event: 'calendar', club: 'clubs' };
+const KIND_CAT: Record<string, CategoryId> = { sim: 'sims', household: 'households', lot: 'worlds', world: 'worlds', holiday: 'calendar', event: 'calendar', photo: 'photos', club: 'clubs' };
 const recName = (r: Rec) => {
   const d = r.data as Record<string, unknown>;
-  const n = String(d.name ?? `${d.first ?? ''} ${d.last ?? ''}`).trim();
+  const n = String(d.name ?? d.caption ?? `${d.first ?? ''} ${d.last ?? ''}`).trim();
   return n || 'Untitled';
 };
 
@@ -27,7 +29,14 @@ export function SaveSettings({ save }: { save: SaveRow }) {
   const phone = useIsPhone();
   const d = saveData(save);
   const update = (patch: Partial<SaveData>) => store.updateSave(save.id, patch);
-  const trash = useTrash();
+  const photos = usePhotos();
+  const setCover = (p: PhotoRef | null) => {
+    if (d.cover && d.cover.id !== p?.id) void photos.remove([d.cover.id]).catch(() => {});
+    update({ cover: p });
+  };
+  const coverField = <div className="field"><span className="label">Cover photo</span><PhotoField value={d.cover ?? null} onChange={setCover} aspect={4} saveId={save.id} label="Cover photo" emptyText="Add a cover photo" /></div>;
+  // Relationships come back with their Sim, so they aren't listed on their own.
+  const trash = useTrash().filter((r) => r.kind !== 'rel');
 
   const [nameText, setNameText] = useState<string | null>(null);
   const [setDate, setSetDate] = useState<SimDate | null>(null);
@@ -98,7 +107,7 @@ export function SaveSettings({ save }: { save: SaveRow }) {
         <Modal title="Set today’s date" onClose={() => setSetDate(null)}
           footer={<><button type="button" className="btn" onClick={() => setSetDate(null)}>Cancel</button><button type="button" className="btn primary" onClick={confirmSetDate}>Set date</button></>}>
           <p className="small muted" style={{ marginTop: 0 }}>For fixing the date. Moving forward? Jump ahead shows you what happened along the way.</p>
-          <DateFields value={setDate} onChange={setSetDate} seasonLength={d.calendar.seasonLength} />
+          <DateFields label="Today’s date" value={setDate} onChange={setSetDate} seasonLength={d.calendar.seasonLength} />
           <p className="tiny muted">{formatDate(setDate)}</p>
         </Modal>
       )}
@@ -125,10 +134,11 @@ export function SaveSettings({ save }: { save: SaveRow }) {
         <div className="m-group">
           <MRow title="Track today’s date" chevron={false} right={<Toggle on={d.trackDate} onChange={(trackDate) => update({ trackDate })} label="Track today’s date" />} />
           {d.trackDate && <MRow title="Today" value={`Y${t.year} · ${formatDate(t, 'short')}`} onClick={() => setSetDate(t)} />}
+          {d.trackDate && <MRow title="Real-life ages" sub="Like “24 years old”. Choose the ages in App settings." chevron={false} right={<Toggle on={!!d.realAges} onChange={(realAges) => update({ realAges })} label="Real-life ages" />} />}
           <MRow title="Season length" value={seasonLengthLabel(d.calendar.seasonLength)} onClick={() => setSheet('season')} />
           <MRow title="Lifespan" value={lifespanLabel(d.lifespan)} onClick={() => setSheet('life')} />
         </div>
-        <div className="m-help">{d.trackDate ? 'Powers ages, countdowns, birthdays, holidays, rotation and Jump ahead.' : 'Countdowns and Jump ahead are hidden. Age Sims up by hand from their profile.'}</div>
+        <div className="m-help">{d.trackDate ? 'Powers ages, countdowns, birthdays, holidays, rotation and Jump ahead.' : 'Countdowns and Jump ahead are hidden. Age Sims up by hand from their profile. Real-life ages need today’s date tracked.'}</div>
         <div className="m-label">Modules</div>
         <div className="m-group">
           {MODULES.map((m) => (
@@ -149,7 +159,7 @@ export function SaveSettings({ save }: { save: SaveRow }) {
         )}
         <div className="m-label">Save</div>
         <div className="m-group">
-          <MRow title="Name and color" value={d.name} onClick={() => setSheet('name')} />
+          <MRow title="Name, color and cover" value={d.name} onClick={() => setSheet('name')} />
           <MRow title="Packs" value={d.packs.length} onClick={openPacks} />
           <MRow title="Trash" value={trash.length || undefined} onClick={() => setSheet('trash')} />
           <MRow title="Delete this save" danger chevron={false} onClick={() => setDeleting(true)} />
@@ -167,10 +177,11 @@ export function SaveSettings({ save }: { save: SaveRow }) {
           </Modal>
         )}
         {sheet === 'name' && (
-          <Modal title="Name and color" onClose={() => { onNameDone(); setSheet(null); }} footer={<button type="button" className="btn primary" onClick={() => { onNameDone(); setSheet(null); }}>Done</button>}>
+          <Modal title="Name, color and cover" onClose={() => { onNameDone(); setSheet(null); }} footer={<button type="button" className="btn primary" onClick={() => { onNameDone(); setSheet(null); }}>Done</button>}>
             <div className="stack" style={{ gap: 16 }}>
               <Field label="Save name">{(id) => <input id={id} className="input" value={nameValue} placeholder={DEFAULT_NAME} maxLength={60} onChange={(e) => onName(e.target.value)} onBlur={onNameDone} />}</Field>
               <div className="field"><span className="label">Save color</span><Swatches value={d.color} onChange={(color) => update({ color })} /></div>
+              {coverField}
             </div>
           </Modal>
         )}
@@ -193,6 +204,7 @@ export function SaveSettings({ save }: { save: SaveRow }) {
         <div className="stack" style={{ gap: 16 }}>
           <Field label="Save name">{(id) => <input id={id} className="input" value={nameValue} placeholder={DEFAULT_NAME} maxLength={60} onChange={(e) => onName(e.target.value)} onBlur={onNameDone} />}</Field>
           <div className="field"><span className="label">Save color</span><Swatches value={d.color} onChange={(color) => update({ color })} size={36} /></div>
+          {coverField}
         </div>
       </section>
 
@@ -212,6 +224,11 @@ export function SaveSettings({ save }: { save: SaveRow }) {
             <button type="button" className="btn sm" onClick={() => setSetDate(todayOf(d))}>Set date</button>
           </div>
         )}
+        <div className="divider" />
+        <div className="switch-row">
+          <div className="grow"><div className="bold">Real-life ages</div><div className="small muted">{d.trackDate ? 'Show Sims’ ages the way a person’s would read, like “24 years old”. Choose the ages in App settings.' : 'Needs a save that tracks today’s date.'}</div></div>
+          {d.trackDate && <Toggle on={!!d.realAges} onChange={(realAges) => update({ realAges })} label="Real-life ages" />}
+        </div>
         <div className="divider" />
         <div className="field"><span className="label">Season length</span>
           <SeasonLengthPicker value={d.calendar.seasonLength} onChange={setLength} />

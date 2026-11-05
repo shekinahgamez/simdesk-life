@@ -1,4 +1,4 @@
-import { GoneError, NetworkError, type Backend, type DraftRow, type Rec, type RemoteEvent, type SaveRow } from './types';
+import { GoneError, NetworkError, type AccountDoc, type Backend, type DraftRow, type Rec, type RemoteEvent, type SaveRow } from './types';
 
 /**
  * A pretend account, kept in this browser, for the style check test page (the preview can't reach
@@ -17,6 +17,7 @@ export class MemoryBackend implements Backend {
   private saves = new Map<string, SaveRow>();
   private recs = new Map<string, Map<string, Rec>>();
   private drafts = new Map<string, DraftRow>();
+  private account: AccountDoc | null = null;
   private listeners = new Set<(e: RemoteEvent) => void>();
   private reconnects = new Set<() => void>();
   private key: string;
@@ -27,7 +28,8 @@ export class MemoryBackend implements Backend {
     try {
       const raw = localStorage.getItem(key);
       if (raw) {
-        const d = JSON.parse(raw) as { saves: SaveRow[]; recs: [string, Rec[]][]; drafts: DraftRow[] };
+        const d = JSON.parse(raw) as { saves: SaveRow[]; recs: [string, Rec[]][]; drafts: DraftRow[]; account?: AccountDoc | null };
+        this.account = d.account ?? null;
         this.saves = new Map(d.saves.map((s) => [s.id, s]));
         this.recs = new Map(d.recs.map(([id, rs]) => [id, new Map(rs.map((r) => [r.id, r]))]));
         this.drafts = new Map(d.drafts.map((x) => [x.key, x]));
@@ -41,6 +43,7 @@ export class MemoryBackend implements Backend {
         saves: [...this.saves.values()],
         recs: [...this.recs].map(([id, m]) => [id, [...m.values()]]),
         drafts: [...this.drafts.values()],
+        account: this.account,
       }));
     } catch { /* ignore */ }
   }
@@ -49,6 +52,7 @@ export class MemoryBackend implements Backend {
     this.saves.clear();
     this.recs.clear();
     this.drafts.clear();
+    this.account = null;
     this.offline = false;
     try { localStorage.removeItem(this.key); } catch { /* ignore */ }
   }
@@ -105,6 +109,14 @@ export class MemoryBackend implements Backend {
     this.save();
   }
   async deleteDraft(key: string) { await this.wait(); this.drafts.delete(key); this.save(); }
+  async loadAccount() { await this.wait(); return this.account; }
+  async pushAccount(doc: AccountDoc) {
+    await this.wait();
+    const row = { ...doc, edited_at: this.clamp(doc.edited_at)! };
+    if (!this.account || Date.parse(this.account.edited_at) <= Date.parse(row.edited_at)) this.account = row;
+    this.save();
+    return this.account;
+  }
 
   subscribe(onEvent: (e: RemoteEvent) => void, onReconnect: () => void) {
     this.listeners.add(onEvent);

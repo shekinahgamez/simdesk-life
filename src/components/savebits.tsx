@@ -6,8 +6,9 @@ import { MODULES, packContents, SAVE_COLORS, seasonLengthLabel, type ModuleDef }
 import { savePath } from '../lib/router';
 import { matches, plural } from '../lib/text';
 import {
-  SEASON_LENGTHS, SEASONS, STAGE_IDS, stageName, stageTable, type Lifespan, type Season, type SeasonLength, type SimDate, type StageId,
+  SEASON_LENGTHS, STAGE_IDS, stageName, stageTable, type Lifespan, type SeasonLength, type SimDate, type StageId,
 } from '../lib/time';
+import { DateField } from './SeasonPicker';
 import { Modal, NoMatches, SearchBox, Seg, Stepper } from './ui';
 
 // ---------- save color ----------
@@ -224,19 +225,7 @@ export function LifespanEditor({ value, onChange, customDays }: {
   );
 }
 
-/** Season, day and year. Used for "Today in your game" (setup) and Set date (settings). */
-export function DateFields({ value, onChange, seasonLength }: { value: SimDate; onChange(v: SimDate): void; seasonLength: SeasonLength }) {
-  const day = Math.min(value.day, seasonLength);
-  return (
-    <div className="stack" style={{ gap: 12 }}>
-      <Seg<Season> label="Season" value={value.season} onChange={(season) => onChange({ ...value, season, day })}
-        options={SEASONS.map((s, i) => ({ v: i as Season, label: s }))} />
-      <div className="row" style={{ gap: 20 }}>
-        <div className="field"><span className="label">Day</span>
-          <Stepper label="Day" min={1} max={seasonLength} value={day} onChange={(d) => onChange({ ...value, day: d })} /></div>
-        <div className="field"><span className="label">Year</span>
-          <Stepper label="Year" min={1} max={999} value={value.year} onChange={(y) => onChange({ ...value, year: y })} /></div>
-      </div>
-    </div>
-  );
+/** Season, day and year, picked on the calendar. Used for "Today in your game" (setup), Set date (settings) and when a Sim passed. */
+export function DateFields({ value, onChange, seasonLength, label = 'Date', today }: { value: SimDate; onChange(v: SimDate): void; seasonLength: SeasonLength; label?: string; today?: SimDate | null }) {
+  return <DateField label={label} value={value} onChange={onChange} seasonLength={seasonLength} today={today} />;
 }

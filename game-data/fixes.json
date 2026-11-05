@@ -129,5 +129,22 @@
       "name": "Social Puppeteer",
       "notes": ""
     }
-  ]
+  ],
+  "lotTypeChanges": {
+    "remove": [
+      "Rental",
+      "Penthouse"
+    ],
+    "add": [
+      {
+        "name": "General",
+        "pack": "Base Game",
+        "kind": "community"
+      }
+    ],
+    "kind": {
+      "Vacation Rental": "community"
+    }
+  },
+  "_lotTypeChanges": "Owner-approved 2026-11-04. 'Rental' isn't a lot type. Penthouse is a kind of spot, not a lot type. General is the non-residential default in game. Vacation rentals aren't homes."
 }

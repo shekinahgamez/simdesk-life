@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { CaretLeft, Check, DeviceMobile, Moon, Sun, type Icon } from '@phosphor-icons/react';
 import { getTheme, setTheme, type ThemePref } from '../lib/theme';
 import { useIsPhone } from '../lib/useIsPhone';
 
-/** Settings for the whole app (not one save). Theme for now. */
+/** Settings for the whole app (not one save): theme, plus account settings when signed in. */
 
 const THEMES: { v: ThemePref; label: string; icon: Icon }[] = [
   { v: 'light', label: 'Light', icon: Sun },
@@ -26,7 +26,8 @@ function ThemeRows({ value, onPick }: { value: ThemePref; onPick(v: ThemePref): 
   );
 }
 
-export function AppSettings() {
+/** `extra`: account settings (only when signed in). `inShell`: drawn inside the app's own layout. */
+export function AppSettings({ extra, inShell = false }: { extra?: ReactNode; inShell?: boolean } = {}) {
   const phone = useIsPhone();
   const [theme, setPref] = useState<ThemePref>(getTheme);
   const pick = (v: ThemePref) => {
@@ -35,21 +36,20 @@ export function AppSettings() {
   };
 
   if (phone) {
-    return (
-      <main className="m-main">
+    const inner = (
         <div className="m-stack">
           <a className="m-back" href="#/account"><CaretLeft size={20} weight="bold" /> Account</a>
           <h1 className="m-h1">App settings</h1>
           <div className="m-label">Theme</div>
           <ThemeRows value={theme} onPick={pick} />
           <div className="m-help">{HELP}</div>
+          {extra}
         </div>
-      </main>
     );
+    return inShell ? inner : <main className="m-main">{inner}</main>;
   }
 
-  return (
-    <main className="main">
+  const page = (
       <div className="page" style={{ maxWidth: 640 }}>
         <div className="crumbs"><a href="#/account">Account</a> / App settings</div>
         <div className="page-head">
@@ -63,7 +63,8 @@ export function AppSettings() {
           <ThemeRows value={theme} onPick={pick} />
           <p className="hint" style={{ margin: '10px 0 0' }}>{HELP}</p>
         </div>
+        {extra}
       </div>
-    </main>
   );
+  return inShell ? page : <main className="main">{page}</main>;
 }

@@ -18,6 +18,7 @@
   --worlds-tint: #D8F3EE;    --worlds-ink: #167C6D;
   --calendar-tint: #DDE9FF;  --calendar-ink: #2F62D6;
   --clubs-tint: #FBE0F0;     --clubs-ink: #B23A7D;
+  --photos-tint: #ECE4FB;    --photos-ink: #6B49C2;
   --storylines-tint: #ECE7FF; --storylines-ink: #5B4BD6;
 
   --shadow-sm: 0 1px 2px rgba(36, 25, 31, 0.05);
@@ -44,6 +45,7 @@
     --worlds-tint: #173A35; --worlds-ink: #6FD8C6;
     --calendar-tint: #1E2C4A; --calendar-ink: #8DB0FF;
     --clubs-tint: #432039; --clubs-ink: #F28FC9;
+    --photos-tint: #2E2547; --photos-ink: #B9A4FF;
     --storylines-tint: #2C2650; --storylines-ink: #ADA2FF;
     --shadow-sm: 0 1px 2px rgba(0,0,0,.3);
     --shadow: 0 1px 2px rgba(0,0,0,.25), 0 4px 14px rgba(0,0,0,.3);
@@ -59,6 +61,7 @@
   --worlds-tint: #173A35; --worlds-ink: #6FD8C6;
   --calendar-tint: #1E2C4A; --calendar-ink: #8DB0FF;
   --clubs-tint: #432039; --clubs-ink: #F28FC9;
+  --photos-tint: #2E2547; --photos-ink: #B9A4FF;
   --storylines-tint: #2C2650; --storylines-ink: #ADA2FF;
   --shadow-sm: 0 1px 2px rgba(0,0,0,.3);
   --shadow: 0 1px 2px rgba(0,0,0,.25), 0 4px 14px rgba(0,0,0,.3);
@@ -105,28 +108,14 @@ input, select, textarea { font: inherit; color: inherit; }
 .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .stack { display: flex; flex-direction: column; gap: 12px; }
 .grow { flex: 1; min-width: 0; }
-.grid-2 { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px; align-items: start; }
-.grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
 .muted { color: var(--muted); }
 .small { font-size: 13px; }
 .tiny { font-size: 12px; }
 .bold { font-weight: 700; }
 
-.mobile-bar { display: none; }
-
 @media (max-width: 860px) {
   .sidebar { display: none; }
-  .sidebar.open {
-    display: flex; position: fixed; inset: 0 auto 0 0; z-index: 60; height: 100%; box-shadow: var(--shadow-lg);
-  }
-  .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 55; }
   .main { padding: 0 16px 80px; }
-  .mobile-bar {
-    display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 40;
-    background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px);
-    margin: 0 -16px 12px; padding: 10px 16px; border-bottom: 1px solid var(--line);
-  }
-  .grid-2 { grid-template-columns: 1fr; }
   h1 { font-size: 26px; }
 }
 
@@ -135,7 +124,6 @@ input, select, textarea { font: inherit; color: inherit; }
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg);
   padding: 20px 22px; box-shadow: var(--shadow-sm);
 }
-.card.tight { padding: 14px 16px; }
 .card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
 .card-head h2 { display: flex; align-items: center; gap: 10px; }
 .divider { border-top: 1px solid var(--line); margin: 14px 0; }
@@ -151,6 +139,7 @@ input, select, textarea { font: inherit; color: inherit; }
 .obj.worlds { background: var(--worlds-tint); color: var(--worlds-ink); }
 .obj.calendar { background: var(--calendar-tint); color: var(--calendar-ink); }
 .obj.clubs { background: var(--clubs-tint); color: var(--clubs-ink); }
+.obj.photos { background: var(--photos-tint); color: var(--photos-ink); }
 .obj.storylines { background: var(--storylines-tint); color: var(--storylines-ink); }
 .obj.berry { background: var(--accent-soft); color: var(--accent); }
 
@@ -225,16 +214,6 @@ input, select, textarea { font: inherit; color: inherit; }
 .switch-row { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-top: 1px solid var(--line); }
 .switch-row:first-of-type { border-top: 0; }
 
-/* ---------- avatars ---------- */
-.avatar {
-  border-radius: 50%; background: var(--sims-tint); color: var(--sims-ink); display: inline-flex; align-items: center;
-  justify-content: center; font-weight: 700; flex-shrink: 0; overflow: hidden; font-size: 12px; width: 32px; height: 32px;
-  border: 2px solid var(--surface);
-}
-.avatar img { width: 100%; height: 100%; object-fit: cover; }
-.avatar-stack { display: flex; }
-.avatar-stack .avatar + .avatar { margin-left: -9px; }
-
 /* ---------- tables / lists ---------- */
 .table-wrap { overflow-x: auto; border-radius: var(--r-lg); border: 1px solid var(--line); background: var(--surface); }
 table.table { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -243,12 +222,6 @@ table.table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .table tr:last-child td { border-bottom: 0; }
 .table tbody tr { cursor: pointer; content-visibility: auto; contain-intrinsic-size: auto 60px; }
 .table tbody tr:hover td { background: color-mix(in srgb, var(--text) 3%, transparent); }
-
-.list-item {
-  display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--r);
-  text-decoration: none; color: inherit; content-visibility: auto; contain-intrinsic-size: auto 60px;
-}
-.list-item:hover { background: color-mix(in srgb, var(--text) 4%, transparent); }
 
 /* ---------- misc ---------- */
 .empty {
@@ -404,3 +377,28 @@ table.table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .on-its-way p { margin: 0; color: var(--muted); }
 .home-head { text-align: center; display: flex; flex-direction: column; gap: 6px; align-items: center; }
 .pretend-bar { position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 900; background: var(--storylines-tint); color: var(--storylines-ink); font-size: 12px; font-weight: 700; padding: calc(4px + env(safe-area-inset-top, 0px)) 12px 4px; border-radius: 0 0 10px 10px; pointer-events: none; }
+
+/* ---------- tap ripple (lib/ripple.ts) ---------- */
+html { -webkit-tap-highlight-color: transparent; }
+:root { --ripple: rgba(36, 25, 31, .08); }
+:root[data-sd-theme='dark'] { --ripple: rgba(255, 255, 255, .09); }
+@media (prefers-color-scheme: dark) { :root[data-sd-theme='system'] { --ripple: rgba(255, 255, 255, .09); } }
+.btn, .m-row, .m-pillbtn, .m-fab, .fchip, .place-pill, .seg button, .m-seg button, .tabs button, .world-tile, .place-world, .spot-row,
+.sim-card, .pk, .ms-pk, .ms-dcard, .lot-photo, .sim-hero-photo, .photo-drop, .m-savechip, .nav-link { position: relative; }
+.rip-clip { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 0; }
+.rip { position: absolute; border-radius: 50%; background: var(--ripple); transform: translate(-50%, -50%) scale(0); animation: rip-grow .5s cubic-bezier(.2, .6, .35, 1) forwards; }
+.rip.out { animation: rip-grow .5s cubic-bezier(.2, .6, .35, 1) forwards, rip-fade .35s ease .15s forwards; }
+.rip.still { transform: translate(-50%, -50%) scale(1); animation: none; opacity: .7; }
+.rip.still.out { animation: rip-fade .3s ease forwards; }
+@keyframes rip-grow { to { transform: translate(-50%, -50%) scale(1); } }
+@keyframes rip-fade { to { opacity: 0; } }
+/* Lighter ripple on photos and on berry buttons. */
+.world-tile .rip, .lot-photo .rip, .sim-hero-photo .rip, .sim-card .rip { background: rgba(255, 255, 255, .4); }
+.btn.primary .rip, .m-pillbtn .rip, .m-fab .rip { background: rgba(255, 255, 255, .25); }
+
+/* Fog: see-through surface with a faint warm blush and a thin bright edge. Used on things that float over photos or content. */
+.fog, .pp-round, .pp-edit, .m-tabbar, .season-banner-in .btn {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--surface) 62%, transparent), color-mix(in srgb, var(--accent-soft) 38%, transparent));
+  -webkit-backdrop-filter: blur(14px) saturate(1.25); backdrop-filter: blur(14px) saturate(1.25);
+  border: 1px solid color-mix(in srgb, var(--surface) 55%, transparent); box-shadow: 0 4px 14px rgba(36,25,31,.08);
+}

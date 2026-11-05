@@ -5,15 +5,23 @@ import './styles/mobile.css';
 import './styles/stylecheck.css';
 import './styles/auth.css';
 import './styles/setup.css';
+import './styles/sims.css';
+import './styles/worlds.css';
+import './styles/households.css';
+import './styles/calendar.css';
+import './styles/photos.css';
+import './styles/clubs.css';
 import { StyleCheck } from './pages/StyleCheck';
 import { AppSettings } from './pages/AppSettings';
 import { Auth } from './pages/Auth';
 import { isPretend, PretendApp, SetPassword, SignedIn } from './pages/AccountScreens';
 import { Toaster } from './components/ui';
 import { startTheme } from './lib/theme';
+import { startRipples } from './lib/ripple';
 import { useAuth } from './lib/auth';
 
 startTheme();
+startRipples();
 
 // Keep a copy of the app on this device so the installed app opens offline (see vite.config.ts → offlineCopy).
 if (import.meta.env.PROD && 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
@@ -30,12 +38,13 @@ function useHash() {
   return hash;
 }
 
-/** Until navigation is built (Phase 2): the account screens, plus #style-check and #app-settings for testing. */
+/** Picks what to show: the app when signed in, log in when not. #style-check is the design check page; #app-settings also works signed out (theme only). */
 function App() {
   const hash = useHash();
   const auth = useAuth();
   const [recoveryDone, setRecoveryDone] = React.useState(false);
-  if (hash === '#app-settings') return <AppSettings />;
+  // Signed in, App settings opens inside the app (it has account settings too).
+  if (hash === '#app-settings' && auth.status === 'signed-out' && !isPretend()) return <AppSettings />;
   if (hash === '#style-check') return <StyleCheck />;
   if (isPretend()) return <PretendApp />;
   if (auth.status === 'loading') return <div className="loading" role="status">Loading…</div>;

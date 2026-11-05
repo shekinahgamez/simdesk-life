@@ -1,5 +1,5 @@
 import { supabase } from '../supabase';
-import { GoneError, NetworkError, type Backend, type DraftRow, type Rec, type SaveRow } from './types';
+import { GoneError, NetworkError, type AccountDoc, type Backend, type DraftRow, type Rec, type SaveRow } from './types';
 
 const NET = /failed to fetch|networkerror|load failed|network request failed|fetch failed/i;
 
@@ -66,6 +66,17 @@ export const supabaseBackend: Backend = {
     const { error } = await supabase.from('drafts').delete().eq('key', key);
     if (error) fail(error);
   },
+  async loadAccount() {
+    const { data, error } = await supabase.from('account_docs').select('data,edited_at').maybeSingle();
+    if (error) fail(error);
+    return (data as AccountDoc | null) ?? null;
+  },
+  async pushAccount(doc) {
+    const { data, error } = await supabase.rpc('push_account', { p_data: doc.data, p_edited_at: doc.edited_at });
+    if (error) fail(error);
+    const row = data as AccountDoc;
+    return { data: row.data, edited_at: row.edited_at };
+  },
   subscribe(onEvent, onReconnect) {
     let joinedOnce = false;
     const ch = supabase
@@ -77,6 +88,10 @@ export const supabaseBackend: Backend = {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'saves' }, (p) => {
         const row = p.new as SaveRow | undefined;
         if (row && row.id) onEvent({ type: 'save', save: pickSave(row) });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'account_docs' }, (p) => {
+        const row = p.new as AccountDoc | undefined;
+        if (row && row.edited_at) onEvent({ type: 'account', doc: { data: row.data, edited_at: row.edited_at } });
       })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {

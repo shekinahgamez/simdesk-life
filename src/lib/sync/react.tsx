@@ -79,3 +79,10 @@ export function useDraft<T extends Record<string, unknown>>(key: string) {
     clear: () => s.clearDraft(key),
   };
 }
+
+/** Account-wide things (custom traits, display choices). */
+export function useAccount() {
+  const s = useStore();
+  const v = useStoreVersion();
+  return useMemo(() => ({ data: s.accountData(), update: (fn: (d: Record<string, unknown>) => Record<string, unknown>) => s.updateAccount(fn) }), [s, v]);
+}

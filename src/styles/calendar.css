@@ -1,0 +1,118 @@
+/* Calendar: season banner, the grid, item colors, the phone list, Coming up. */
+.k-holiday { --t: var(--calendar-tint); --i: var(--calendar-ink); }
+.k-event { --t: var(--storylines-tint); --i: var(--storylines-ink); }
+.k-birthday { --t: var(--sims-tint); --i: var(--sims-ink); }
+.k-vacation { --t: var(--worlds-tint); --i: var(--worlds-ink); }
+
+.season-banner { position: relative; height: 150px; border-radius: 22px; overflow: hidden; border: 1px solid var(--line); flex-shrink: 0; }
+.season-banner > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.season-banner::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, color-mix(in srgb, var(--bg) 72%, transparent) 72%, var(--bg) 100%); }
+.season-banner-in { position: absolute; left: 20px; right: 20px; bottom: 14px; z-index: 1; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.season-banner h2 { font-size: 32px; font-weight: 800; line-height: 1.05; margin: 0; }
+.season-banner .s { font-size: 14px; color: var(--muted); }
+.season-banner.sm { height: 116px; border-radius: 18px; }
+.season-banner.sm h2 { font-size: 24px; }
+.season-banner.sm .season-banner-in { left: 16px; right: 12px; bottom: 10px; }
+.cal-nav { display: flex; gap: 6px; }
+
+.cal-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.cal-legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--surface); }
+.cal-wd { font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); padding: 10px 10px 8px; border-bottom: 1px solid var(--line); }
+.cal-day { min-height: 96px; padding: 6px 0 8px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; min-width: 0; cursor: pointer; }
+.cal-grid > .cal-day:nth-child(7n + 8) { border-left: 0; }
+.cal-n { align-self: flex-start; margin: 0 6px; border: 0; background: none; font: inherit; font-size: 13px; color: var(--muted); padding: 0 4px; border-radius: 999px; cursor: pointer; }
+.cal-n:hover { background: var(--field); }
+.cal-day.today .cal-n { background: var(--accent); color: var(--accent-ink); padding: 0 8px; }
+.cal-it { margin: 0 6px; padding: 3px 8px; border: 0; border-radius: 7px; background: var(--t); color: var(--text); font: inherit; font-size: 12.5px; font-weight: 600; line-height: 1.3; text-align: left; display: flex; align-items: flex-start; gap: 5px; cursor: pointer; min-width: 0; }
+.kind-ic { color: var(--i); flex-shrink: 0; }
+.cal-it .kind-ic { margin-top: 1px; }
+.cal-it.ghost { visibility: hidden; height: 23px; }
+.cal-it.bar { margin: 0; border-radius: 0; white-space: nowrap; overflow: visible; position: relative; height: 23px; }
+.cal-it.bar.st { margin-left: 6px; border-radius: 7px 0 0 7px; z-index: 1; }
+.cal-it.bar.en { margin-right: 6px; border-radius: 0 7px 7px 0; }
+.cal-it.bar.st.en { border-radius: 7px; }
+
+.cal-add { display: flex; flex-direction: column; gap: 4px; }
+.cal-add-opt { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; border: 0; background: none; font: inherit; font-weight: 600; font-size: 15px; color: var(--text); cursor: pointer; text-align: left; }
+.cal-add-opt:hover { background: var(--field); }
+.cal-tile { width: 34px; height: 34px; border-radius: 10px; background: var(--t); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.modal.cal-add-modal { max-width: 340px; }
+.cal-daypick { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.cal-daypick.two { grid-template-columns: 1fr 1fr; }
+
+.cal-mrow { text-align: left; }
+
+.cal-cu { display: flex; flex-direction: column; }
+.cal-cu-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-top: 1px solid var(--line); color: inherit; text-decoration: none; min-width: 0; }
+.cal-cu-row:first-child { border-top: 0; padding-top: 0; }
+.cal-cu-row b { display: block; font-weight: 600; }
+.cal-cu-row .s { display: block; font-size: 13px; color: var(--muted); }
+.cal-when { width: 52px; flex-shrink: 0; text-align: center; border-radius: 12px; background: var(--t); padding: 5px 0; line-height: 1.1; }
+.cal-when b { display: block; font-family: var(--font-head); font-size: 18px; color: var(--i); }
+.cal-when span { font-size: 11px; font-weight: 600; color: var(--muted); }
+
+/* the little card that opens beside an item on the desktop calendar */
+.cal-pop { position: fixed; z-index: 40; width: 340px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 18px 44px rgba(36, 25, 31, .2); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.cal-pop::before { content: ""; position: absolute; top: var(--ay, 26px); width: 14px; height: 14px; background: var(--surface); transform: rotate(45deg); }
+.cal-pop.side-right::before { left: -8px; border-left: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.cal-pop.side-left::before { right: -8px; border-top: 1px solid var(--line); border-right: 1px solid var(--line); }
+.cal-pop.side-below::before { display: none; }
+.cal-pop-top { display: flex; gap: 12px; align-items: flex-start; }
+.cal-pop h3 { font-size: 18px; font-weight: 800; line-height: 1.2; margin: 0; }
+.cal-pop .s { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.cal-pop-x { border: 0; background: none; color: var(--muted); cursor: pointer; padding: 4px; border-radius: 8px; display: inline-flex; }
+.cal-pop-x:hover { background: var(--field); }
+.cal-pop-row { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.cal-pop-row .l { width: 52px; font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); flex-shrink: 0; }
+.cal-pop-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.cal-pop-notes { background: var(--field); border-radius: 12px; padding: 8px 12px; color: var(--muted); font-size: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.cal-pop-btns { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+.cal-tile.lg { width: 42px; height: 42px; border-radius: 12px; }
+.cal-tile.xl { width: 64px; height: 64px; border-radius: 18px; }
+.cal-tile .kind-ic { color: var(--i); }
+
+/* an item's own page */
+.cal-item-grid { column-count: 2; column-gap: 18px; }
+.cal-item-grid > .card { break-inside: avoid; margin: 0 0 18px; }
+.cal-item-grid > .card:only-child { column-span: all; }
+@media (max-width: 820px) { .cal-item-grid { column-count: 1; } }
+.cal-h { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.cal-person { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-top: 1px solid var(--line); color: inherit; text-decoration: none; }
+.cal-h + .cal-person { border-top: 0; }
+.cal-person b { display: block; font-weight: 600; }
+.cal-person .s { display: block; font-size: 13px; color: var(--muted); }
+
+/* themed headers (pictures from bannerData) */
+.season-banner .btn.fog { white-space: nowrap; }
+
+/* picking a banner: just the pictures */
+.banner-pick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.banner-th { position: relative; height: 56px; padding: 0; border-radius: 12px; overflow: hidden; border: 2px solid var(--line); background: var(--field); cursor: pointer; }
+.banner-th svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.banner-th.on { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+@media (max-width: 520px) { .banner-pick { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* the calendar picker */
+.dp-field { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; text-align: left; cursor: pointer; }
+.dp-field svg { color: var(--accent); flex-shrink: 0; }
+.modal.dp-modal { max-width: 380px; }
+.dp { display: flex; flex-direction: column; gap: 12px; }
+.dp-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.dp-wd { text-align: center; font-size: 12px; font-weight: 700; color: var(--muted); padding: 2px 0; }
+.dp-day { height: 40px; border: 0; border-radius: 12px; background: none; font: inherit; font-size: 15px; font-weight: 600; color: var(--text); cursor: pointer; }
+.dp-day:hover { background: var(--field); }
+.dp-day.mid { background: var(--accent-soft); border-radius: 6px; }
+.dp-day.today { box-shadow: inset 0 0 0 2px var(--accent); }
+.dp-day.sel { background: var(--accent); color: var(--accent-ink); }
+.dp-note { margin: 0; font-size: 13px; color: var(--muted); }
+
+.cal-back { border: 0; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font: inherit; font-weight: 700; font-size: 13px; padding: 6px 14px; cursor: pointer; }
+.cal-back:hover { filter: brightness(.97); }
+.cal-nav .btn.fog { gap: 4px; }
+.season-banner h1 { font-size: 32px; font-weight: 800; line-height: 1.05; margin: 0; }
+.season-banner.sm h1 { font-size: 24px; }
+.cal-pop-link { color: inherit; text-decoration: none; }
+.cal-pop-link:hover { text-decoration: underline; }
+.banner-more { grid-column: 1 / -1; justify-self: start; border: 0; background: none; color: var(--accent); font: inherit; font-weight: 700; font-size: 13px; padding: 4px 2px; cursor: pointer; }

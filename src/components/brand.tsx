@@ -10,7 +10,12 @@ export function Sparkle({ size = 24, color = 'var(--accent)', className, style }
   );
 }
 
-/** Lowercase wordmark in Gabarito ExtraBold with a berry four-point sparkle as the dot on the "i". */
+/**
+ * Lowercase wordmark in Gabarito ExtraBold with a berry four-point sparkle as the dot on the "i".
+ * This is the one logo. Inside the app, always use <Wordmark />. Anywhere else (mockups, images,
+ * social posts), use the matching files in public/brand/ (simdesk-logo.svg, simdesk-logo-dark.svg,
+ * sparkle.svg), which were traced from this exact component. Never redraw the sparkle by hand.
+ */
 export function Wordmark({ size = 22 }: { size?: number }) {
   const word = APP.wordmark;
   const i = word.indexOf('i');

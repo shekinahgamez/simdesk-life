@@ -153,6 +153,16 @@ list('lot-types', ['Lot types'], (r) => {
   const g = norm(pick(r, 'group', 'kind', 'category'));
   return { kind: g.startsWith('resid') ? 'residential' : g.startsWith('special') ? 'special' : 'community' };
 });
+{
+  // fixes.json lotTypeChanges: drop, add and re-group lot types the workbook gets wrong.
+  const f = path.join(outDir, 'lot-types.json');
+  const c = fixes.lotTypeChanges ?? {};
+  const drop = new Set((c.remove ?? []).map(norm));
+  let types = JSON.parse(fs.readFileSync(f, 'utf8')).filter((t) => !drop.has(norm(t.name)));
+  for (const x of c.add ?? []) if (!types.some((t) => norm(t.name) === norm(x.name))) types.push({ id: slug(x.name), name: x.name, pack: packId(x.pack), kind: x.kind });
+  types = types.map((t) => (c.kind?.[t.name] ? { ...t, kind: c.kind[t.name] } : t));
+  fs.writeFileSync(f, JSON.stringify(types, null, 1) + '\n');
+}
 
 // ---- Neighborhoods and lots (need world ids) ----
 const worlds = JSON.parse(fs.readFileSync(path.join(outDir, 'worlds.json'), 'utf8'));

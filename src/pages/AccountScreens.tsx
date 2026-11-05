@@ -9,12 +9,28 @@ import { go, savePath, useRoute } from '../lib/router';
 import { getLastSave, setLastSave } from '../lib/saves';
 import { useIsPhone } from '../lib/useIsPhone';
 import { HomeDeck, More, OnItsWay, PhoneToday } from './InApp';
+import { HouseholdsList } from './households/HouseholdsList';
+import { LotTypeRegistry } from './worlds/shared';
+import { CalendarPage } from './calendar/CalendarPage';
+import { PhotosPage } from './photos/PhotosPage';
+import { ClubsPage } from './clubs/ClubsPage';
+import { isItemKind, ItemPage } from './calendar/ItemPage';
+import { HouseholdPage } from './households/HouseholdPage';
 import { SaveSettings } from './SaveSettings';
+import { AppSettings } from './AppSettings';
+import { AskSettings } from './worlds/AskSettings';
+import { RealAgesSettings } from './sims/RealAgesSettings';
 import { Setup } from './Setup';
 import { SyncProvider, useSaves, useStore, useStoreVersion } from '../lib/sync/react';
 import { SyncStore } from '../lib/sync/store';
 import { supabaseBackend } from '../lib/sync/supabaseBackend';
 import { MemoryBackend } from '../lib/sync/memoryBackend';
+import { localPhotos, photoIdsIn, PhotoCtx, supabasePhotos, type PhotoService } from '../lib/photos';
+import { SimProfile } from './sims/SimProfile';
+import { SimsList } from './sims/SimsList';
+import { WorldsHome } from './worlds/WorldsHome';
+import { WorldPage } from './worlds/WorldPage';
+import { ApartmentPage, LotPage } from './worlds/LotPage';
 import { NetworkError } from '../lib/sync/types';
 import {
   AuthError, changeUsername, claimUsername, loadProfile, logOut, MIN_PASSWORD, nextUsernameChange, recentUsernameChanges,
@@ -225,7 +241,7 @@ function AccountPage({ profile, onProfile, pretend }: { profile: Profile; onProf
   );
 }
 
-const SECTION_CATS: Record<string, CategoryId> = { sims: 'sims', households: 'households', worlds: 'worlds', lots: 'worlds', calendar: 'calendar', clubs: 'clubs', storylines: 'storylines' };
+const SECTION_CATS: Record<string, CategoryId> = { sims: 'sims', households: 'households', worlds: 'worlds', lots: 'worlds', calendar: 'calendar', photos: 'photos', clubs: 'clubs', storylines: 'storylines' };
 
 /** Everything after logging in: picks the page from the address and keeps the right save open. */
 export function AppRoot({ userId, profile, onProfile, pretend }: { userId: string; profile: Profile; onProfile(p: Profile): void; pretend?: boolean }) {
@@ -240,7 +256,10 @@ export function AppRoot({ userId, profile, onProfile, pretend }: { userId: strin
   useEffect(() => {
     if (!ready) return;
     if (route.page === 'home') {
-      if (active.length === 0) return go('#/setup', { replace: true });
+      if (active.length === 0) {
+        if (!store.savesChecked) return; // wait for the account before deciding there are no saves
+        return go('#/setup', { replace: true });
+      }
       const last = getLastSave(userId);
       const target = active.find((s) => s.id === last) ?? active[0];
       return go(savePath(target.id, phone ? 'today' : ''), { replace: true });
@@ -251,8 +270,9 @@ export function AppRoot({ userId, profile, onProfile, pretend }: { userId: strin
       if (!phone && (route.section === 'today' || route.section === 'more')) return go(savePath(routeSave.id), { replace: true });
       setLastSave(userId, routeSave.id);
       if (store.openId !== routeSave.id) void store.openSave(routeSave.id);
+      else store.purgeExpired();
     }
-  }, [ready, route, routeSave, active.length, phone, userId, store]);
+  }, [ready, route, routeSave, active.length, phone, userId, store, store.savesChecked]);
 
   if (store.savesState === 'error') {
     return (
@@ -269,6 +289,7 @@ export function AppRoot({ userId, profile, onProfile, pretend }: { userId: strin
   if (route.page === 'setup') return <Setup userKey={userId} />;
 
   const shellSave = routeSave ?? (store.openId ? active.find((s) => s.id === store.openId) ?? null : null);
+  if (route.page === 'app-settings') return <Shell save={shellSave} route={route}><AppSettings inShell extra={<><RealAgesSettings phone={phone} /><AskSettings phone={phone} /></>} /></Shell>;
   if (route.page === 'account') return <Shell save={shellSave} route={route}><AccountPage profile={profile} onProfile={onProfile} pretend={pretend} /></Shell>;
   if (!routeSave || route.page !== 'save') return <div className="loading" role="status">Opening your save…</div>;
 
@@ -277,12 +298,46 @@ export function AppRoot({ userId, profile, onProfile, pretend }: { userId: strin
   if (sec === 'settings') page = <SaveSettings save={routeSave} />;
   else if (sec === 'today') page = <PhoneToday save={routeSave} />;
   else if (sec === 'more') page = <More save={routeSave} />;
+  else if (sec === 'worlds' || sec === 'lots') {
+    const [a, b] = sec === 'lots' ? ['lots'] : route.rest;
+    if (a === 'lot' && b) page = <LotPage key={b} save={routeSave} lotId={b} />;
+    else if (a === 'apt' && b) page = <ApartmentPage key={b} save={routeSave} gameId={b} />;
+    else if (a && a !== 'lots') page = <WorldPage key={a} save={routeSave} worldId={a} />;
+    else page = <WorldsHome save={routeSave} tab={a === 'lots' ? 'lots' : 'worlds'} />;
+  }
+  else if (sec === 'calendar' && isItemKind(route.rest[0]) && route.rest[1]) page = <ItemPage key={route.rest.join('/')} save={routeSave} kind={route.rest[0]} id={route.rest[1]} when={route.rest[2]} />;
+  else if (sec === 'calendar') page = <CalendarPage key={route.rest.join('/')} save={routeSave} rest={route.rest} />;
+  else if (sec === 'photos') page = <PhotosPage key={route.rest.join('/')} save={routeSave} rest={route.rest} />;
+  else if (sec === 'clubs') page = <ClubsPage key={route.rest.join('/')} save={routeSave} rest={route.rest} />;
+  else if (sec === 'households') page = route.rest[0] ? <HouseholdPage key={route.rest[0]} save={routeSave} hhId={route.rest[0]} /> : <HouseholdsList save={routeSave} />;
+  else if (sec === 'sims') page = route.rest[0] ? <SimProfile key={route.rest[0]} save={routeSave} simId={route.rest[0]} /> : <SimsList save={routeSave} />;
   else if (SECTION_CATS[sec]) page = <OnItsWay cat={SECTION_CATS[sec]} />;
   else page = <HomeDeck save={routeSave} />;
-  return <Shell save={routeSave} route={route}>{page}</Shell>;
+  return <><LotTypeRegistry /><Shell save={routeSave} route={route}>{page}</Shell></>;
 }
 
 const PROFILE_KEY = 'sd:profile';
+
+// ---------- photos ----------
+const pretendPhotos = localPhotos('sd:pretend-account');
+const photoServices = new Map<string, PhotoService>();
+function photosFor(userId: string) {
+  let p = photoServices.get(userId);
+  if (!p) { p = supabasePhotos(userId); photoServices.set(userId, p); }
+  return p;
+}
+/** Things deleted for good take their photos with them. */
+function wirePhotos(store: SyncStore, photos: PhotoService) {
+  store.onPurge = (recs) => {
+    const ids = recs.flatMap((r) => photoIdsIn(r.data));
+    if (ids.length) void photos.remove(ids).catch(() => { /* tidied up next time */ });
+  };
+  store.onPurgeSave = (saveId) => {
+    const cover = photoIdsIn(store.saves.get(saveId)?.data);
+    void photos.removeForSave(saveId).catch(() => {});
+    if (cover.length) void photos.remove(cover).catch(() => {});
+  };
+}
 
 // ---------- pretend account (for trying the app where Supabase can't be reached, like a preview link) ----------
 const PRETEND_KEY = 'sd:pretend';
@@ -293,14 +348,17 @@ function endPretend() { try { sessionStorage.removeItem(PRETEND_KEY); } catch { 
 export function PretendApp() {
   const [store] = useState(() => {
     const s = new SyncStore(new MemoryBackend('sd:pretend-account'), 'pretend');
+    wirePhotos(s, pretendPhotos);
     void s.start({ listenToWindow: true });
     return s;
   });
   const [profile, setProfile] = useState<Profile>({ user_id: 'pretend', username: 'PretendSimmer', plan: 'free' });
   return (
     <SyncProvider store={store}>
+      <PhotoCtx.Provider value={pretendPhotos}>
       <div className="pretend-bar">Pretend account · saved in this browser only</div>
       <AppRoot userId="pretend" profile={profile} onProfile={setProfile} pretend />
+      </PhotoCtx.Provider>
     </SyncProvider>
   );
 }
@@ -322,6 +380,7 @@ export function SignedIn({ userId }: { userId: string }) {
 
   useEffect(() => {
     const s = new SyncStore(supabaseBackend, userId);
+    wirePhotos(s, photosFor(userId));
     setStore(s);
     s.start({ listenToWindow: true });
     return () => s.stop();
@@ -359,7 +418,9 @@ export function SignedIn({ userId }: { userId: string }) {
   if (profile === null) return <PickUsername onDone={load} />;
   return (
     <SyncProvider store={store}>
-      <AppRoot userId={userId} profile={profile} onProfile={remember} />
+      <PhotoCtx.Provider value={photosFor(userId)}>
+        <AppRoot userId={userId} profile={profile} onProfile={remember} />
+      </PhotoCtx.Provider>
     </SyncProvider>
   );
 }

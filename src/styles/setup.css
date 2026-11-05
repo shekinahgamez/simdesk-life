@@ -165,9 +165,6 @@
 .ms-mods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .ms-mods .flipwrap { height: 168px; }
 .ms-mods .face { padding: 12px; }
-.ms-deck { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; gap: 0; padding: 20px 0 30px; margin: 0 calc(var(--m-pad) * -1); }
-.ms-deck::-webkit-scrollbar { display: none; }
-.ms-deck .slot { flex: 0 0 100%; scroll-snap-align: center; display: flex; justify-content: center; padding: 0 var(--m-pad); }
 .ms-dcard {
   width: min(100%, 260px); background: var(--surface); border-radius: 22px; padding: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--line);
   display: flex; flex-direction: column; gap: 10px; text-align: left; font: inherit; color: var(--text); cursor: pointer;
@@ -217,8 +214,9 @@
 .new-item-title.calendar { color: var(--calendar-ink); }
 .new-item-title.clubs { color: var(--clubs-ink); }
 
-/* ---------- deck pick motion (owner-approved: lift, glide to center, color fill) ---------- */
+/* ---------- deck pick motion (owner-approved: rise and glide to center, ripple fill) ---------- */
 .deck-wipe { position: fixed; inset: 0; z-index: 1000; pointer-events: none; }
+.deck-ripple { position: fixed; z-index: 1000; pointer-events: none; border-radius: 50%; }
 .deck-card { transition: filter .25s ease; }
 .deck.picking .deck-card:not(.picked) { filter: opacity(.35) saturate(.8); }
 .deck-card { transform-origin: 50% 50%; }

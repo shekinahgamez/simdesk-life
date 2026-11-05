@@ -59,7 +59,7 @@ function useBackdrop(onTap: () => void) {
 
 // ---------- pop-up ----------
 export function Modal({
-  title, onClose, dirty = false, onSaveDraft, children, footer, wide,
+  title, onClose, dirty = false, onSaveDraft, children, footer, wide, className = '', autoFocus = true,
 }: {
   title: ReactNode;
   /** Actually closes the pop-up. Called straight away when nothing changed, or after the player picks Discard. */
@@ -72,6 +72,10 @@ export function Modal({
   /** Buttons at the bottom. Pass a function to get `close`, which asks first when there are changes (for Cancel). */
   footer?: ReactNode | ((close: () => void) => ReactNode);
   wide?: boolean;
+  /** "pinned" keeps the buttons at the bottom while the form scrolls. */
+  className?: string;
+  /** false: open without putting the cursor in the first field (for pop-ups that are mostly buttons). */
+  autoFocus?: boolean;
 }) {
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
@@ -80,13 +84,13 @@ export function Modal({
   latest.current = { onClose, dirty };
   const requestClose = () => (latest.current.dirty ? setAsking(true) : latest.current.onClose());
   const { isTop } = useLayer(requestClose);
-  useOpenFocus(ref, true);
+  useOpenFocus(ref, autoFocus);
   const backdrop = useBackdrop(requestClose);
 
   return createPortal(
     <div className="modal-scrim" {...backdrop}>
       <div
-        className={`modal ${wide ? 'wide' : ''}`}
+        className={`modal ${wide ? 'wide' : ''} ${className}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={id}
@@ -130,8 +134,10 @@ function DiscardChanges({ onKeep, onSaveDraft, onDiscard }: { onKeep(): void; on
 export type ConfirmAction = { label: ReactNode; kind?: 'primary' | 'danger'; run(): void; disabled?: boolean };
 
 /** A small in-app question (never the browser's pop-up). Escape or tapping outside = onCancel. First button gets focus. */
-export function Confirm({ title, text, actions, onCancel, children }: {
+export function Confirm({ title, text, actions, onCancel, children, after }: {
   title: ReactNode; text?: ReactNode; actions: ConfirmAction[]; onCancel(): void; children?: ReactNode;
+  /** A small line under the buttons (like "Stop asking"). */
+  after?: ReactNode;
 }) {
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
@@ -154,6 +160,7 @@ export function Confirm({ title, text, actions, onCancel, children }: {
             <button key={i} type="button" className={`btn ${a.kind ?? ''}`} disabled={a.disabled} onClick={a.run}>{a.label}</button>
           ))}
         </div>
+        {after}
       </div>
     </div>,
     document.body,
@@ -293,7 +300,7 @@ export function NoMatches({ query }: { query: string }) {
 export type Option = { id: string; label: string; group?: string };
 
 export function Picker({
-  id, options, value, onChange, multiple = false, placeholder, onAdd, max,
+  id, options, value, onChange, multiple = false, placeholder, onAdd, addLabel, max,
 }: {
   id?: string;
   options: Option[];
@@ -304,6 +311,8 @@ export function Picker({
   placeholder?: string;
   /** Lets the player add what they typed as a new option. Return the new option's id. */
   onAdd?: (label: string) => string;
+  /** The words on the add row. Default: Add “what you typed”. */
+  addLabel?: (typed: string) => string;
   max?: number;
 }) {
   const autoId = useId();
@@ -402,7 +411,7 @@ export function Picker({
           ))}
           {canAdd && (
             <button type="button" role="option" aria-selected={hi === results.length} data-active={hi === results.length} onClick={add}>
-              <Plus size={14} weight="bold" /> Add “{q.trim()}”
+              <Plus size={14} weight="bold" /> {addLabel ? addLabel(q.trim()) : `Add “${q.trim()}”`}
             </button>
           )}
           {rows === 0 && <div className="no-matches">{q.trim() ? `No matches for “${q.trim()}”.` : 'Nothing left to pick.'}</div>}
@@ -469,5 +478,20 @@ export function Stepper({ id, value, onChange, min, max, label, unit }: {
       <button type="button" className="btn icon" aria-label={`More ${unit ?? ''}`.trim()} disabled={value >= max} onClick={() => onChange(clampTo(value + 1))}>+</button>
       {unit && <span className="stepper-unit">{unit}</span>}
     </div>
+  );
+}
+
+// ---------- notes box ----------
+/** A text box that saves itself a moment after typing stops, and when you leave it. */
+export function AutoText({ value, onSave, placeholder, label, rows = 4 }: { value: string; onSave(v: string): void; placeholder: string; label: string; rows?: number }) {
+  const [text, setText] = useState(value);
+  const timer = useRef<number>();
+  const latest = useRef({ value, onSave });
+  latest.current = { value, onSave };
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+  return (
+    <textarea className="textarea notes-box" aria-label={label} placeholder={placeholder} rows={rows} value={text}
+      onChange={(e) => { const v = e.target.value; setText(v); window.clearTimeout(timer.current); timer.current = window.setTimeout(() => latest.current.onSave(v), 500); }}
+      onBlur={() => { window.clearTimeout(timer.current); if (text !== latest.current.value) latest.current.onSave(text); }} />
   );
 }

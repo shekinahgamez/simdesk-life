@@ -2,7 +2,7 @@ import { toast } from '../../components/ui';
 import { kvDel, kvDelPrefix, kvGet, kvSet } from './kv';
 import {
   DAY, DRAFT_DAYS, GoneError, NetworkError, TRASH_DAYS,
-  type Backend, type DraftRow, type Rec, type RemoteEvent, type SaveData, type SaveRow,
+  type AccountDoc, type Backend, type DraftRow, type Rec, type RemoteEvent, type SaveData, type SaveRow,
 } from './types';
 
 /**
@@ -29,6 +29,8 @@ type Persisted = {
   purgeSaves: string[];
   drafts: DraftRow[];
   draftOut: [string, DraftRow | null][];
+  account?: AccountDoc | null;
+  accountOut?: AccountDoc | null;
 };
 
 const now = () => new Date().toISOString();
@@ -64,10 +66,14 @@ export class SyncStore {
   /** True once the open save's things are in memory (from this device or the server). */
   ready = false;
   drafts = new Map<string, DraftRow>();
+  /** Account-wide things: custom traits and display choices. */
+  account: AccountDoc | null = null;
   status: Status = 'synced';
   error = '';
   /** Whether the save list is known yet (from this device or the account). 'error' = nothing to show and can't reach the account. */
   savesState: 'loading' | 'ready' | 'error' = 'loading';
+  /** True once the account has answered (or can't be reached), so an empty list on this device isn't taken as "no saves" too early. */
+  savesChecked = false;
   /** Counts changes that came from another device, per item, so open forms can notice. */
   remoteHits = new Map<string, number>();
   version = 0;
@@ -77,6 +83,7 @@ export class SyncStore {
   private purgeRecs = new Map<string, Set<string>>();
   private purgeSaves = new Set<string>();
   private draftOut = new Map<string, DraftRow | null>();
+  private accountOut: AccountDoc | null = null;
   private listeners = new Set<() => void>();
   private online = typeof navigator === 'undefined' ? true : navigator.onLine;
   private flushing = false;
@@ -117,11 +124,14 @@ export class SyncStore {
       this.purgeSaves = new Set(saved.purgeSaves);
       this.drafts = new Map(saved.drafts.map((d) => [d.key, d]));
       this.draftOut = new Map(saved.draftOut);
+      this.account = saved.account ?? null;
+      this.accountOut = saved.accountOut ?? null;
     }
     if (saved) this.savesState = 'ready';
     if (this.openId) await this.loadCachedRecords(this.openId);
     if (!this.online) this.status = 'offline';
     if (!this.online && !saved) this.savesState = 'error';
+    if (!this.online) this.savesChecked = true;
     this.emit();
 
     if (opts.listenToWindow) {
@@ -160,10 +170,10 @@ export class SyncStore {
   /** True when some edits haven't reached the account yet. */
   hasPending(): boolean {
     return this.outSaves.size > 0 || [...this.outRecs.values()].some((m) => m.size > 0)
-      || [...this.purgeRecs.values()].some((s) => s.size > 0) || this.purgeSaves.size > 0 || this.draftOut.size > 0;
+      || [...this.purgeRecs.values()].some((s) => s.size > 0) || this.purgeSaves.size > 0 || this.draftOut.size > 0 || !!this.accountOut;
   }
   pendingCount(): number {
-    let n = this.outSaves.size + this.purgeSaves.size + this.draftOut.size;
+    let n = this.outSaves.size + this.purgeSaves.size + this.draftOut.size + (this.accountOut ? 1 : 0);
     for (const m of this.outRecs.values()) n += m.size;
     for (const s of this.purgeRecs.values()) n += s.size;
     return n;
@@ -203,9 +213,11 @@ export class SyncStore {
   async refresh() {
     if (!this.online || this.stopped) return;
     try {
-      const [saves, drafts] = await Promise.all([this.backend.listSaves(), this.backend.listDrafts()]);
+      const [saves, drafts, account] = await Promise.all([this.backend.listSaves(), this.backend.listDrafts(), this.backend.loadAccount()]);
       this.mergeSaves(saves);
+      this.mergeAccount(account);
       this.savesState = 'ready';
+      this.savesChecked = true;
       this.mergeDrafts(drafts);
       if (this.openId) {
         const id = this.openId;
@@ -215,7 +227,9 @@ export class SyncStore {
       this.persist();
       this.emit();
     } catch (e) {
-      if (this.savesState === 'loading') { this.savesState = 'error'; this.emit(); }
+      if (this.savesState === 'loading') this.savesState = 'error';
+      this.savesChecked = true;
+      this.emit();
       this.onFail(e);
     }
   }
@@ -286,7 +300,29 @@ export class SyncStore {
     this.remoteHits.set(id, (this.remoteHits.get(id) ?? 0) + 1);
   }
 
+  private mergeAccount(doc: AccountDoc | null) {
+    if (!doc || this.accountOut) return;
+    if (!this.account || t(doc.edited_at) >= t(this.account.edited_at)) this.account = doc;
+  }
+
+  // ---------- account-wide things ----------
+  accountData(): Record<string, unknown> { return this.account?.data ?? {}; }
+  /** Changes the account-wide record (custom traits, display choices). Syncs like everything else. */
+  updateAccount(change: (data: Record<string, unknown>) => Record<string, unknown>) {
+    const doc: AccountDoc = { data: change({ ...this.accountData() }), edited_at: now() };
+    this.account = doc;
+    this.accountOut = doc;
+    this.changed();
+  }
+
   private onRemote(e: RemoteEvent) {
+    if (e.type === 'account') {
+      if (this.accountOut) return;
+      this.mergeAccount(e.doc);
+      this.persist();
+      this.emit();
+      return;
+    }
     if (e.type === 'save') {
       const row = e.save;
       if (this.outSaves.has(row.id) || this.purgeSaves.has(row.id)) return;
@@ -353,7 +389,11 @@ export class SyncStore {
   }
 
   /** Deletes a save and everything in it for good. */
+  /** Called when a save is deleted for good (so its photos can be removed too). */
+  onPurgeSave: ((saveId: string) => void) | null = null;
+
   deleteSaveForever(id: string) {
+    this.onPurgeSave?.(id);
     this.saves.delete(id);
     this.outSaves.delete(id);
     this.outRecs.delete(id);
@@ -465,17 +505,47 @@ export class SyncStore {
     toast(`${name} moved to Trash`, { label: 'Undo', run: () => this.restore(id) });
   }
 
+  /** Moves several things to Trash together (a Sim and their relationships). Undo brings them all back. */
+  moveManyToTrash(ids: string[], name: string, quiet = false) {
+    const saveId = this.needOpen();
+    const at = now();
+    for (const id of ids) {
+      const cur = this.records.get(id);
+      if (cur && !cur.deleted_at) this.putRec(saveId, { ...cur, deleted_at: at, edited_at: at });
+    }
+    if (!quiet) toast(`${name} moved to Trash`, { label: 'Undo', run: () => ids.forEach((id) => this.restore(id)) });
+  }
+
+  /** Brings a thing back from Trash, along with anything trashed together with it (a Sim's relationships). */
   restore(id: string) {
     const saveId = this.needOpen();
     const cur = this.records.get(id);
     if (!cur) return;
+    const when = cur.deleted_at;
     this.putRec(saveId, { ...cur, deleted_at: null, edited_at: now() });
+    if (!when) return;
+    for (const r of [...this.records.values()]) {
+      const d = r.data as { a?: unknown; b?: unknown };
+      if (r.id !== id && r.deleted_at === when && (d.a === id || d.b === id)) this.putRec(saveId, { ...r, deleted_at: null, edited_at: now() });
+    }
+  }
+
+  /** Called with things deleted for good (so their photos can be removed too). */
+  onPurge: ((recs: Rec[]) => void) | null = null;
+
+  /** Deletes Trash older than 7 days for good (the server also does this nightly). */
+  purgeExpired() {
+    if (!this.openId || !this.ready) return;
+    const old = [...this.records.values()].filter((r) => r.deleted_at && expired(r.deleted_at, TRASH_DAYS)).map((r) => r.id);
+    if (old.length) this.deleteForever(old);
   }
 
   deleteForever(ids: string[]) {
     const saveId = this.needOpen();
     const waiting = this.outRecs.get(saveId);
     const purge = this.purgeRecs.get(saveId) ?? new Set<string>();
+    const gone = ids.map((id) => this.records.get(id)).filter((r): r is Rec => !!r);
+    if (gone.length) this.onPurge?.(gone);
     for (const id of ids) {
       this.records.delete(id);
       waiting?.delete(id);
@@ -595,6 +665,11 @@ export class SyncStore {
         for (const id of list) ids.delete(id);
         if (ids.size === 0) this.purgeRecs.delete(saveId);
       }
+      if (this.accountOut) {
+        const sent = this.accountOut;
+        const row = await this.backend.pushAccount(sent);
+        if (this.accountOut === sent) { this.accountOut = null; this.account = row; }
+      }
       for (const [key, d] of [...this.draftOut]) {
         try {
           if (d) await this.backend.putDraft(d);
@@ -657,6 +732,8 @@ export class SyncStore {
       purgeSaves: [...this.purgeSaves],
       drafts: [...this.drafts.values()],
       draftOut: [...this.draftOut],
+      account: this.account,
+      accountOut: this.accountOut,
     };
     kvSet(`${this.prefix}state`, state);
     if (this.cacheTimer) this.writeCache();

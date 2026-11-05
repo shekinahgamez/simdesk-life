@@ -14,7 +14,6 @@ import neighborhoodsJson from './game/neighborhoods.json';
 import lotsJson from './game/lots.json';
 import lotTypesJson from './game/lot-types.json';
 import secretAreasJson from './game/secret-areas.json';
-import mapsJson from './game/maps.json';
 import about from './game/_about.json';
 
 export type PackType = 'base' | 'expansion' | 'game' | 'stuff' | 'kit' | 'free';
@@ -34,7 +33,6 @@ export interface StageRow { id: string; name: string; short: number; normal: num
 export interface GameLot extends Tagged { world: string; neighborhood: string; size: string; locked?: boolean; lotType?: string; secret?: boolean; note?: string }
 export interface LotType { id: string; name: string; pack: string; kind: 'residential' | 'community' | 'special' }
 export interface SecretArea extends Tagged { notes: string }
-export interface WorldMap { image: string; plots: [number, number][]; pins: Record<string, number> }
 
 export const BASE_PACK = 'base-game';
 
@@ -50,7 +48,6 @@ export const GAME = {
   lots: lotsJson as GameLot[],
   lotTypes: lotTypesJson as LotType[],
   secretAreas: secretAreasJson as SecretArea[],
-  maps: Object.fromEntries(Object.entries(mapsJson).filter(([k]) => !k.startsWith('_'))) as Record<string, WorldMap>,
   importedAt: about.importedAt,
 };
 
@@ -83,11 +80,10 @@ export type Owned = { packs: ReadonlySet<string>; secretLots: ReadonlySet<string
 export function ownedFrom(packs: readonly string[] = [], secretLots: readonly string[] = []): Owned {
   return { packs: new Set([BASE_PACK, ...packs]), secretLots: new Set(secretLots) };
 }
-export const isOn = (owned: Owned, pack: string) => owned.packs.has(pack);
 
 /**
  * Everything a save can choose from: only items from its packs. Secret lots also need turning on.
- * Packs, life stages and maps are never filtered.
+ * Packs and life stages are never filtered.
  */
 export function available(owned: Owned) {
   const on = <T extends { pack: string }>(rows: T[]) => rows.filter((r) => owned.packs.has(r.pack));

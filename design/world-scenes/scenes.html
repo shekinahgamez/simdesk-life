@@ -1,0 +1,96 @@
+<title>World Tile Scenes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito:wght@700;800&family=Rethink+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: the Worlds tab, three tiles with flat layered scenes (simple shapes only), name on the soft melt. SimDesk tokens. */
+:root{--bg:#FAF8F7;--surface:#FFFFFF;--line:#ECE4E1;--text:#24191F;--muted:#7A6B72;--accent:#B83C76;
+  --display:'Gabarito',system-ui,sans-serif;--body:'Rethink Sans','Helvetica Neue',Arial,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171214;--surface:#211A1D;--line:#3A2F33;--text:#F5ECEF;--muted:#B3A2A9;--accent:#F07DB0;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171214;--surface:#211A1D;--line:#3A2F33;--text:#F5ECEF;--muted:#B3A2A9;--accent:#F07DB0;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:15px;margin:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.page{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{font-family:var(--display);font-size:30px;font-weight:800;margin:0}
+.note{color:var(--muted);margin:0;max-width:66ch}
+.lab{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-top:8px}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.tiles.big{grid-template-columns:1fr}
+@media (max-width:760px){.tiles{grid-template-columns:1fr 1fr}}
+@media (max-width:460px){.tiles{grid-template-columns:1fr}}
+.tile{position:relative;aspect-ratio:4/3;border-radius:22px;overflow:hidden;border:1px solid var(--line);box-shadow:0 2px 10px rgba(36,25,31,.06);max-width:100%}
+.big .tile{aspect-ratio:16/6}
+.tile svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.tile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,color-mix(in srgb,var(--bg) 72%,transparent) 76%,var(--bg) 100%)}
+.nm{position:absolute;left:16px;bottom:12px;z-index:1;display:flex;flex-direction:column}
+.nm b{font-family:var(--display);font-size:20px;font-weight:800;line-height:1.15}
+.nm span{font-size:12.5px;color:var(--muted)}
+</style>
+<div class="page">
+  <div><h1>World tiles</h1><p class="note">Flat, layered scenes made from simple shapes, in SimDesk's pastels. One per world. No maps, no lot names.</p></div>
+  <span class="lab">Worlds tab</span>
+  <div class="tiles">
+    <div class="tile">
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><linearGradient id="wcS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E4F4EC"/><stop offset="1" stop-color="#F6F3E2"/></linearGradient></defs>
+        <rect width="400" height="300" fill="url(#wcS)"/>
+        <circle cx="300" cy="78" r="38" fill="#FBEFC4"/>
+        <path d="M0 140 C70 112 140 118 210 132 S330 112 400 124 V300 H0Z" fill="#CDE8C9"/>
+        <path d="M0 172 C80 150 170 160 250 170 S360 152 400 160 V300 H0Z" fill="#B2DCAE"/>
+        <ellipse cx="96" cy="160" rx="26" ry="22" fill="#9FD0A0"/><rect x="94" y="168" width="4" height="14" rx="2" fill="#8DB98B"/>
+        <ellipse cx="132" cy="166" rx="18" ry="16" fill="#9FD0A0"/><rect x="130" y="172" width="4" height="10" rx="2" fill="#8DB98B"/>
+        <ellipse cx="318" cy="156" rx="22" ry="19" fill="#9FD0A0"/><rect x="316" y="163" width="4" height="12" rx="2" fill="#8DB98B"/>
+        <path d="M0 214 C60 196 120 198 180 208 S300 226 400 200 V222 C300 246 200 226 160 222 S60 214 0 236Z" fill="#A9DDE6"/>
+        <path d="M0 236 C60 214 160 222 200 226 S320 246 400 222 V300 H0Z" fill="#C3E5BC"/>
+      </svg>
+      <div class="nm"><b>Willow Creek</b><span>Base Game</span></div>
+    </div>
+    <div class="tile">
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><linearGradient id="osS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FCE3D3"/><stop offset="1" stop-color="#FDF1E3"/></linearGradient></defs>
+        <rect width="400" height="300" fill="url(#osS)"/>
+        <circle cx="282" cy="118" r="62" fill="#FCE7B8"/>
+        <path d="M38 172 L88 96 Q94 88 100 96 L150 172Z" fill="#E9B79F"/>
+        <path d="M120 172 L152 122 Q157 115 162 122 L194 172Z" fill="#EFC5AF"/>
+        <path d="M0 150 C80 138 160 146 240 140 S350 132 400 142 V300 H0Z" fill="#F4D3BC"/>
+        <path d="M0 186 C90 168 180 182 260 176 S360 164 400 172 V300 H0Z" fill="#EDC2A6"/>
+        <path d="M0 222 C100 204 190 220 280 212 S370 200 400 206 V300 H0Z" fill="#F3D2BB"/>
+        <rect x="336" y="150" width="5" height="34" rx="2.5" fill="#D9A68C"/>
+        <path d="M338 152 c-12 -6 -20 -2 -26 4 M338 152 c12 -6 20 -2 26 4 M338 150 c-6 -10 -14 -12 -20 -10 M338 150 c6 -10 14 -12 20 -10" stroke="#D9A68C" stroke-width="5" stroke-linecap="round" fill="none"/>
+      </svg>
+      <div class="nm"><b>Oasis Springs</b><span>Base Game</span></div>
+    </div>
+    <div class="tile">
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><linearGradient id="ncS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E5E0F7"/><stop offset="1" stop-color="#FBE6EE"/></linearGradient></defs>
+        <rect width="400" height="300" fill="url(#ncS)"/>
+        <path d="M92 52 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z" fill="#FFFFFF" opacity=".9"/>
+        <path d="M150 86 l2.5 6 6 2.5 -6 2.5 -2.5 6 -2.5 -6 -6 -2.5 6 -2.5z" fill="#FFFFFF" opacity=".8"/>
+        <circle cx="306" cy="92" r="26" fill="#FDEFF4"/>
+        <path d="M0 148 C90 122 170 132 250 142 S350 126 400 134 V300 H0Z" fill="#CFE3EA"/>
+        <path d="M0 180 C70 164 150 170 220 178 S340 168 400 174 V300 H0Z" fill="#B9DCD7"/>
+        <ellipse cx="236" cy="206" rx="96" ry="16" fill="#D8ECF6"/>
+        <path d="M70 180 l10 -26 10 26z" fill="#9FCFC6"/><path d="M88 182 l8 -20 8 20z" fill="#A9D5CC"/>
+        <path d="M340 176 l10 -24 10 24z" fill="#9FCFC6"/>
+        <path d="M0 228 C90 214 180 226 260 222 S360 214 400 218 V300 H0Z" fill="#C6E4DB"/>
+      </svg>
+      <div class="nm"><b>Newcrest</b><span>Base Game</span></div>
+    </div>
+  </div>
+  <span class="lab">World page header</span>
+  <div class="tiles big">
+    <div class="tile">
+      <svg viewBox="0 0 400 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><linearGradient id="osS2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FCE3D3"/><stop offset="1" stop-color="#FDF1E3"/></linearGradient></defs>
+        <rect width="400" height="150" fill="url(#osS2)"/>
+        <circle cx="300" cy="62" r="40" fill="#FCE7B8"/>
+        <path d="M46 92 L83 40 Q88 34 93 40 L130 92Z" fill="#E9B79F"/><path d="M110 92 L134 58 Q138 53 142 58 L166 92Z" fill="#EFC5AF"/>
+        <path d="M0 80 C80 72 160 78 240 74 S350 68 400 74 V150 H0Z" fill="#F4D3BC"/>
+        <path d="M0 100 C90 90 180 98 260 95 S360 88 400 92 V150 H0Z" fill="#EDC2A6"/>
+        <path d="M0 120 C100 110 190 118 280 114 S370 108 400 111 V150 H0Z" fill="#F3D2BB"/>
+      </svg>
+      <div class="nm"><b style="font-size:28px">Oasis Springs</b><span>Base Game</span></div>
+    </div>
+  </div>
+</div>
