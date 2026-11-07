@@ -18,6 +18,7 @@ import { ComingUp } from '../calendar/shared';
 import { NewHousehold } from './HouseholdsList';
 import { HhPill, useHhCtx, type HhCtx } from './shared';
 import { HouseholdRotation } from '../rotation/Rotation';
+import { MoneyCard, MoneyStrip } from '../money/Money';
 
 /** One household: its Sims, the lots it lives on and owns, and notes. */
 export function HouseholdPage({ save, hhId }: { save: SaveRow; hhId: string }) {
@@ -120,6 +121,7 @@ export function HouseholdPage({ save, hhId }: { save: SaveRow; hhId: string }) {
           <HhMore onDelete={() => setDialog('delete')} />
         </div>
         <HouseholdRotation save={save} hhId={hh.id} />
+        <MoneyStrip save={save} hhId={hh.id} />
         {tiles}
         <ComingUp save={save} simIds={members.map((m) => m.id)} seeAll={`calendar/household/${hh.id}`} showFaces />
         {lotsCard}
@@ -148,6 +150,7 @@ export function HouseholdPage({ save, hhId }: { save: SaveRow; hhId: string }) {
           {notes}
         </div>
         <div className="stack" style={{ gap: 18, minWidth: 0 }}>
+          <MoneyCard save={save} hhId={hh.id} />
           <ComingUp save={save} simIds={members.map((m) => m.id)} seeAll={`calendar/household/${hh.id}`} showFaces />
           {lotsCard}
         </div>

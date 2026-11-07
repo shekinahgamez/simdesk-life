@@ -28,6 +28,8 @@ export type SaveData = {
   cover?: PhotoRef | null;
   /** Rotation module: who's playing now and who's up next (see rotation.ts). */
   rotation?: unknown;
+  /** Household funds module: mod add-ons and wealth classes (see money.ts). */
+  money?: unknown;
 };
 
 export const SAVE_COLORS: { label: string; hex: string }[] = [
@@ -61,6 +63,7 @@ export function saveData(row: SaveRow | undefined): SaveData {
     modules: d.modules ?? {},
     cover: d.cover ?? null,
     rotation: d.rotation,
+    money: d.money,
   };
 }
 
@@ -94,7 +97,7 @@ export type ModuleDef = { id: string; label: string; desc: string; icon: Icon; t
 /** Optional features. Only ready ones can be turned on; the rest say "Coming soon". */
 export const MODULES: ModuleDef[] = [
   { id: 'rotation', label: 'Rotation', desc: 'Who’s up next and for how long', icon: ArrowsClockwise, tint: 'worlds', ready: true },
-  { id: 'funds', label: 'Household funds', desc: 'Simoleons for every household', icon: Coins, tint: 'households', ready: false },
+  { id: 'funds', label: 'Household funds', desc: 'Net worth for every household and Sim', icon: Coins, tint: 'households', ready: true },
   { id: 'careers', label: 'Careers', desc: 'Career, level and workplace', icon: Briefcase, tint: 'calendar', ready: false },
   { id: 'venues', label: 'Businesses & venues', desc: 'Owners, employees and customer activities', icon: Storefront, tint: 'sims', ready: false },
   { id: 'storylines', label: 'Storylines', desc: 'Threads that link Sims together', icon: Path, tint: 'storylines', ready: false },

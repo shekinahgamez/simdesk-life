@@ -1,0 +1,63 @@
+const { chromium } = require('playwright');
+const { mock, newState, logIn } = require('./mockdb.cjs');
+const { seed, SID } = require('./seed.cjs');
+const CORI='c208ae97-1e4b-472e-9c9d-36bc4bd441f7', KIANA='6d700e82-63fa-496e-b183-b35787852e05';
+const OUT=process.env.OUT||'.';
+let pass=0, fail=0; const ok=(c,m)=>{ if(c) pass++; else { fail++; console.log('FAIL', m); } };
+(async()=>{ const b=await chromium.launch();
+ for (const phone of [false,true]) {
+  const st=newState(); seed(st);
+  const now=new Date().toISOString();
+  Object.assign(st.records[SID][CORI].data,{likes:['Fitness','Video gaming','R&B music','Pink'],dislikes:['Country music','Cooking'],turnOns:['Funny','Hard worker','Stubble'],turnOffs:['Lazy','Mean']});
+  Object.assign(st.records[SID][KIANA].data,{likes:['Hip hop music','Gospel music','fitness'],dislikes:[],turnOns:['Creative'],turnOffs:[]});
+  const R=(id,data)=>({id,save_id:SID,kind:'sim',data:{first:data.first,last:'Test',traits:[],stagePhotos:[],genderSettings:{},notes:'',addedDay:0,bornDay:-300,...data},edited_at:now,deleted_at:null,created_at:now});
+  for (const [i,d] of [[1,{first:'Ava',likes:['Hip hop music','Museums']}],[2,{first:'Bo',likes:['Hip hop music'],dislikes:['Gospel music']}],[3,{first:'Cy',likes:['Hip hop music'],turnOns:['Fitness','Romantic']}]]) { const id=`bbbbbbbb-0000-4000-8000-00000000000${i}`; st.records[SID][id]=R(id,d); }
+  const ctx=await b.newContext(phone?{viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true,serviceWorkers:'block'}:{viewport:{width:1280,height:900},deviceScaleFactor:2,serviceWorkers:'block'});
+  const p=await ctx.newPage(); p.on('pageerror',e=>{fail++;console.log('ERR',e.message);});
+  await mock(p,st); await logIn(p); await p.waitForURL(/#\/s\//); await p.waitForTimeout(1000);
+  await p.goto(`http://localhost:4173/#/s/${SID}/sims/${CORI}`); await p.reload(); await p.waitForTimeout(1800);
+  const tag=phone?'phone':'desktop';
+  const row=(n)=>p.getByRole('button',{name:`Change ${n}`});
+  ok(await row('likes').isVisible(),'likes row shows');
+  ok((await row('likes').innerText()).includes('Fitness · Video gaming · R&B music · Pink'),'likes text');
+  ok((await p.locator('.cp-likes svg').count())===4,'four row icons');
+  await row('likes').scrollIntoViewIfNeeded(); await p.evaluate(()=>window.scrollBy(0,-120));
+  await p.screenshot({path:`${OUT}/${tag}-1-profile.png`});
+  await row('likes').click(); await p.waitForTimeout(300);
+  const box=p.getByRole('searchbox',{name:'Add a like'});
+  ok(await box.isVisible(),'search opens');
+  await box.fill('mus'); await p.waitForTimeout(200);
+  const opts=await p.locator('.lk-edit .choice').allInnerTexts();
+  ok(opts.some(t=>/Hip hop music\s*4 Sims/.test(t)),'hip hop 4 Sims: '+opts.join('|'));
+  ok(opts.some(t=>/Country music\s*Already in dislikes/.test(t)),'country disabled');
+  ok(!opts.some(t=>/R&B music/.test(t)),'own like hidden');
+  ok(opts.some(t=>/Add “mus” as new/.test(t)),'add new offered');
+  await p.screenshot({path:`${OUT}/${tag}-2-search.png`});
+  await p.locator('.lk-edit .choice',{hasText:'Hip hop music'}).click(); await p.waitForTimeout(300);
+  ok(await box.inputValue()==='','search clears');
+  await p.getByRole('button',{name:'Remove Pink'}).click(); await p.waitForTimeout(200);
+  await p.getByRole('button',{name:'Done'}).last().click(); await p.waitForTimeout(400);
+  ok((await row('likes').innerText()).includes('Fitness · Video gaming · R&B music · Hip hop music'),'likes saved '+await row('likes').innerText());
+  // new word in turn ons
+  await row('turn ons').click(); await p.waitForTimeout(300);
+  const box2=p.getByRole('searchbox',{name:'Add a turn on'});
+  await box2.fill('Tall'); await p.waitForTimeout(200);
+  await p.screenshot({path:`${OUT}/${tag}-3-new-word.png`});
+  await box2.press('Enter'); await p.waitForTimeout(300);
+  await p.getByRole('button',{name:'Done'}).last().click(); await p.waitForTimeout(400);
+  ok((await row('turn ons').innerText()).includes('Stubble · Tall'),'tall added');
+  // shows up for another Sim
+  await p.waitForTimeout(1500);
+  const cori=Object.values(st.records[SID]).find(r=>r.id===CORI).data;
+  ok(JSON.stringify(cori.turnOns)===JSON.stringify(['Funny','Hard worker','Stubble','Tall']),'synced '+JSON.stringify(cori.turnOns));
+  await p.goto(`http://localhost:4173/#/s/${SID}/sims/${KIANA}`); await p.waitForTimeout(1200);
+  await row('turn offs').click(); await p.waitForTimeout(300);
+  const t2=await p.locator('.lk-edit .choice').allInnerTexts();
+  ok(t2.some(t=>/Tall\s*1 Sim/.test(t)),'Tall offered to Kiana: '+t2.join('|'));
+  ok(t2.some(t=>/Creative\s*Already in turn ons/.test(t)),'Kiana creative disabled');
+  await p.screenshot({path:`${OUT}/${tag}-4-other-sim.png`});
+  await p.keyboard.press('Escape'); await p.waitForTimeout(300);
+  ok((await row('dislikes').innerText()).includes('--'),'empty shows --');
+  await ctx.close();
+ }
+ console.log('pass',pass,'fail',fail); await b.close(); process.exit(fail?1:0);})();

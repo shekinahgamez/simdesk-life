@@ -263,11 +263,11 @@ export function HolidayForm({ ctx, id, day, onClose }: { ctx: CalCtx; id: string
   );
 }
 
-export function EventForm({ ctx, id, day, onClose }: { ctx: CalCtx; id: string | null; day: number; onClose(): void }) {
+export function EventForm({ ctx, id, day, name, onClose }: { ctx: CalCtx; id: string | null; day: number; /** New event only: a name to start with. */ name?: string; onClose(): void }) {
   const store = useStore();
   const rec = id ? store.get(id) : undefined;
   const [start] = useState(() => (rec ? eventData(rec) : { name: '', day, banner: DEFAULT_EVENT_BANNER, host: null as string | null, going: [] as string[], notes: '' }));
-  const [f, setF] = useState(start);
+  const [f, setF] = useState(() => (!id && name ? { ...start, name, banner: bannerForName(name, 'event') || start.banner } : start));
   const [tried, setTried] = useState(false);
   const [picked, setPicked] = useState(!!id);
   const sims = useSimOptions(ctx);

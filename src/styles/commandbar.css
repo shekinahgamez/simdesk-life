@@ -1,0 +1,70 @@
+/* Command bar (desktop, Ctrl K) and Quick actions (phone). Calm: no filled buttons, the picked row is a soft berry tint. */
+.cb-back { position: fixed; inset: 0; z-index: 300; background: rgba(36, 25, 31, 0.22); }
+.cb {
+  position: fixed; z-index: 301; left: 50%; top: 88px; transform: translateX(-50%); width: min(640px, calc(100vw - 32px));
+  max-height: calc(100vh - 140px); display: flex; flex-direction: column; overflow: hidden;
+  background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-lg);
+}
+.cb-in { display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 12px 0 16px; border-bottom: 1px solid var(--line); flex-shrink: 0; color: var(--muted); }
+.cb-input { flex: 1; min-width: 0; height: 40px; border: 0; outline: 0; background: transparent; color: var(--text); font: inherit; font-size: 17px; padding: 0; }
+.cb-input::placeholder { color: var(--muted); }
+.cb-tok { display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 8px; border-radius: 8px; font-weight: 600; font-size: 15px; flex-shrink: 0; white-space: nowrap; }
+.cb-tok.worlds { background: var(--worlds-tint); color: var(--worlds-ink); }
+.cb-tok.calendar { background: var(--calendar-tint); color: var(--calendar-ink); }
+.cb-tok.sims { background: var(--sims-tint); color: var(--sims-ink); }
+.cb-tok.households { background: var(--households-tint); color: var(--households-ink); }
+.cb-tok.clubs { background: var(--clubs-tint); color: var(--clubs-ink); }
+.cb-tok.photos { background: var(--photos-tint); color: var(--photos-ink); }
+.cb-tok.berry { background: var(--accent-soft); color: var(--accent); }
+.cb-esc { height: 32px; min-width: 40px; font: inherit; font-size: 12px; font-weight: 600; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+.cb-list { overflow: auto; padding: 6px 8px 8px; flex: 1; min-height: 0; }
+.cb-h { font-size: 12px; font-weight: 600; color: var(--muted); padding: 10px 8px 4px; letter-spacing: 0.02em; }
+.cb-r { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 8px; border-radius: 10px; cursor: pointer; }
+.cb-r.on { background: var(--accent-soft); }
+.cb-r.off { cursor: default; }
+.cb-r .g { flex: 1; display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.cb-r .t { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; max-width: 60%; }
+.cb-r .s { color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.cb-r .k { font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; color: var(--muted); flex-shrink: 0; }
+.cb-r.on .k { color: var(--accent); }
+.cb-r .sim-avatar, .cb-r .obj { flex-shrink: 0; }
+.cb-tag { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--worlds-tint); color: var(--worlds-ink); flex-shrink: 0; }
+.cb-tag.gray { background: var(--sidebar); color: var(--muted); }
+.cb-help .kw { font-family: ui-monospace, Consolas, monospace; font-weight: 600; color: var(--accent); width: 100px; flex-shrink: 0; font-size: 14px; }
+.cb-help .ex { font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; }
+.cb-hint { font-size: 13px; color: var(--muted); padding: 8px 16px 0; }
+.cb-hint b { font-family: ui-monospace, Consolas, monospace; color: var(--accent); }
+.cb-tip { padding: 4px 16px 10px; }
+.cb-empty { color: var(--muted); padding: 16px 8px; font-size: 14px; }
+.cb-ft { display: flex; gap: 16px; align-items: center; padding: 0 16px; height: 36px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); flex-shrink: 0; }
+.cb-ft b { font-family: ui-monospace, Consolas, monospace; font-weight: 600; color: var(--text); border: 1px solid var(--line); border-radius: 5px; padding: 0 5px; margin-right: 4px; }
+
+/* Desktop sidebar Search */
+.side-search {
+  display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; width: 100%;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--muted); font: inherit; font-size: 14px; cursor: pointer;
+}
+.side-search:hover { color: var(--text); }
+.side-search .kk { margin-left: auto; font-size: 11.5px; font-weight: 600; border: 1px solid var(--line); border-radius: 5px; padding: 0 5px; }
+
+/* Phone: lightning button and the Quick actions sheet */
+.qa-btn { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 10px; background: var(--accent-soft); color: var(--accent); cursor: pointer; flex-shrink: 0; }
+.qa { padding-bottom: 8px; }
+.qa .cb-h { padding-left: 0; }
+.qa-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.qa-tile {
+  display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 8px 0 6px; min-width: 0;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; font-weight: 600; font-size: 14px; cursor: pointer; text-align: left;
+}
+.qa-tile span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qa-row { width: 100%; border: 0; background: transparent; font: inherit; color: inherit; text-align: left; padding: 4px 0; min-height: 48px; }
+.qa-row .g { flex-direction: column; gap: 0; align-items: stretch; }
+
+/* Phone picking sheet (Play someone else, Add to rotation, Move a Sim, Light or dark) */
+.cb.ph-pick { position: static; transform: none; width: auto; max-height: none; border: 0; box-shadow: none; border-radius: 0; background: transparent; overflow: visible; }
+.cb.ph-pick .cb-in { padding: 0 4px; border: 1px solid var(--line); border-radius: 12px; height: 48px; padding-left: 12px; }
+.cb.ph-pick .cb-list { padding: 4px 0 8px; overflow: visible; }
+.cb.ph-pick .cb-r { min-height: 48px; }
+.cb.ph-pick .cb-r .g { flex-direction: column; gap: 0; align-items: stretch; }
+.cb.ph-pick .cb-r .t { max-width: none; }
+.cb.ph-pick .cb-hint { padding: 8px 0 0; }

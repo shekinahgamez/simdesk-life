@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { CalendarBlank, GearSix, LockKey, MapPin, Package, PuzzlePiece, Trash } from '@phosphor-icons/react';
 import { BackLink, MRow } from '../components/Shell';
 import { ObjIcon, type CategoryId } from '../components/categories';
+import { FundsSettings } from './money/Money';
 import { DateFields, LifespanEditor, MODULES, NewFromPacks, PackPicker, SeasonLengthPicker, Swatches } from '../components/savebits';
 import { DeleteSaveDialog, TrashList } from '../components/sync';
 import { Field, Modal, toast, Toggle } from '../components/ui';
@@ -152,7 +153,7 @@ export function SaveSettings({ save }: { save: SaveRow }) {
           {MODULES.map((m) => (
             <MRow key={m.id} title={m.label} sub={m.ready ? undefined : m.desc} chevron={false}
               right={m.ready ? <Toggle on={!!d.modules[m.id]} onChange={(on) => update({ modules: { ...d.modules, [m.id]: on } })} label={m.label} /> : <span className="tag outline" style={{ whiteSpace: 'nowrap' }}>Coming soon</span>} />
-          ))}
+          )).flatMap((row, i) => (MODULES[i].id === 'funds' ? [row, <FundsSettings key="funds-sub" save={save} phone update={update} />] : [row]))}
         </div>
         <div className="m-help">Turning one off hides it without deleting anything. The rest are on the way.</div>
         {secretLots.length > 0 && (
@@ -275,7 +276,7 @@ export function SaveSettings({ save }: { save: SaveRow }) {
             </div>
             {m.ready ? <Toggle on={!!d.modules[m.id]} onChange={(on) => update({ modules: { ...d.modules, [m.id]: on } })} label={m.label} /> : <span className="tag outline" style={{ whiteSpace: 'nowrap' }}>Coming soon</span>}
           </div>
-        ))}
+        )).flatMap((row, i) => (MODULES[i].id === 'funds' ? [row, <FundsSettings key="funds-sub" save={save} phone={false} update={update} />] : [row]))}
       </section>
 
       {secretLots.length > 0 && (

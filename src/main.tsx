@@ -13,6 +13,8 @@ import './styles/rotation.css';
 import './styles/calendar.css';
 import './styles/photos.css';
 import './styles/clubs.css';
+import './styles/money.css';
+import './styles/commandbar.css';
 import { StyleCheck } from './pages/StyleCheck';
 import { AppSettings } from './pages/AppSettings';
 import { Auth } from './pages/Auth';
