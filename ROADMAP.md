@@ -6,12 +6,13 @@ Things the owner has asked for that come after the current phase. Newest ideas g
 - Nothing queued. Ask the owner what's next.
 
 ## Building now / next
-- Account page polish and backups (download a file per save, with or without photos; restore a backup as a new save). Mockups next.
 - **Guest demo: on hold** until every module is turned on and finished.
 - **Maps: shelved, not in v1.** The owner wants an artist to draw them her way.
 - A cleanup pass of small fixes once every v1 page exists
 
 ## Done
+- Account page and backups (computer only): password change, backup file with or without photos, spreadsheet and photos downloads, restore as a new save
+- Playing now: Add a day, Pause rotation, Play someone else
 - Fewer clicks (boards 1 to 10): tap a household cell to pick one, Select mode for moving Sims in bulk, relationship picker with housemates first and Save and add another, tap a profile row to edit it with Undo, Next day / Jump ahead / Go back, Pick a home lists the game's lots, compact Sim profile, Today page instead of the deck, smaller world and household page controls, tighter club page with a pencil per card
 - Today page (replaces the home deck)
 - Rotation: Playing now card on Today, Rotation page (order by dragging, turn length per household, Play now / Play next, take out), End turn (never moves the date), a line on the household page, a Playing now tag on Sim profiles

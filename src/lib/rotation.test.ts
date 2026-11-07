@@ -67,3 +67,43 @@ describe('rotation', () => {
     expect(cleanRotation(undefined)).toEqual(EMPTY_ROTATION);
   });
 });
+
+describe('adding days to this turn', () => {
+  it('lengthens only the turn being played and resets when the next turn starts', async () => {
+    const m = await import('./rotation');
+    let r = m.addHouseholds(m.EMPTY_ROTATION, ['a', 'b'], 3, 10);
+    r = m.addDays(r, 2);
+    expect(m.currentLength(r)).toBe(5);
+    expect(m.turnLength(r, 'a')).toBe(3);
+    r = m.endTurn(r, 15);
+    expect(r.extra).toBe(0);
+    expect(m.currentLength(r)).toBe(3);
+    r = m.endTurn(r, 18);
+    expect(r.current).toBe('a');
+    expect(m.currentLength(r)).toBe(3);
+  });
+  it('playing someone else now clears the added days', async () => {
+    const m = await import('./rotation');
+    let r = m.addDays(m.addHouseholds(m.EMPTY_ROTATION, ['a', 'b', 'c'], 3, 1), 1);
+    r = m.playNow(r, 'c', 2);
+    expect(r.extra).toBe(0);
+    expect(m.upNext(r)).toEqual(['b', 'a']);
+  });
+  it('cleans junk', () => {
+    expect(cleanRotation({ order: ['a'], extra: -4 }).extra).toBe(0);
+    expect(cleanRotation({ order: ['a'], extra: 2 }).extra).toBe(2);
+  });
+});
+
+describe('pause', () => {
+  it('keeps the household playing, then resume starts a fresh turn today', async () => {
+    const m = await import('./rotation');
+    let r = m.addDays(m.addHouseholds(m.EMPTY_ROTATION, ['a', 'b'], 3, 1), 2);
+    r = m.pause(r);
+    expect(r.paused).toBe(true);
+    r = m.resume(r, 20);
+    expect(r).toMatchObject({ paused: false, current: 'a', startDay: 20, extra: 0 });
+    expect(m.endTurn(m.pause(r), 21).paused).toBe(false);
+  });
+});
+

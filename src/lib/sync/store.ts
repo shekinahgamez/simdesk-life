@@ -367,6 +367,15 @@ export class SyncStore {
     return row.id;
   }
 
+  /** Adds a whole save at once (restoring a backup). Its things go to the account with the next sync. */
+  importSave(data: SaveData, recs: Rec[]): string {
+    const id = this.createSave(data);
+    this.outRecs.set(id, new Map(recs.map((r) => [r.id, r])));
+    kvSet(`${this.prefix}recs:${id}`, recs);
+    this.changed();
+    return id;
+  }
+
   updateSave(id: string, patch: Partial<SaveData>) {
     const cur = this.saves.get(id);
     if (!cur) return;

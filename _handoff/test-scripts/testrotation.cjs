@@ -101,6 +101,30 @@ const rot = (st) => st.saves[SID].data.rotation || {};
     await p.getByRole('button', { name: 'Add 2 households' }).click(); await p.waitForTimeout(400);
     ok((await p.locator('.rot-now').innerText()).includes('Priestley household') && (await p.locator('.rot-now').innerText()).includes('Day 1 of 3'), `${n} first one added starts playing`);
     ok(errs.length === 0, `${n} no page errors (empty) ${errs.join(' | ')}`);
+    // Add a day / Pause / Play someone else (Nov 7)
+    {
+      const o = await open(true); const p2 = o.p; const card2 = p2.locator('.rot-now');
+      await p2.goto(url(phone ? 'today' : '')); await p2.waitForTimeout(900);
+      ok(await p2.getByRole('button', { name: 'Add a day' }).isVisible() && await p2.getByRole('button', { name: 'Pause rotation' }).isVisible() && await p2.getByRole('button', { name: 'Play someone else' }).isVisible(), `${n} card has Add a day, Pause rotation, Play someone else`);
+      ok(await p2.getByRole('button', { name: 'Change', exact: true }).count() === 0, `${n} no unclear Change button`);
+      await p2.getByRole('button', { name: 'Add a day' }).click(); await p2.getByRole('button', { name: 'Add a day' }).click(); await p2.waitForTimeout(500);
+      ok((await card2.innerText()).includes('Day 2 of 5') && rot(o.st).extra === 2 && !(rot(o.st).lengths || {}).hp, `${n} two taps give 5 days this turn, usual length unchanged`);
+      await card2.getByRole('button', { name: /End turn/ }).click(); await p2.waitForTimeout(400);
+      await p2.getByRole('button', { name: /Start the Adebayo household’s turn/ }).click(); await p2.waitForTimeout(500);
+      ok(rot(o.st).current === 'ha' && (rot(o.st).extra || 0) === 0, `${n} extra days clear when the next turn starts`);
+      await p2.getByRole('button', { name: 'Pause rotation' }).click(); await p2.waitForTimeout(500);
+      const t = await card2.innerText();
+      ok(rot(o.st).paused === true && await p2.getByRole('button', { name: 'Resume rotation' }).isVisible() && /paused/i.test(t) && await p2.getByRole('button', { name: 'Add a day' }).count() === 0, `${n} pause shows Resume and hides Add a day`);
+      await p2.getByRole('button', { name: 'Resume rotation' }).click(); await p2.waitForTimeout(500);
+      ok(rot(o.st).paused === false && rot(o.st).startDay === 11 && (await card2.innerText()).includes('Day 1 of 3'), `${n} resume starts a fresh turn today`);
+      await p2.getByRole('button', { name: 'Play someone else' }).click(); await p2.waitForTimeout(500);
+      ok(await p2.locator('.rot-swpick', { hasText: 'Coriana' }).isVisible() && await p2.locator('.rot-swrow', { hasText: 'Vaughn' }).isVisible(), `${n} list shows rotation households and ones not in it`);
+      await p2.getByPlaceholder('Search households').fill('vau'); await p2.waitForTimeout(300);
+      ok(await p2.locator('.rot-swrow').count() === 1, `${n} search narrows the list`);
+      await p2.locator('.rot-swpick', { hasText: 'Vaughn' }).click(); await p2.waitForTimeout(600);
+      ok(rot(o.st).current === 'hx' && rot(o.st).order.includes('hx') && rot(o.st).order.includes('ha'), `${n} picking one outside the rotation plays it and adds it`);
+      ok(o.errs.length === 0, `${n} no page errors (switch) ${o.errs.join(' | ')}`);
+    }
   }
   // module off: nothing shows
   {

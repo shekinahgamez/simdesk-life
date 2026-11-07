@@ -13,7 +13,7 @@ import { clubData } from '../lib/clubs';
 import { layerCount, useLayer } from '../lib/layers';
 import { lotData } from '../lib/lots';
 import { recentOf } from '../lib/recent';
-import { addHouseholds, DEFAULT_TURN, playNow, turnDay, turnLength, upNext } from '../lib/rotation';
+import { addHouseholds, DEFAULT_TURN, playNow, currentLength, turnDay, upNext } from '../lib/rotation';
 import { go, savePath } from '../lib/router';
 import { moduleOn, saveData } from '../lib/saves';
 import { fullName, householdLabel, simData } from '../lib/sims';
@@ -264,7 +264,7 @@ function quickRows(x: Runner): Row[] {
   if (play && r.current) rows.push({ ...cmdRow(play, x, 'Quick'), sub: `Playing now: ${env.hh.nameOf(r.current)}` });
   else if (play) rows.push(cmdRow(play, x, 'Quick'));
   const end = find('end');
-  if (end && r.current) rows.push({ ...cmdRow(end, x, 'Quick'), title: `End ${env.hh.nameOf(r.current)}’s turn`, sub: env.d.trackDate ? `Day ${turnDay(r, env.d.today)} of ${turnLength(r, r.current)}` : undefined });
+  if (end && r.current) rows.push({ ...cmdRow(end, x, 'Quick'), title: `End ${env.hh.nameOf(r.current)}’s turn`, sub: env.d.trackDate ? `Day ${turnDay(r, env.d.today)} of ${currentLength(r)}` : undefined });
   const next = find('next');
   if (next) rows.push({ ...cmdRow(next, x, 'Quick'), sub: env.when(env.d.today + 1) });
   rows.push({ ...cmdRow(find('sim')!, x, 'Quick'), sub: undefined });
