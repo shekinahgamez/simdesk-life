@@ -68,3 +68,23 @@
 .rot-today .rot-who.rot-page { gap: 8px; }
 .rot-today .rot-who.rot-page .rot-name { font-size: 22px; }
 .rot-foot { flex-wrap: nowrap; }
+
+/* Switch household (from the Playing now card) */
+.rot-topacts { display: flex; align-items: center; gap: 12px; }
+.rot-search { display: flex; align-items: center; gap: 8px; position: relative; }
+.rot-search svg { position: absolute; left: 12px; color: var(--muted); pointer-events: none; }
+.rot-search .input { padding-left: 36px; width: 100%; }
+.rot-swlist { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.rot-swrow { display: flex; align-items: center; gap: 8px; padding-right: 8px; }
+.rot-swrow + .rot-swrow { border-top: 1px solid var(--line); }
+.rot-swpick { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 12px; background: none; border: 0; text-align: left; cursor: pointer; }
+.rot-swpick:hover { background: var(--sidebar); }
+.rot-swpick .grow { display: flex; flex-direction: column; min-width: 0; }
+.rot-swpick b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rot-swplay { color: var(--muted); flex: 0 0 auto; }
+.rot-swrow .btn.sm { flex: 0 0 auto; }
+.rot-swfaces { flex: 0 0 72px; display: flex; }
+@media (max-width: 700px) { .rot-swaddtxt { display: none; } .rot-swrow .btn.sm { width: 32px; padding: 0; justify-content: center; } }
+
+.rot-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.rot-now.paused .rot-line { color: var(--text); font-weight: 600; }

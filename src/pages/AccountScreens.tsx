@@ -1,9 +1,11 @@
 import { useEffect, useId, useState, type FormEvent, type ReactNode } from 'react';
-import { Gear, Palette, SignOut } from '@phosphor-icons/react';
+import { Gear, SignOut } from '@phosphor-icons/react';
 import { PasswordInput } from '../components/PasswordInput';
 import { Confirm, Field, Modal, toast } from '../components/ui';
 import { SaveTrash } from '../components/sync';
-import { BackLink, Shell } from '../components/Shell';
+import { BackLink, MRow, Shell } from '../components/Shell';
+import { BackupsCard, YouGroup } from './account/AccountParts';
+import { supabase } from '../lib/supabase';
 import type { CategoryId } from '../components/categories';
 import { go, savePath, useRoute } from '../lib/router';
 import { getLastSave, setLastSave } from '../lib/saves';
@@ -180,7 +182,7 @@ function AccountPage({ profile, onProfile, pretend }: { profile: Profile; onProf
   const [changing, setChanging] = useState(false);
   const [askLogOut, setAskLogOut] = useState(false);
   const store = useStore();
-  const { trashed } = useSaves();
+  const { trashed, active } = useSaves();
   const phone = useIsPhone();
   const leave = async () => {
     if (pretend) { endPretend(); return; }
@@ -190,27 +192,27 @@ function AccountPage({ profile, onProfile, pretend }: { profile: Profile; onProf
   };
   const tryLogOut = () => (store.hasPending() ? setAskLogOut(true) : leave());
   const back = store.openId ? savePath(store.openId, phone ? 'more' : '') : '#/';
+  const [email, setEmail] = useState<string | null>(null);
+  useEffect(() => { if (!pretend) supabase.auth.getSession().then(({ data }) => setEmail(data.session?.user.email ?? null)).catch(() => {}); }, [pretend]);
   const body = (
     <>
-      <div className="card stack">
-        <div>
-          <div className="small muted">Username</div>
-          <div className="signed-in-name">{profile.username}</div>
-        </div>
-        <div className="row">
-          {!pretend && <button type="button" className="btn" onClick={() => setChanging(true)}>Change username</button>}
-          <button type="button" className="btn danger" onClick={tryLogOut}><SignOut size={16} weight="duotone" /> {pretend ? 'Leave the pretend account' : 'Log out'}</button>
-        </div>
-        <div className="row">
-          <a className="btn ghost sm" href="#app-settings"><Gear size={16} weight="duotone" /> App settings</a>
-          <a className="btn ghost sm" href="#style-check"><Palette size={16} weight="duotone" /> Style check</a>
-        </div>
+      <div className="acct-head">
+        <span className="acct-avatar" aria-hidden="true">{profile.username.slice(0, 1).toUpperCase()}</span>
+        <div><div className="acct-name">{profile.username}</div>{pretend && <div className="muted small">Pretend account</div>}</div>
       </div>
-      <div className="card stack">
-        <div className="card-head" style={{ margin: 0 }}><h2>Deleted saves</h2></div>
+      <YouGroup username={profile.username} email={email} pretend={pretend} onUsername={() => setChanging(true)} />
+      <div className="m-group acct-group">
+        <MRow href="#app-settings" title="App settings" sub="Theme, real-life ages, questions" icon={<span className="obj berry"><Gear size={16} weight="duotone" /></span>} />
+      </div>
+      {active.length > 0 && <BackupsCard saves={active} />}
+      <section className="card acct-card">
+        <div className="card-head"><h2>Deleted saves</h2></div>
         {trashed.length === 0
           ? <p className="small muted" style={{ margin: 0 }}>None. A deleted save stays here for 7 days, then it’s gone for good.</p>
           : <><p className="small muted" style={{ margin: 0 }}>A deleted save stays here for 7 days, then it’s gone for good.</p><SaveTrash saves={trashed} /></>}
+      </section>
+      <div className="acct-logout">
+        <button type="button" className="btn danger" onClick={tryLogOut}><SignOut size={16} weight="duotone" /> {pretend ? 'Leave the pretend account' : 'Log out'}</button>
       </div>
     </>
   );
@@ -224,7 +226,7 @@ function AccountPage({ profile, onProfile, pretend }: { profile: Profile; onProf
         </div>
       ) : (
         <div className="page" style={{ maxWidth: 640 }}>
-          <div className="page-head"><div><h1>Account</h1><div className="sub">Signed in as {profile.username}</div></div></div>
+          <div className="page-head"><div><h1>Account</h1></div></div>
           {body}
         </div>
       )}
