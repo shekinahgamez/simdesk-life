@@ -63,3 +63,29 @@
 .unit-row .row .tag.hh-pill { font-size: 12.5px; }
 .hh-lot .obj { width: 38px; height: 38px; border-radius: 11px; }
 .more-apts { width: 100%; }
+
+/* Households: List view */
+.hh-table td { vertical-align: middle; }
+.hh-table tbody tr { cursor: pointer; }
+.hh-table .hh-face { border-width: 2px; }
+.hh-home { display: inline-flex; align-items: center; gap: 6px; }
+.hh-home svg { color: var(--households-ink); flex-shrink: 0; }
+.hh-pick { font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); background: none; border: 1px dashed var(--line); border-radius: 9px; padding: 5px 10px; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+.hh-pick:hover { color: var(--households-ink); border-color: var(--households-ink); }
+.hh-mrow { gap: 12px; min-height: 60px; width: 100%; text-align: left; font: inherit; color: inherit; background: none; border-left: 0; border-right: 0; border-top: 0; }
+.hh-mrow .t, .hh-mrow .s { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hh-mrow-faces { width: 60px; flex-shrink: 0; display: inline-flex; }
+.hh-mrow .hh-face { border-width: 2px; }
+.hh-face-empty { width: 30px; height: 30px; border-radius: 50%; border: 1.5px dashed var(--line); }
+
+/* smaller Sim circles on a household page (Nov 2026) */
+.hh-tiles { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 10px 8px; }
+.m-stack .hh-tiles { grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); }
+.hh-tile { align-items: center; text-align: center; }
+.hh-tile .hh-tile-img { width: 56px; height: 56px; border-radius: 50%; }
+.hh-tile .hh-tile-img.initials { font-size: 17px; }
+.m-stack .hh-tile .hh-tile-img { width: 52px; height: 52px; border-radius: 50%; }
+.hh-tile b { max-width: 100%; margin-top: 4px; }
+.hh-tile > span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.more-menu .danger { color: var(--danger); }
+.m-stack .hh-more-btn { width: 32px; height: 32px; }

@@ -64,3 +64,31 @@ export function realAgeShort(years: number): string {
   if (years < 1) return `${Math.floor(years * 12 + 1e-9)}M`;
   return String(Math.floor(years + 1e-9));
 }
+
+/**
+ * The other way round: a real-life age in whole years to where that puts a Sim on their age bar.
+ * Lands halfway through that year, so the Sim reads as exactly that age. Returns the stage and the
+ * days already spent in it (never the last day, so a birthday is always at least a day away).
+ */
+export function stageForRealAge(years: number, r: RealAgeRanges, stageDays: number[]): { stage: StageId; inStage: number } {
+  const target = Math.min(Math.max(0, Math.floor(years)) + 0.5, r.end - 0.01);
+  let i = 0;
+  for (let k = 0; k < r.starts.length; k++) if (r.starts[k] <= target) i = k;
+  const lo = r.starts[i];
+  const hi = i + 1 < r.starts.length ? r.starts[i + 1] : r.end;
+  const days = stageDays[i];
+  const want = Math.floor(target);
+  const yearsAt = (d: number) => lo + (d / days) * (hi - lo);
+  // Short stages have few days, so pick the day that reads as this age and sits closest to mid-year.
+  let best = 0;
+  let bestScore = Infinity;
+  for (let d = 0; d < days; d++) {
+    const y = yearsAt(d);
+    const score = (Math.floor(y + 1e-9) === want ? 0 : 1000) + Math.abs(y - target);
+    if (score < bestScore) { best = d; bestScore = score; }
+  }
+  return { stage: STAGE_IDS[i], inStage: best };
+}
+
+/** Youngest and oldest whole-year ages the stepper offers. */
+export const realAgeLimits = (r: RealAgeRanges) => ({ min: 0, max: Math.ceil(r.end) - 1 });

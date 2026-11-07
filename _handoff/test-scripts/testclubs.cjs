@@ -50,10 +50,7 @@ const clubs = (st, sid) => Object.values(st.records[sid] ?? {}).filter((r) => r.
     if (phone) ok(await p.getByRole('link', { name: /Clubs/ }).isVisible(), `${n} pack on: Clubs on the More page`);
     else ok(await p.getByRole('link', { name: 'Clubs' }).first().isVisible(), `${n} pack on: Clubs in the sidebar`);
 
-    if (!phone) {
-      await open(ON, ''); ok(await p.locator('.deck-card', { hasText: 'Clubs' }).count() === 1, `${n} pack on: Clubs card on the home deck`);
-      await open(OFF, ''); ok(await p.locator('.deck-card', { hasText: 'Clubs' }).count() === 0, `${n} pack off: no Clubs card`);
-    }
+    // (The home deck's Clubs card is gone: Today replaced the deck, Nov 2026. The sidebar check above covers it.)
     // ---- empty state, then a new club
     await open(ON, 'clubs');
     ok(await p.getByText('No clubs yet').isVisible(), `${n} empty state`);
@@ -142,7 +139,8 @@ const clubs = (st, sid) => Object.values(st.records[sid] ?? {}).filter((r) => r.
     ok(c.requirements.length === 2 && c.requirements[1].value === 'Teen, Adult' && c.perks[0]?.kind === 'vibe', `${n} requirements and perks saved`);
     ok(/\/clubs\/[0-9a-f-]+$/.test(p.url()), `${n} lands on the club page`);
     ok(await p.getByRole('heading', { name: 'Page Turners' }).isVisible() && await p.getByText('Invite only').first().isVisible(), `${n} club page title and admission`);
-    ok(await p.locator('.club-member', { hasText: 'Tobi Okafor' }).getByText('Leader').isVisible(), `${n} leader tagged`);
+    ok(await p.locator('.club-face[aria-label="Tobi Okafor, leader"] .club-lead').isVisible() && await p.locator('.club-lead').count() === 1, `${n} leader tagged`);
+    ok(await p.locator('.club-face', { hasText: 'Tobi' }).count() === 1 && await p.locator('.club-face.add').isVisible(), `${n} members as faces with first names and Add`);
     ok(await p.getByText('Any Library').isVisible() && await p.getByText('Bookworm').isVisible() && await p.getByText('Secret'.slice(0, 0) + 'Focused').isVisible() && await p.getByText('Meets every Saturday.').isVisible(), `${n} place, requirement, perk, notes shown`);
     ok(await p.getByText('Read', { exact: true }).isVisible() && await p.getByText('Fight', { exact: true }).isVisible(), `${n} encouraged and banned shown`);
     if (shots) await p.screenshot({ path: `${shots}/${n}-club.png`, fullPage: true });
@@ -177,20 +175,36 @@ const clubs = (st, sid) => Object.values(st.records[sid] ?? {}).filter((r) => r.
 
     // ---- a Sim's profile
     await open(ON, `sims/${U(1)}`);
-    if (phone) await p.getByRole('tab', { name: 'About' }).click();
+    
     await wait(p, 300);
     ok(await p.getByText(/^Clubs/).first().isVisible() && await p.getByText('Page Turners').first().isVisible() && await p.getByText('Night Owls').first().isVisible(), `${n} Sim profile lists both clubs`);
-    await open(ON, `sims/${U(5)}`); if (phone) await p.getByRole('tab', { name: 'About' }).click(); await wait(p, 300);
+    await open(ON, `sims/${U(5)}`);  await wait(p, 300);
     ok(await p.getByText('Night Owls').count() === 0, `${n} a Sim in no club has no Clubs card`);
 
-    // ---- edit and delete
+    // ---- edit just one part, from the pencil on its card
     await open(ON, `clubs/${firstClub}`);
-    await btn('Edit').click(); await wait(p, 500);
+    await btn('Edit rules').click(); await wait(p, 500);
+    ok(await dlg().getByLabel('Encouraged activities 1').isVisible() && await dlg().getByLabel('Club name').count() === 0 && await dlg().getByText('Requirements').count() === 0, `${n} rules pencil shows only the rules`);
+    await dlg().getByLabel('Encouraged activities 2').fill('Tell Stories');
+    await btn('Done', dlg()).click(); await wait(p, 700);
+    ok(clubs(st, ON).find((r) => r.id === firstClub)?.data.encouraged[1]?.text === 'Tell Stories' && await p.getByText('Tell Stories', { exact: true }).isVisible(), `${n} closing the part saves it`);
+    await p.locator('.toast').getByRole('button', { name: 'Undo' }).click(); await wait(p, 700);
+    ok(clubs(st, ON).find((r) => r.id === firstClub)?.data.encouraged[1]?.text === 'Tell Jokes', `${n} Undo puts the rules back`);
+    await btn('Edit details').click(); await wait(p, 500);
+    ok(await dlg().getByLabel('Notes').isVisible() && await btn(/^Meets at:/, dlg()).isVisible() && await dlg().getByLabel('Encouraged activities 1').count() === 0, `${n} details pencil: place, requirements, perks, notes`);
+    await p.keyboard.press('Escape'); await wait(p, 400);
+    ok(await dlg().count() === 0, `${n} closing with no change just closes`);
+    await p.locator('.club-face.add').click(); await wait(p, 500);
+    ok(await dlg().getByRole('checkbox', { name: 'Tobi Okafor' }).isVisible(), `${n} the Add face opens the member list`);
+    await p.keyboard.press('Escape'); await wait(p, 400);
+
+    // ---- edit and delete
+    await btn('Edit', p).filter({ hasText: /^Edit$/ }).click(); await wait(p, 500);
     ok(await dlg().getByLabel('Club name').inputValue() === 'Page Turners' && await btn('Delete', dlg()).isVisible(), `${n} edit window has the details and Delete`);
     await dlg().getByLabel('Club name').fill('Page Turners Club');
     await btn('Save', dlg()).click(); await wait(p, 700);
     ok(await p.getByRole('heading', { name: 'Page Turners Club' }).isVisible(), `${n} edited`);
-    await btn('Edit').click(); await wait(p, 400);
+    await btn('Edit', p).filter({ hasText: /^Edit$/ }).click(); await wait(p, 400);
     await btn('Delete', dlg()).click(); await wait(p, 300);
     await p.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click(); await wait(p, 900);
     ok(/\/clubs$/.test(p.url()) && clubs(st, ON).length === 1, `${n} deleted, back to the list`);

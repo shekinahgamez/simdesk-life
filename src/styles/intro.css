@@ -1,0 +1,20 @@
+/* The opening intro (components/Intro.tsx). Plays over the app on the first open of each day.
+   The six section icons swirl around each other into the middle, a big sparkle pops there and glides
+   down onto the "i" of the logo, then the whole thing fades away to show the page underneath. */
+.intro { position: fixed; inset: 0; z-index: 60; background: var(--bg); overflow: hidden; cursor: default; transition: opacity .45s ease-in; }
+.intro.out { opacity: 0; pointer-events: none; }
+.intro-mid { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 0 16px; text-align: center; }
+.intro-tag { margin: 0; color: var(--muted); font-size: 17px; }
+/* the real sparkle on the "i" stays hidden until the big one lands on it */
+.intro-mid [role='img'] svg { opacity: 0; }
+.intro.landed .intro-mid [role='img'] svg { opacity: 1; }
+/* swirl pieces sit on the logo's centre (top is set from the logo's position) */
+.intro-fly { position: absolute; left: 50%; top: 50%; width: 48px; height: 48px; margin: -24px 0 0 -24px; border-radius: 14px; opacity: 0; }
+.intro-big { position: absolute; left: 50%; top: 50%; margin: -44px 0 0 -44px; opacity: 0; }
+.intro-ring { position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; border: 2px solid var(--accent); opacity: 0; }
+.intro .fu-in { opacity: 0; animation: fadeup .7s ease-out forwards; }
+@media (prefers-reduced-motion: reduce) {
+  .intro-fly, .intro-big, .intro-ring { display: none; }
+  .intro .intro-mid [role='img'] svg { opacity: 1; }
+  .intro .fu-in { animation-duration: .3s; animation-delay: 0s !important; }
+}

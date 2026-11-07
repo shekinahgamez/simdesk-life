@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
-import { Sparkle, Wordmark } from '../components/brand';
+import { Sparkle } from '../components/brand';
 import { BUILT, CATEGORIES, needsPack, type CategoryId, DECK } from '../components/categories';
 import { DesktopDeck, PhoneDeck } from '../components/Deck';
 import { DateFields, LifespanEditor, ModuleCard, MODULES, PackPicker, SeasonLengthPicker, Swatches } from '../components/savebits';
 import { Field, Seg, Toggle } from '../components/ui';
 import { PhotoField } from '../components/photo';
 import { usePhotos, type PhotoRef } from '../lib/photos';
-import { APP } from '../config/app';
 import { go, savePath } from '../lib/router';
 import { lifespanLabel, newSaveData, SAVE_COLORS, saveData, setLastSave, todayOf, type SaveData } from '../lib/saves';
 import { useSaves, useStore } from '../lib/sync/react';
@@ -15,7 +14,7 @@ import { plural } from '../lib/text';
 import { formatDate, SEASONS, type Lifespan, type Season, type SeasonLength, type SimDate } from '../lib/time';
 import { useIsPhone } from '../lib/useIsPhone';
 
-type Phase = 'welcome' | 'steps' | 'leaving' | 'burst' | 'summary' | 'deck';
+type Phase = 'steps' | 'leaving' | 'burst' | 'summary' | 'deck';
 const OBJ_COLORS = ['#D6492E', '#A86F00', '#167C6D', '#2F62D6', '#B23A7D', '#5B4BD6', '#FFE4DC', '#FFF0D1', '#D8F3EE', '#DDE9FF', '#FBE0F0', '#ECE7FF'];
 
 export function Setup({ userKey }: { userKey: string }) {
@@ -23,9 +22,8 @@ export function Setup({ userKey }: { userKey: string }) {
   const { active } = useSaves();
   const phone = useIsPhone();
   const hasSaves = active.length > 0;
-  const [phase, setPhase] = useState<Phase>('welcome');
+  const [phase, setPhase] = useState<Phase>('steps');
   const [step, setStep] = useState(1);
-  const [skip, setSkip] = useState(false);
   const [made, setMade] = useState<{ id: string; data: SaveData } | null>(null);
 
   // the form
@@ -41,7 +39,10 @@ export function Setup({ userKey }: { userKey: string }) {
   const [mods, setMods] = useState<string[]>([]);
 
   const notNow = () => { if (cover) void photos.remove([cover.id]).catch(() => {}); go('#/'); };
-  const back = () => (step > 1 ? setStep(step - 1) : hasSaves ? notNow() : setPhase('welcome'));
+  // The intro now plays on its own once a day (components/Intro), so setup opens on step 1.
+  // With no saves there is nowhere to go back to from step 1, so there's no back button there.
+  const canBack = step > 1 || hasSaves;
+  const back = () => (step > 1 ? setStep(step - 1) : hasSaves ? notNow() : undefined);
   const next = () => (step < 4 ? setStep(step + 1) : finish());
 
   const finish = () => {
@@ -62,59 +63,6 @@ export function Setup({ userKey }: { userKey: string }) {
   const noneBuilt = cards.every((c) => !c.built);
   const toSettings = () => made && go(savePath(made.id, 'settings'));
   const openSection = (id: CategoryId) => made && go(savePath(made.id, CATEGORIES.find((c) => c.id === id)!.path));
-
-  // ---------- welcome ----------
-  if (phase === 'welcome') {
-    if (phone) {
-      return (
-        <div className="ms-flow">
-          <div className="ms-welcome">
-            <div className="ms-iconrow" aria-hidden="true">
-              {DECK.map((c, i) => {
-                const I = c.icon;
-                return <span key={c.id} className={`obj ${c.id}`} style={{ animationDelay: `${0.15 + i * 0.09}s`, ['--r' as string]: `${[-6, 4, -3, 5, -4, 3][i]}deg` }}><I size={20} weight="duotone" /></span>;
-              })}
-            </div>
-            <div className="fu" style={{ animationDelay: '0.85s' }}><Wordmark size={60} /></div>
-            <p className="fu m-sub" style={{ animationDelay: '1.05s', fontSize: 17 }}>{APP.tagline}</p>
-          </div>
-          <div className="ms-bar col fu" style={{ animationDelay: '1.3s' }}>
-            <button type="button" className="m-pillbtn" onClick={() => setPhase('steps')}>Let’s build your save</button>
-            {hasSaves && <button type="button" className="btn ghost" onClick={notNow}>Not now</button>}
-          </div>
-        </div>
-      );
-    }
-    const starts = [[-560, -300, 25], [560, -280, -25], [-600, 40, 25], [600, 60, -25], [-420, 320, 25], [440, 330, -25]];
-    const gather = [[-56, -30], [0, -56], [56, -30], [-56, 30], [0, 56], [56, 30]];
-    return (
-      // Clicking anywhere during the intro skips straight to the buttons.
-      <div className={`flow ${skip ? 'skip-intro' : ''}`} onClick={() => setSkip(true)}>
-        <div className="welcome">
-          {DECK.map((c, i) => {
-            const I = c.icon;
-            return (
-              <div key={c.id} className={`fly obj ${c.id}`} aria-hidden="true"
-                style={{ ['--sx' as string]: `${starts[i][0]}px`, ['--sy' as string]: `${starts[i][1]}px`, ['--sr' as string]: `${starts[i][2]}deg`, ['--gx' as string]: `${gather[i][0]}px`, ['--gy' as string]: `${gather[i][1]}px`, animationDelay: `${i * 0.05}s` }}>
-                <I size={24} weight="duotone" />
-              </div>
-            );
-          })}
-          <span className="ring" />
-          <Sparkle size={88} className="burst-sparkle" />
-          <div style={{ position: 'absolute', top: '54%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, padding: '0 16px', textAlign: 'center' }}>
-            <div className="fu" style={{ animationDelay: '2.3s' }}><Wordmark size={56} /></div>
-            <h1 className="fu" style={{ animationDelay: '2.55s', fontSize: 26 }}>Let’s build your save</h1>
-            <p className="fu muted" style={{ animationDelay: '2.7s', margin: 0 }}>A few quick questions. You can change all of it later.</p>
-            <div className="row fu" style={{ animationDelay: '2.85s', justifyContent: 'center' }}>
-              <button type="button" className="btn primary lg" onClick={() => setPhase('steps')}>Start <ArrowRight size={18} weight="bold" /></button>
-              {hasSaves && <button type="button" className="btn ghost lg" onClick={notNow}>Not now</button>}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // ---------- finale ----------
   if ((phase === 'burst' || phase === 'summary' || phase === 'deck') && made) {
@@ -235,9 +183,11 @@ export function Setup({ userKey }: { userKey: string }) {
           <div className="stepin" style={{ marginTop: step === 4 ? 0 : 14 }}>{body}</div>
         </div>
         <div className="ms-bar">
-          <button type="button" className="m-circlebtn" aria-label={step > 1 ? 'Back' : hasSaves ? 'Cancel' : 'Back to the start'} onClick={back}>
-            <ArrowLeft size={20} weight="bold" />
-          </button>
+          {canBack ? (
+            <button type="button" className="m-circlebtn" aria-label="Back" onClick={back}>
+              <ArrowLeft size={20} weight="bold" />
+            </button>
+          ) : <span />}
           <button type="button" className="m-pillbtn" disabled={phase === 'leaving'} onClick={next}>
             {step === 2 ? `Next · ${plural(packs.length, 'pack')}` : step < 4 ? 'Next' : 'Start my save'}
           </button>
@@ -261,11 +211,7 @@ export function Setup({ userKey }: { userKey: string }) {
           {step === 4 && <p className="small muted" style={{ margin: '-8px 0 0' }}>Tap what you want to track. Off means hidden, never deleted. The grey ones are on the way.</p>}
           <div key={step} className="stepin">{body}</div>
           <div className="row" style={{ justifyContent: 'space-between', marginTop: 4 }}>
-            {step > 1 ? (
-              <button type="button" className="btn ghost" onClick={back}><ArrowLeft size={16} weight="bold" /> Back</button>
-            ) : (
-              <button type="button" className="btn ghost" onClick={back}>{hasSaves ? 'Cancel' : <><ArrowLeft size={16} weight="bold" /> Back</>}</button>
-            )}
+            {canBack ? <button type="button" className="btn ghost" onClick={back}><ArrowLeft size={16} weight="bold" /> Back</button> : <span />}
             <button type="button" className="btn primary lg" onClick={next} disabled={phase === 'leaving'}>
               {step < 4 ? 'Next' : 'Start my save'} <ArrowRight size={18} weight="bold" />
             </button>

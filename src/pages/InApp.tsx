@@ -1,4 +1,4 @@
-import { GearSix, Path, UserCircle } from '@phosphor-icons/react';
+import { ArrowsClockwise, GearSix, Path, UserCircle } from '@phosphor-icons/react';
 import { BUILT, CATEGORIES, needsPack, ObjIcon, type CategoryId, DECK } from '../components/categories';
 import { DesktopDeck, PhoneDeck, type DeckCard } from '../components/Deck';
 import { PhotoBox } from '../components/photo';
@@ -78,6 +78,7 @@ export function More({ save }: { save: SaveRow }) {
       <div className="m-group">
         <MRow href={savePath(save.id, 'photos')} title="Photos" icon={<ObjIcon cat="photos" />} />
         {d.packs.includes('get-together') && <MRow href={savePath(save.id, 'clubs')} title="Clubs" icon={<ObjIcon cat="clubs" />} />}
+        {moduleOn(d, 'rotation') && <MRow href={savePath(save.id, 'rotation')} title="Rotation" icon={<span className="obj worlds"><ArrowsClockwise size={16} weight="duotone" /></span>} />}
         {moduleOn(d, 'storylines') && <MRow href={savePath(save.id, 'storylines')} title="Storylines" icon={<span className="obj storylines"><Path size={16} weight="duotone" /></span>} />}
       </div>
       <div className="m-group">

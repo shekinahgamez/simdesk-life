@@ -80,10 +80,10 @@ const photos = (st) => Object.values(st.records[SID] ?? {}).filter((r) => r.kind
 
     // on the Sim's profile
     await p.goto(`http://localhost:4173/#/s/${SID}/sims/aaaaaaaa-0000-4000-8000-000000000001`); await wait(p, 900);
-    if (phone) await p.getByRole('tab', { name: 'About' }).click();
+    
     ok(await p.locator('.ph-mini').first().isVisible(), `${n} photo on the Sim's profile`);
     await p.goto(`http://localhost:4173/#/s/${SID}/sims/aaaaaaaa-0000-4000-8000-000000000002`); await wait(p, 900);
-    if (phone) await p.getByRole('tab', { name: 'About' }).click();
+    
     ok(await p.locator('.ph-mini').count() === 0 && await p.getByText('No photos of them yet.').isVisible(), `${n} no photos for an untagged Sim`);
 
     // on a calendar event

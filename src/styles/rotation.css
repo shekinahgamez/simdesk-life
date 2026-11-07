@@ -1,0 +1,70 @@
+/* ---------- Rotation (Nov 2026) ---------- */
+.rot-now { background: var(--worlds-tint); border-color: color-mix(in srgb, var(--worlds-ink) 25%, transparent); display: flex; flex-direction: column; gap: 12px; }
+.rot-now.over { background: var(--households-tint); border-color: color-mix(in srgb, var(--households-ink) 30%, transparent); }
+.rot-start { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.rot-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.rot-kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--worlds-ink); }
+.rot-now.over .rot-kicker { color: var(--households-ink); }
+.rot-link { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; min-height: 32px; display: inline-flex; align-items: center; }
+.rot-who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.rot-who.rot-page { flex-direction: column; align-items: flex-start; gap: 12px; }
+.rot-name { display: block; font: 800 20px/1.2 var(--font-head); color: var(--text); text-decoration: none; }
+.rot-who.rot-page .rot-name { font-size: 28px; }
+.rot-name:hover { color: var(--accent); }
+.rot-line { font-size: 14px; color: var(--muted); margin-top: 4px; }
+.rot-bar { display: flex; gap: 4px; }
+.rot-bar span { flex: 1; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--worlds-ink) 18%, transparent); }
+.rot-bar span.on { background: var(--worlds-ink); }
+.rot-bar.over span.on { background: var(--households-ink); }
+.rot-bar span.x { background: var(--households-ink); opacity: .55; }
+.rot-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.rot-now.rot-page .rot-foot .btn { flex: 1; }
+.rot-next { font-size: 14px; min-width: 0; }
+.rot-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; align-items: start; }
+
+.rot-up { padding-bottom: 8px; }
+.rot-row { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 0; border-top: 1px solid var(--line); background: var(--surface); }
+.rot-up [ref] > div:first-child .rot-row, .rot-up .card-head + div > div:first-child .rot-row { border-top: 0; }
+.rot-row.dragging { box-shadow: var(--shadow-lg); border-radius: var(--r-sm); position: relative; z-index: 2; }
+.rot-grip { cursor: grab; color: var(--muted); touch-action: none; flex-shrink: 0; }
+.rot-rowname { display: flex; flex-direction: column; min-width: 0; text-decoration: none; color: var(--text); }
+.rot-rowname b { font-size: 16px; }
+.rot-rowname:hover b { color: var(--accent); }
+.rot-len { flex-shrink: 0; }
+.rot-round { display: flex; align-items: center; gap: 8px; justify-content: center; font-size: 13px; color: var(--muted); padding: 8px 0; border-top: 1px dashed var(--line); }
+.rot-round.end { border-top: 1px solid var(--line); }
+.rot-menu { min-width: 220px; }
+
+.rot-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 40px 24px; max-width: 520px; margin: 0 auto; }
+.rot-empty h2 { margin: 0; }
+.rot-empty p { margin: 0; }
+
+.rot-sheet { display: flex; flex-direction: column; gap: 12px; }
+.rot-sheet-foot { display: flex; flex-direction: column-reverse; gap: 8px; margin-top: 4px; }
+.rot-sheet-foot .btn { width: 100%; }
+.rot-span { background: var(--field); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px 16px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; }
+.rot-label { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+.rot-nextcard { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: var(--r); padding: 12px 16px; }
+.rot-picklist { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; max-height: 320px; overflow-y: auto; }
+.rot-pick { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 8px 12px; border: 0; border-top: 1px solid var(--line); background: var(--surface); font: inherit; color: var(--text); text-align: left; cursor: pointer; }
+.rot-pick:first-child { border-top: 0; }
+.rot-pick.on { background: var(--accent-soft); }
+.rot-check { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--line); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.rot-pick.on .rot-check { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.rot-order { font-size: 12px; font-weight: 700; color: var(--accent); }
+.rot-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.rot-chip { height: 32px; padding: 0 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); font: inherit; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; }
+.rot-chip.on { background: var(--text); border-color: var(--text); color: var(--surface); }
+
+.rot-hh { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 8px 12px; min-height: 48px; font-size: 14px; }
+.rot-hh .obj { text-decoration: none; flex-shrink: 0; }
+.rot-tag { text-decoration: none; display: inline-flex; align-items: center; gap: 4px; color: var(--worlds-ink); font-weight: 700; }
+
+.rot-row > .hh-faces { width: 92px; flex-shrink: 0; }
+.rot-today .rot-foot .btn { margin-left: auto; }
+.rot-rowcol { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.rot-rowcol .rot-len { color: var(--worlds-ink); }
+.rot-row .rot-grip { margin: 0 -8px 0 -8px; }
+.rot-today .rot-who.rot-page { gap: 8px; }
+.rot-today .rot-who.rot-page .rot-name { font-size: 22px; }
+.rot-foot { flex-wrap: nowrap; }

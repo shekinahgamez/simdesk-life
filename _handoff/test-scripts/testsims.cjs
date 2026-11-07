@@ -18,14 +18,9 @@ const shots = process.env.SHOTS;
     const p = await ctx.newPage(); const errs = []; p.on('pageerror', (e) => errs.push(e.message));
     await mock(p, st); await logIn(p); await p.waitForURL(/#\/s\//); await wait(p, 1500);
 
-    // deck: Sims is built now
-    if (!phone) {
-      ok(await p.locator('.deck-card.soon').count() === 0 && await p.locator('.deck-card').count() === 4, `${n} four cards, all lit; no Clubs card without Get Together`);
-      await p.locator('.deck-card').first().click();
-    } else {
-      ok(await p.locator('.ms-dcard.soon').count() === 0, `${n} every phone deck card lit (Clubs only with Get Together)`);
-      await p.locator('.ms-dcard[aria-hidden="false"]').click();
-    }
+    // Today page (the deck is gone from home): open Sims from the sidebar or the tab bar
+    ok(await p.locator('.today-head h1, .home-cover h1').first().isVisible(), `${n} Today page is home`);
+    await p.locator(phone ? '.m-tabbar a[href$="/sims"]' : '.sidebar a[href$="/sims"]').first().click();
     await p.waitForURL(/\/sims$/, { timeout: 5000 }); await wait(p, 900);
     ok(await p.getByText('No Sims yet. Time to make some!').isVisible(), `${n} empty state`);
 
@@ -86,23 +81,26 @@ const shots = process.env.SHOTS;
     // profile: relationships, photo, deceased
     const marId = mar.id;
     await p.goto(`http://localhost:4173/#/s/${sid}/sims/${marId}`); await wait(p, 1000);
-    if (phone) await p.getByRole('tab', { name: 'Family' }).click();
-    await p.getByRole('button', { name: phone ? 'Add a relationship' : 'Add', exact: true }).first().click(); await wait(p, 300);
+    // compact profile (Nov 2026): no tabs; relationship dialog has housemate chips, type tiles, names + secret behind a link
+    await p.getByRole('button', { name: 'Add', exact: true }).first().click(); await wait(p, 300);
     const rd = p.getByRole('dialog');
-    await rd.getByLabel('Who').fill('Desm'); await rd.getByRole('option', { name: 'Desmond Okafor' }).click();
-    await rd.getByLabel('Relationship').selectOption('parent');
+    const chip = rd.locator('.rel-mate', { hasText: 'Desmond Okafor' });
+    if (await chip.count()) await chip.click();
+    else { await rd.getByLabel(/^(Who|Or search all Sims)$/).fill('Desm'); await rd.getByRole('option', { name: 'Desmond Okafor' }).click(); }
+    await rd.getByRole('radio', { name: 'Parent' }).click();
+    await rd.getByRole('button', { name: 'Names on profiles, secret' }).click();
     await rd.getByLabel(/On Marisol’s profile/).fill('Father');
     await rd.getByRole('button', { name: 'Secret' }).click();
     await rd.getByRole('button', { name: 'Save', exact: true }).click(); await wait(p, 1200);
-    ok(await p.getByText('Father', { exact: true }).isVisible() && await p.locator('.secret-tag').isVisible(), `${n} relationship with label and secret`);
+    ok(await p.getByText('Father', { exact: true }).isVisible() && await p.locator('.cp-person [aria-label="Secret"]').isVisible(), `${n} relationship with label and secret`);
     const rel = Object.values(st.records[sid]).find((r) => r.kind === 'rel');
     ok(rel && rel.data.a !== marId && rel.data.b === marId && rel.data.labelB === 'Father', `${n} parent is a, label on child's side`);
+    await p.getByRole('button', { name: 'Edit relationships' }).click();
     await p.getByRole('button', { name: /Edit relationship with Desmond/ }).click(); await wait(p, 300);
     await p.getByRole('dialog').getByRole('button', { name: 'Remove' }).click(); await wait(p, 300);
     ok(await p.locator('.toast', { hasText: 'Relationship moved to Trash' }).isVisible(), `${n} remove relationship toast`);
     await p.locator('.toast-btn').click(); await wait(p, 500);
     ok(await p.getByText('Father', { exact: true }).isVisible(), `${n} undo brings relationship back`);
-    if (phone) await p.getByRole('tab', { name: 'About' }).click();
 
     const chooser = p.waitForEvent('filechooser');
     await p.getByRole('button', { name: /Add a portrait/ }).first().click();
@@ -110,7 +108,7 @@ const shots = process.env.SHOTS;
     await p.getByRole('dialog', { name: 'Position your photo' }).waitFor({ timeout: 8000 });
     await p.getByRole('button', { name: 'Use photo' }).click(); await wait(p, 2000);
     ok(Object.keys(st.photos).length === 1 && Object.keys(st.files).length === 2, `${n} photo uploaded (full + small)`);
-    ok(await p.locator(phone ? '.pp-photo img' : '.sim-hero-photo img').first().evaluate((i) => i.complete && i.naturalWidth > 0), `${n} photo shows`);
+    ok(await p.locator(phone ? '.pp-photo img' : '.cp-pt img').first().evaluate((i) => i.complete && i.naturalWidth > 0), `${n} photo shows`);
     if (shots) await p.screenshot({ path: `${shots}/${n}-profile.png` });
     if (phone) {
       await p.evaluate(() => window.scrollTo(0, 600)); await wait(p, 300);
@@ -118,8 +116,8 @@ const shots = process.env.SHOTS;
       ok(wpx < 80, `${n} photo shrinks into the circle when scrolled (${Math.round(wpx)})`);
       await p.evaluate(() => window.scrollTo(0, 0)); await wait(p, 200);
     }
-    await p.getByRole('button', { name: 'Edit', exact: !phone ? false : true }).first().click(); await wait(p, 500);
-    await p.screenshot({ path: 'dbg-edit.png' }); const ed = p.getByRole('dialog', { name: 'Edit Marisol' });
+    await p.getByRole('button', { name: phone ? 'Edit' : 'Edit Sim', exact: true }).first().click(); await wait(p, 500);
+    const ed = p.getByRole('dialog', { name: 'Edit Marisol' });
     await ed.getByRole('button', { name: 'Remove', exact: true }).click();
     await ed.getByRole('button', { name: 'Save changes' }).click(); await wait(p, 1500);
     ok(Object.keys(st.photos).length === 0 && Object.keys(st.files).length === 0, `${n} removed photo deleted from storage`);
@@ -172,7 +170,7 @@ const shots = process.env.SHOTS;
       await p.goto(`http://localhost:4173/#/s/${sid}`); await wait(p, 1500);
       if (shots) await p.screenshot({ path: `${shots}/${n}-home.png` });
       ok(await p.locator('.home-cover img').evaluate((i) => i.complete && i.naturalWidth > 0), `${n} cover on home`);
-      ok((await p.locator('.deck-card').first().textContent()).includes('3 Sims'), `${n} live count on Sims card`);
+      ok(await p.locator('.today-cols').isVisible(), `${n} Today cards under the cover`);
     }
     ok(errs.length === 0, `${n} no page errors ${errs.join(' | ')}`);
     await ctx.close();

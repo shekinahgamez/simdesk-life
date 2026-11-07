@@ -8,7 +8,7 @@ import { savePath } from '../../lib/router';
 import { useAccount, useRecords } from '../../lib/sync/react';
 import { newId } from '../../lib/sync/store';
 import type { SaveRow } from '../../lib/sync/types';
-import { dateOf, formatDate, SEASONS } from '../../lib/time';
+import { dateOf, formatDate, SEASONS, stageName } from '../../lib/time';
 import { SimAvatar, useSaveInfo } from '../sims/shared';
 
 /** Everything the calendar pages share for the open save. */
@@ -108,7 +108,8 @@ export function ComingUp({ save, simIds, seeAll, showFaces }: { save: SaveRow; s
         <div className="cal-cu">
           {list.map((i) => {
             const d = dateOf(i.day, ctx.info.cal);
-            const sub = i.kind === 'birthday' ? `Birthday · ${daysWord(i.day - today)}`
+            // On a Sim's page the age block already counts the days, so the birthday just says what's next.
+            const sub = i.kind === 'birthday' ? (!showFaces && i.toStage ? `Ages up to ${stageName(i.toStage).toLowerCase()}` : `Birthday · ${daysWord(i.day - today)}`)
               : i.kind === 'vacation' ? `${i.getaway ? 'Getaway' : 'Vacation'} · ${spanText(ctx, i.day, i.end)}`
               : showFaces ? (i.host ? `Hosted by ${ctx.firstOf(i.host)}` : 'Event')
               : i.host && mine.has(i.host) ? 'Event · hosting' : 'Event · going';

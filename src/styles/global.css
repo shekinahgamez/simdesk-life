@@ -402,3 +402,30 @@ html { -webkit-tap-highlight-color: transparent; }
   -webkit-backdrop-filter: blur(14px) saturate(1.25); backdrop-filter: blur(14px) saturate(1.25);
   border: 1px solid color-mix(in srgb, var(--surface) 55%, transparent); box-shadow: 0 4px 14px rgba(36,25,31,.08);
 }
+
+/* ---------- Today page (Nov 2026) ---------- */
+.today-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.today-head h1 { font: 800 32px/1.15 var(--font-head); margin: 2px 0 0; }
+.today-head.phone { flex-direction: column; align-items: stretch; gap: 12px; }
+.today-head.phone h1 { font-size: 26px; }
+.day-btns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.day-btns.phone { display: grid; grid-template-columns: 1fr 1fr; }
+.day-btns.phone .day-back { grid-column: 1 / -1; justify-self: center; }
+.today-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.today-card { padding-bottom: 8px; }
+.today-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 8px 4px; border: 0; border-top: 1px solid var(--line); background: none; font: inherit; color: var(--text); text-align: left; text-decoration: none; cursor: pointer; }
+.today-row:first-of-type { border-top: 0; }
+.today-card .card-head + .today-row { border-top: 0; }
+.today-row .t { display: block; font-size: 15px; }
+.today-row .s { display: block; font-size: 13px; color: var(--muted); }
+.today-row .chev { color: var(--muted); flex-shrink: 0; }
+.today-row:hover .t { color: var(--accent); }
+.side-nextday { margin: -2px 0 6px; justify-content: center; }
+.dp-day.off { color: var(--muted); opacity: .35; cursor: default; }
+.dp-day.off:hover { background: none; }
+.jump-note { font-size: 14px; margin: 12px 0 0; line-height: 1.45; }
+.jump-note.back { background: #FFF4D6; color: #6B4E00; border-radius: 12px; padding: 10px 12px; }
+.jump-foot { justify-content: flex-end; gap: 8px; margin-top: 14px; padding-bottom: 6px; }
+button.m-datepill { border: 0; font-family: inherit; color: var(--text); cursor: pointer; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .jump-note.back { background: #3D3214; color: #F5D98A; } }
+:root[data-theme="dark"] .jump-note.back { background: #3D3214; color: #F5D98A; }

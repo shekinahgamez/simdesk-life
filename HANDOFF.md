@@ -2,6 +2,14 @@
 
 Read `DESIGN-RULES.md` first, then this file. The owner (a friend, not a developer) follows everything on a phone.
 
+## Latest (Nov 7 2026)
+- This repo now holds the combined code from every SimDesk thread: household filter and gallery, birthdays, fewer-clicks boards 1 to 10, Today page, intro, worlds on and off, neighborhood renames, Rotation.
+- New design rules from Nov 6 are in `DESIGN-RULES.md`: fewer clicks, 40/32px tap sizes, one filled button per screen, no teal buttons, never draw Sims, no plumbob, no rounded fonts, one code copy.
+- Rotation lives in `src/lib/rotation.ts` (logic, tests in `rotation.test.ts`) and `src/pages/rotation/Rotation.tsx` (UI, styles in `src/styles/rotation.css`). Stored on the save as `SaveData.rotation`, so no database change.
+- `testdeck.cjs` is retired (the deck is gone); `testtoday.cjs` and `testrotation.cjs` replace it.
+- Last test run: vitest 125, testrotation 50, testtoday 29, testsims 65, testclubs 144, testworlds 67, testphotos 135, testworldsplay 20, all passing. Run testsims and testphotos from inside `_handoff/test-scripts/` (they read `portrait.png` there).
+- Next: Account page polish and backups (mockups first). Guest demo on hold. Maps shelved.
+
 ## How to work with them (standing rules)
 - **Mockups first, then approval, then code.** Anything visual: send screenshots (SendUserFile, not interactive artifacts), wait for "approved", then build. Don't code first.
 - **Build exactly what was approved.** If the approved mockup and an existing app component differ, the mockup wins. If you want to deviate, say so and ask. Do not say "matches" unless you compared the real screenshot to the mockup side by side.
@@ -9,10 +17,11 @@ Read `DESIGN-RULES.md` first, then this file. The owner (a friend, not a develop
 - "No assumptions pls." If something is ambiguous, ask, or state the reading you used.
 - Talk like a friend. Lean wording in SimDesk's voice. Careful with credits.
 - Don't refresh or publish the preview until told. Don't commit or push unless asked.
+- Desktop tap sizes everywhere (40px buttons, 32px small). Mockups at 1440 and 390 wide.
 - Hard constraints: Supabase project **simdesk (pyszlcaaotkituvvpvvw)** only. Never touch simbase (pczvxbuipkeksnpeqehp). Never put the owner's personal views on the site. No new map creation. Don't host EA map art.
 
 ## Project
-Vite 6 + React 18 + TypeScript at `/home/user/simdesk-life` (not a git repo). Pages: https://shekinahgamez.github.io/simdesk-life/. Local-first sync store (IndexedDB), hash routing `#/s/<saveId>/<section>`. Preview artifact (stale, v37): https://claude.ai/artifact/TtJeWSUUmJC7ZA3o4LUR2A. Zip `/home/user/simdesk-code.zip` is stale too (rebuild with `zip -rq ... -x '*.tsbuildinfo'` when asked).
+Vite 6 + React 18 + TypeScript, GitHub repo `shekinahgamez/simdesk-life`. Pages: https://shekinahgamez.github.io/simdesk-life/. Local-first sync store (IndexedDB), hash routing `#/s/<saveId>/<section>`. Preview artifact (stale, v37): https://claude.ai/artifact/TtJeWSUUmJC7ZA3o4LUR2A. Zip `/home/user/simdesk-code.zip` is stale too (rebuild with `zip -rq ... -x '*.tsbuildinfo'` when asked).
 
 ## What is done and approved
 Maps out and world scenes in, Plot Matcher notes removed, Sim tile soft melt, batch 2 and 3 worlds, no Black History Month banner, lot rename gap, world page redesign, Willow Creek pink trees, Photos area (event page, photo viewer, album with iPhone-style sections), `DESIGN-RULES.md`.

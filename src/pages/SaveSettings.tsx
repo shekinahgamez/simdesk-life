@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { CalendarBlank, GearSix, LockKey, Package, PuzzlePiece, Trash } from '@phosphor-icons/react';
+import { CalendarBlank, GearSix, LockKey, MapPin, Package, PuzzlePiece, Trash } from '@phosphor-icons/react';
 import { BackLink, MRow } from '../components/Shell';
 import { ObjIcon, type CategoryId } from '../components/categories';
 import { DateFields, LifespanEditor, MODULES, NewFromPacks, PackPicker, SeasonLengthPicker, Swatches } from '../components/savebits';
@@ -15,6 +15,7 @@ import type { Rec, SaveRow } from '../lib/sync/types';
 import { plural } from '../lib/text';
 import { changeSeasonLength, formatDate, rescaleBornDay, stageTable, type Lifespan, type SeasonLength, type SimDate } from '../lib/time';
 import { useIsPhone } from '../lib/useIsPhone';
+import { ChooseWorlds, useLotsCtx } from './worlds/shared';
 
 const KIND_CAT: Record<string, CategoryId> = { sim: 'sims', household: 'households', lot: 'worlds', world: 'worlds', holiday: 'calendar', event: 'calendar', photo: 'photos', club: 'clubs' };
 const recName = (r: Rec) => {
@@ -45,8 +46,14 @@ export function SaveSettings({ save }: { save: SaveRow }) {
   const [deleting, setDeleting] = useState(false);
   const [sheet, setSheet] = useState<null | 'season' | 'life' | 'name' | 'trash'>(null);
 
+  const lots = useLotsCtx(save);
+  const [choosingWorlds, setChoosingWorlds] = useState(false);
+  const worldsSummary = lots.shownWorlds.length === lots.worlds.length
+    ? `All ${plural(lots.worlds.length, 'world')} from your packs show. Hide the ones you don’t play.`
+    : `${lots.shownWorlds.length} of ${lots.worlds.length}${lots.shownWorlds.length ? ` · ${lots.shownWorlds.map((w) => w.name).join(', ')}` : ''}. Hidden worlds keep their lots, they just stay out of your way.`;
   const secretOn = useMemo(() => new Set(d.secretLots), [d.secretLots]);
   const secretLots = useMemo(() => available(ownedOf(d)).secretLots
+    .filter((l) => !(d.hiddenWorlds ?? []).includes(l.world))
     .map((l) => ({ ...l, worldName: BY_ID.worlds.get(l.world)?.name ?? '' }))
     .sort((a, b) => a.worldName.localeCompare(b.worldName) || a.name.localeCompare(b.name)), [d]);
   const allSecretOn = secretLots.length > 0 && secretLots.every((l) => secretOn.has(l.id));
@@ -120,6 +127,7 @@ export function SaveSettings({ save }: { save: SaveRow }) {
         <NewFromPacks saveId={save.id} packIds={newPacks} secretOn={secretOn} onClose={() => setNewPacks([])}
           onTurnOnSecret={(ids) => update({ secretLots: [...new Set([...secretOn, ...ids])] })} />
       )}
+      {choosingWorlds && <ChooseWorlds ctx={lots} save={save} onClose={() => setChoosingWorlds(false)} />}
       {deleting && <DeleteSaveDialog save={save} onClose={() => setDeleting(false)} onDeleted={afterDelete} />}
     </>
   );
@@ -161,6 +169,7 @@ export function SaveSettings({ save }: { save: SaveRow }) {
         <div className="m-group">
           <MRow title="Name, color and cover" value={d.name} onClick={() => setSheet('name')} />
           <MRow title="Packs" value={d.packs.length} onClick={openPacks} />
+          <MRow title="Worlds you play" value={`${lots.shownWorlds.length} of ${lots.worlds.length}`} onClick={() => setChoosingWorlds(true)} />
           <MRow title="Trash" value={trash.length || undefined} onClick={() => setSheet('trash')} />
           <MRow title="Delete this save" danger chevron={false} onClick={() => setDeleting(true)} />
         </div>
@@ -245,6 +254,14 @@ export function SaveSettings({ save }: { save: SaveRow }) {
           <button type="button" className="btn sm" onClick={openPacks}>Change packs</button>
         </div>
         <p className="small muted" style={{ margin: 0 }}>{packSummary}</p>
+      </section>
+
+      <section className="card">
+        <div className="card-head">
+          <h2><span className="obj worlds"><MapPin size={16} weight="duotone" /></span> Worlds you play</h2>
+          <button type="button" className="btn sm" onClick={() => setChoosingWorlds(true)}>Choose</button>
+        </div>
+        <p className="small muted" style={{ margin: 0 }}>{worldsSummary}</p>
       </section>
 
       <section className="card">

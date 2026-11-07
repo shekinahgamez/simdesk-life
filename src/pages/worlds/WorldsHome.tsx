@@ -9,12 +9,12 @@ import {
 } from '../../lib/lots';
 import { go, savePath } from '../../lib/router';
 import { useStore } from '../../lib/sync/react';
-import { plural } from '../../lib/text';
+import { matches, plural } from '../../lib/text';
 import { useIsPhone } from '../../lib/useIsPhone';
 import type { SaveRow } from '../../lib/sync/types';
 import { MoreApts, useAptsInUse, useHouseholdCell } from '../households/shared';
 import { ManageLotTypes } from './ManageLotTypes';
-import { PlaceAsk, PlaceFlow, useCustomLotTypes, useLotsCtx, useShouldAsk, WorldPicture, type LotsCtx } from './shared';
+import { ChooseWorlds, PlaceAsk, PlaceFlow, useCustomLotTypes, useLotsCtx, useShouldAsk, WorldPicture, type LotsCtx } from './shared';
 
 const FILTER_KEY = (saveId: string) => `sd:lotFilters:${saveId}`;
 const load = <T,>(k: string, d: T): T => { try { const v = sessionStorage.getItem(k); return v ? { ...d, ...JSON.parse(v) } : d; } catch { return d; } };
@@ -69,7 +69,7 @@ export function WorldsHome({ save, tab }: { save: SaveRow; tab: 'worlds' | 'lots
           <ObjIcon cat="worlds" size="lg" />
           <div>
             <h1>Worlds &amp; lots</h1>
-            <div className="sub">{plural(ctx.worlds.length, 'world')} · {plural(lotCount, 'lot')}{notPlaced ? ` · ${notPlaced} not placed` : ''}</div>
+            <div className="sub">{plural(ctx.shownWorlds.length, 'world')} · {plural(lotCount, 'lot')}{notPlaced ? ` · ${notPlaced} not placed` : ''}</div>
           </div>
         </div>
         <button type="button" className="btn primary" onClick={() => setAdding(true)}><Plus size={18} weight="bold" /> Add lot</button>
@@ -84,12 +84,14 @@ export function WorldsHome({ save, tab }: { save: SaveRow; tab: 'worlds' | 'lots
 // ---------- worlds ----------
 function WorldTiles({ ctx, save, phone }: { ctx: LotsCtx; save: SaveRow; phone: boolean }) {
   const [q, setQ] = useState('');
-  const shown = ctx.worlds.filter((w) => !q.trim() || w.name.toLowerCase().includes(q.trim().toLowerCase()) || (BY_ID.worlds.get(w.id)?.name ?? '').toLowerCase().includes(q.trim().toLowerCase()));
+  const [choosing, setChoosing] = useState(false);
+  const shown = ctx.shownWorlds.filter((w) => !q.trim() || matches(w.name, q) || matches(w.game, q));
+  const hiddenCount = ctx.worlds.length - ctx.shownWorlds.length;
   if (ctx.worlds.length === 0) return <div className="empty"><ObjIcon cat="worlds" size="lg" /><p>No worlds yet. Turn on packs in Save settings.</p></div>;
   return (
     <>
-      {!phone && <div style={{ maxWidth: 380 }}><SearchBox value={q} onChange={setQ} placeholder="Search worlds" /></div>}
-      {shown.length === 0 ? <p className="muted">No worlds match that.</p> : (
+      {!phone && ctx.shownWorlds.length > 0 && <div style={{ maxWidth: 380 }}><SearchBox value={q} onChange={setQ} placeholder="Search worlds" /></div>}
+      {ctx.shownWorlds.length > 0 && (shown.length === 0 ? <p className="muted">No worlds match that.</p> : (
         <div className="world-tiles">
           {shown.map((w) => (
             <a key={w.id} className="world-tile" href={savePath(save.id, `worlds/${w.id}`)}>
@@ -98,7 +100,15 @@ function WorldTiles({ ctx, save, phone }: { ctx: LotsCtx; save: SaveRow; phone: 
             </a>
           ))}
         </div>
+      ))}
+      {hiddenCount > 0 && (
+        <div className="worlds-hidden-row">
+          <span className="grow"><b>{hiddenCount === ctx.worlds.length ? `All ${plural(hiddenCount, 'world')}` : `${plural(hiddenCount, 'more world')}`}</b> {hiddenCount === 1 ? 'is' : 'are'} hidden</span>
+          <button type="button" className="btn sm" onClick={() => setChoosing(true)}>Choose worlds</button>
+        </div>
       )}
+      {hiddenCount === 0 && <div><button type="button" className="link-btn" onClick={() => setChoosing(true)}>Only play some of these? Choose your worlds</button></div>}
+      {choosing && <ChooseWorlds ctx={ctx} save={save} onClose={() => setChoosing(false)} />}
     </>
   );
 }
@@ -183,7 +193,7 @@ function LotsList({ ctx, save, phone, onAdd, onPlace }: { ctx: LotsCtx; save: Sa
                 <button key={r.id} type="button" className="m-row" onClick={() => open(r)}>
                   <span className="grow" style={{ minWidth: 0 }}>
                     <span className="t" style={{ display: 'block' }}>{r.lot.name}</span>
-                    <span className="s" style={{ display: 'block' }}>{(r.id.startsWith('apt:') ? [ctx.worldName(r.world), r.spot?.neighborhood, usedIn(r)?.lot.name] : [lotTypeName(r.lot.type), r.spot?.name]).filter(Boolean).join(' · ')}</span>
+                    <span className="s" style={{ display: 'block' }}>{(r.id.startsWith('apt:') ? [ctx.worldName(r.world), ctx.hoodName(r.world, r.spot?.neighborhood), usedIn(r)?.lot.name] : [lotTypeName(r.lot.type), r.spot?.name]).filter(Boolean).join(' · ')}</span>
                   </span>
                   <CaretRight size={16} weight="bold" className="chev" />
                 </button>
@@ -216,7 +226,7 @@ function LotsList({ ctx, save, phone, onAdd, onPlace }: { ctx: LotsCtx; save: Sa
                     </td>
                     <td><LotTypeTag id={r.lot.type} /></td>
                     <td>{r.lot.type === APARTMENT ? '' : sz}{r.spot && r.lot.size && sz !== r.lot.size && r.lot.type !== APARTMENT && <span className="cell-sub">Originally {r.lot.size}</span>}</td>
-                    <td>{r.spot ? <><span className="cell-main">{ctx.worldName(r.world)}</span><span className="cell-sub">{r.id.startsWith('apt:') ? r.spot.neighborhood : r.spot.name}</span></>
+                    <td>{r.spot ? <><span className="cell-main">{ctx.worldName(r.world)}</span><span className="cell-sub">{r.id.startsWith('apt:') ? ctx.hoodName(r.world, r.spot.neighborhood) : r.spot.name}</span></>
                       : <button type="button" className="place-pill" onClick={(e) => { e.stopPropagation(); onPlace(r.id); }}>Place</button>}</td>
                     <td>{hhCell(r)}</td>
                   </tr>

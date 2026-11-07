@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { CaretRight, Plus } from '@phosphor-icons/react';
+import { useMemo, useState } from 'react';
+import { CaretRight, HouseSimple, Plus } from '@phosphor-icons/react';
+import { BLANK_LOT } from '../../lib/lots';
 import { Confirm, Modal, SearchBox, Sheet, TextInput, toast } from '../../components/ui';
 import { householdLabel } from '../../lib/sims';
 import { moveIn, type HH, type HomeOption } from '../../lib/households';
@@ -28,6 +29,23 @@ export function HomePicker({ ctx, hh, onClose }: { ctx: HhCtx; hh: HH; onClose()
   const apts = list.filter((o) => !ctx.livesIn.has(o.key) && unusedApt(o));
   const aptsOpen = showApts || (!!q.trim() && apts.length > 0);
   const taken = list.filter((o) => ctx.livesIn.has(o.key));
+  // The game's own lots in your worlds that you haven't placed a build on yet. Tap one: it becomes their home, already placed.
+  const [showGame, setShowGame] = useState(false);
+  const gameLots = useMemo(() => ctx.lots.info.avail.lots.filter((l) => !ctx.lots.bySpot.has(l.id) && !(l.locked && l.lotType && !l.lotType.startsWith('residential'))), [ctx.lots]);
+  const gameShown = gameLots.filter((l) => !q.trim() || matches(l.name, q) || matches(ctx.lots.hoodName(l.world, l.neighborhood), q) || matches(ctx.lots.worldName(l.world), q));
+  const gameOpen = showGame || (!!q.trim() && gameShown.length > 0);
+  const gameGroups = useMemo(() => {
+    const m = new Map<string, typeof gameShown>();
+    for (const l of gameShown.slice(0, 60)) { const k = `${ctx.lots.worldName(l.world)} · ${ctx.lots.hoodName(l.world, l.neighborhood)}`; m.set(k, [...(m.get(k) ?? []), l]); }
+    return [...m.entries()];
+  }, [gameShown, ctx.lots]);
+  const takeGameLot = (g: (typeof gameLots)[number]) => {
+    const id = store.put('lot', { ...BLANK_LOT, name: g.name, type: 'residential', size: g.size, spot: g.id });
+    const home = { kind: 'lot' as const, id, unit: null };
+    applyPlan(store, moveIn({ ...state(), lots: [...ctx.owned, { id, type: 'residential', owner: null }] }, hh.id, home));
+    toast(`${label} moved into ${g.name}`);
+    onClose();
+  };
   const state = () => ({ households: ctx.households, lots: ctx.owned, sims: ctx.sims.map((s) => ({ id: s.id, householdId: s.sim.householdId })) });
 
   const moveTo = (o: HomeOption) => {
@@ -54,9 +72,30 @@ export function HomePicker({ ctx, hh, onClose }: { ctx: HhCtx; hh: HH; onClose()
   );
   const body = (
     <div className="hp-body">
-      <SearchBox value={q} onChange={setQ} placeholder="Search homes" />
+      <SearchBox value={q} onChange={setQ} placeholder="Search homes, streets and game lots" />
       <div className="hp-grp">Empty · {empty.length}</div>
       {empty.length === 0 ? <p className="muted small" style={{ margin: 0 }}>{q.trim() ? 'None of your lots match that.' : 'None of your lots are empty.'}</p> : empty.map(opt)}
+      {gameLots.length > 0 && (
+        <>
+          <button type="button" className="hp-toggle" onClick={() => setShowGame((v) => !v)} aria-expanded={gameOpen}>
+            <span>Lots from your worlds · {q.trim() ? gameShown.length : gameLots.length}</span><span>{gameOpen ? 'Hide' : 'Show'}</span>
+          </button>
+          {gameOpen && gameGroups.map(([where, list]) => (
+            <div key={where} className="hp-game">
+              <div className="hp-grp">{where}</div>
+              {list.map((g) => (
+                <button key={g.id} type="button" className="hp-opt" onClick={() => takeGameLot(g)}>
+                  <span className="obj worlds" aria-hidden="true"><HouseSimple size={16} weight="duotone" /></span>
+                  <span className="grow"><b>{g.name}</b><span className="s">{g.size}</span></span>
+                  <CaretRight size={16} weight="bold" className="chev" />
+                </button>
+              ))}
+            </div>
+          ))}
+          {gameOpen && gameShown.length > 60 && <p className="muted small" style={{ margin: 0 }}>Type to narrow it down.</p>}
+          {gameOpen && <p className="muted small" style={{ margin: 0 }}>Picking a game lot adds it as their home, placed on the map. Name, type and build can be filled in later.</p>}
+        </>
+      )}
       {apts.length > 0 && (
         <>
           <button type="button" className="hp-toggle" onClick={() => setShowApts((v) => !v)} aria-expanded={aptsOpen}>

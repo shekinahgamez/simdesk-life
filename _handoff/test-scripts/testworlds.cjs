@@ -146,7 +146,7 @@ const shots = process.env.SHOTS;
 
     // delete a lot
     await p.goto(`http://localhost:4173/#/s/${sid}/worlds/lot/${lotNamed(st, sid, 'Velvet Room').id}`); await wait(p, 700);
-    await p.getByRole('button', { name: 'Delete lot' }).click(); await p.getByRole('button', { name: 'Delete', exact: true }).click(); await wait(p, 1000);
+    await p.getByRole('button', { name: 'More', exact: true }).click(); await p.getByRole('menuitem', { name: 'Delete lot' }).click(); await p.getByRole('button', { name: 'Delete', exact: true }).click(); await wait(p, 1000);
     ok(!lotNamed(st, sid, 'Velvet Room') && /\/worlds\/lots$/.test(p.url()), `${n} delete goes to Trash`);
 
     // App settings: ask to place, for good

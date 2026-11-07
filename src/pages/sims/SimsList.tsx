@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowDown, ArrowUp, Cake, FunnelSimple, Hourglass, ListPlus, PencilSimple, Plus, Sparkle, Trash, X } from '@phosphor-icons/react';
+import { ArrowDown, ArrowUp, Cake, CaretDown, Check, CheckSquare, FunnelSimple, Hourglass, HouseSimple, ListPlus, PencilSimple, Plus, Rows, Sparkle, SquaresFour, Trash, X } from '@phosphor-icons/react';
 import { ObjIcon } from '../../components/categories';
 import { PhotoBox } from '../../components/photo';
 import { Confirm, Field, Modal, Picker, SearchBox, Seg, Sheet, TextInput, Toggle, toast } from '../../components/ui';
@@ -15,9 +15,18 @@ import { useIsPhone } from '../../lib/useIsPhone';
 import type { SaveRow } from '../../lib/sync/types';
 import { SimForm } from './SimForm';
 import { SimsSwitch } from '../households/HouseholdsList';
+import { HouseholdPick } from './HouseholdPick';
 import { SimAvatar, useBirthdayView, useCustomTraits, useHouseholds, useSaveInfo, useSimRows, type SaveInfo } from './shared';
 
 const FILTER_KEY = (saveId: string) => `sd:simFilters:${saveId}`;
+const LAYOUT_KEY = 'sd:simsLayout';
+function loadLayout(): 'table' | 'gallery' {
+  try { return localStorage.getItem(LAYOUT_KEY) === 'gallery' ? 'gallery' : 'table'; } catch { return 'table'; }
+}
+/** Opens the Sims list already filtered (from Today's "To sort"). */
+export function presetSimsFilter(saveId: string, patch: Partial<Filters>) {
+  try { sessionStorage.setItem(FILTER_KEY(saveId), JSON.stringify({ ...NO_FILTERS, ...patch })); } catch { /* ignore */ }
+}
 function loadFilters(saveId: string): Filters {
   try { return { ...NO_FILTERS, ...JSON.parse(sessionStorage.getItem(FILTER_KEY(saveId)) ?? '{}') }; } catch { return NO_FILTERS; }
 }
@@ -34,9 +43,17 @@ export function SimsList({ save }: { save: SaveRow }) {
   const [filters, setFilters] = useState<Filters>(() => loadFilters(save.id));
   const [sort, setSort] = useState<Sort>({ key: 'name', dir: 1 });
   const [showFilter, setShowFilter] = useState(false);
+  const [layout, setLayoutState] = useState<'table' | 'gallery'>(loadLayout);
+  const setLayout = (l: 'table' | 'gallery') => { setLayoutState(l); try { localStorage.setItem(LAYOUT_KEY, l); } catch { /* ignore */ } };
   const [form, setForm] = useState(false);
   const [quick, setQuick] = useState(false);
   const [traits, setTraits] = useState(false);
+  // Pick a household right in the list (one Sim), or tick several and move them together.
+  const [hhPick, setHhPick] = useState<{ ids: string[]; current: string | null | undefined; el: HTMLElement | null } | null>(null);
+  const [selecting, setSelecting] = useState(false);
+  const [picked, setPicked] = useState<string[]>([]);
+  const togglePick = (id: string) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+  const stopSelecting = () => { setSelecting(false); setPicked([]); };
   useEffect(() => { try { sessionStorage.setItem(FILTER_KEY(save.id), JSON.stringify(filters)); } catch { /* ignore */ } }, [filters, save.id]);
 
   const living = all.filter((r) => !r.sim.deceased).length;
@@ -59,7 +76,22 @@ export function SimsList({ save }: { save: SaveRow }) {
       {form && <SimForm info={info} simId={null} onClose={() => setForm(false)} onSaved={(id, another) => { if (!another) { setForm(false); open(id); } }} />}
       {quick && <QuickAdd info={info} onClose={() => setQuick(false)} />}
       {traits && <CustomTraitsManager onClose={() => setTraits(false)} />}
+      {hhPick && <HouseholdPick simIds={hhPick.ids} current={hhPick.current} anchor={hhPick.el} phone={phone}
+        onClose={() => setHhPick(null)} onDone={hhPick.ids.length > 1 ? stopSelecting : undefined} />}
+      {selecting && !hhPick && (
+        <div className={`select-bar${phone ? ' phone' : ''}`} role="toolbar" aria-label="Picked Sims">
+          <span className="grow"><b>{picked.length}</b> picked</span>
+          <button type="button" className="btn ghost sm" onClick={stopSelecting}><X size={14} weight="bold" /> Cancel</button>
+          <button type="button" className="btn primary sm" disabled={!picked.length}
+            onClick={(e) => setHhPick({ ids: picked, current: undefined, el: e.currentTarget })}><HouseSimple size={15} weight="duotone" /> Move to household</button>
+        </div>
+      )}
     </>
+  );
+  const selectBtn = (
+    <button type="button" className={`btn${phone ? ' ghost sm' : ''}`} aria-pressed={selecting} onClick={() => (selecting ? stopSelecting() : setSelecting(true))}>
+      <CheckSquare size={18} weight={selecting ? 'fill' : 'regular'} /> {selecting ? 'Done' : 'Select'}
+    </button>
   );
 
   if (phone) {
@@ -67,7 +99,10 @@ export function SimsList({ save }: { save: SaveRow }) {
       <div className="m-stack sims-phone">
         <div className="row" style={{ justifyContent: 'space-between', paddingTop: 6 }}>
           <h1 className="m-h1">Sims</h1>
-          <button type="button" className="btn ghost sm" style={{ color: 'var(--accent)' }} onClick={() => setQuick(true)}><ListPlus size={18} /> Quick add</button>
+          <span className="row" style={{ gap: 2, flexWrap: 'nowrap' }}>
+            {all.length > 0 && selectBtn}
+            {!selecting && <button type="button" className="btn ghost sm" style={{ color: 'var(--accent)' }} onClick={() => setQuick(true)}><ListPlus size={18} /> Quick add</button>}
+          </span>
         </div>
         <SimsSwitch saveId={save.id} on="sims" />
         {all.length === 0 ? (
@@ -83,12 +118,12 @@ export function SimsList({ save }: { save: SaveRow }) {
             {tags}
             {shown.length === 0 ? <p className="muted">No Sims match that.</p> : (
               <div className="sim-grid">
-                {shown.map((r) => <SimCard key={r.id} r={r} info={info} view={view} onOpen={() => open(r.id)} />)}
+                {shown.map((r) => <SimCard key={r.id} r={r} info={info} view={view} onOpen={() => (selecting ? togglePick(r.id) : open(r.id))} picked={selecting ? picked.includes(r.id) : undefined} />)}
               </div>
             )}
           </>
         )}
-        <button type="button" className="m-fab" aria-label="New Sim" onClick={() => setForm(true)}><Plus size={26} weight="bold" /></button>
+        {!selecting && <button type="button" className="m-fab" aria-label="New Sim" onClick={() => setForm(true)}><Plus size={26} weight="bold" /></button>}
         {dialogs}
       </div>
     );
@@ -125,13 +160,25 @@ export function SimsList({ save }: { save: SaveRow }) {
             <button type="button" className="btn filter-btn" onClick={() => setShowFilter(true)}>
               <FunnelSimple size={18} weight="bold" /> Filter{nf > 0 && <span className="count">{nf}</span>}
             </button>
+            <span className="grow" />
+            {selectBtn}
+            <span className="view-switch" role="group" aria-label="View">
+              <button type="button" aria-pressed={layout === 'table'} aria-label="List" title="List" onClick={() => setLayout('table')}><Rows size={20} weight={layout === 'table' ? 'fill' : 'regular'} /></button>
+              <button type="button" aria-pressed={layout === 'gallery'} aria-label="Gallery" title="Gallery" onClick={() => setLayout('gallery')}><SquaresFour size={20} weight={layout === 'gallery' ? 'fill' : 'regular'} /></button>
+            </span>
           </div>
           {tags}
-          {shown.length === 0 ? <p className="muted">No Sims match that.</p> : (
+          {shown.length === 0 ? <p className="muted">No Sims match that.</p> : layout === 'gallery' ? (
+            <div className="sim-grid gallery">
+              {shown.map((r) => <SimCard key={r.id} r={r} info={info} view={view} onOpen={() => (selecting ? togglePick(r.id) : open(r.id))} household picked={selecting ? picked.includes(r.id) : undefined} />)}
+            </div>
+          ) : (
             <div className="table-wrap">
               <table className="table sims-table">
                 <thead>
                   <tr>
+                    {selecting && <th className="pick-col"><input type="checkbox" aria-label="Pick all shown" checked={shown.length > 0 && shown.every((r) => picked.includes(r.id))}
+                      onChange={(e) => setPicked(e.target.checked ? shown.map((r) => r.id) : [])} /></th>}
                     <th>{th('name', 'Sim')}</th>
                     <th>{th('stage', 'Life stage')}</th>
                     {realAges && <th>Age</th>}
@@ -151,11 +198,19 @@ export function SimsList({ save }: { save: SaveRow }) {
                   {shown.map((r) => {
                     const b = birthdayCell(r.age, info.cal, view, !!r.sim.deceased);
                     return (
-                      <tr key={r.id} tabIndex={0} onClick={() => open(r.id)} onKeyDown={(e) => e.key === 'Enter' && open(r.id)}>
+                      <tr key={r.id} tabIndex={0} className={selecting && picked.includes(r.id) ? 'picked' : ''}
+                        onClick={() => (selecting ? togglePick(r.id) : open(r.id))} onKeyDown={(e) => e.key === 'Enter' && (selecting ? togglePick(r.id) : open(r.id))}>
+                        {selecting && <td className="pick-col"><input type="checkbox" aria-label={`Pick ${r.name}`} checked={picked.includes(r.id)} onChange={() => togglePick(r.id)} onClick={(e) => e.stopPropagation()} /></td>}
                         <td><span className="sim-cell"><SimAvatar sim={r.sim} />{r.name}</span></td>
                         <td>{r.sim.deceased ? <span className="tag outline">Deceased</span> : <span className="tag sims ink">{stageLabel(r.stage)}</span>}</td>
                         {realAges && <td>{r.realAge ? r.realAge.replace(/ old$/, '') : <span className="muted">–</span>}</td>}
-                        <td>{r.household ? <span className="tag households ink">{r.household}</span> : <span className="muted">None</span>}</td>
+                        <td>
+                          <button type="button" className={`hh-cell${r.household ? '' : ' none'}`} aria-label={`Household for ${r.name}: ${r.household || 'none'}. Change`}
+                            onClick={(e) => { e.stopPropagation(); setHhPick({ ids: [r.id], current: r.sim.householdId ?? null, el: e.currentTarget }); }}>
+                            {r.household ? <span className="tag households ink">{r.household}</span> : <span className="muted">None</span>}
+                            <CaretDown size={12} weight="bold" className="hh-caret" aria-hidden="true" />
+                          </button>
+                        </td>
                         <td>{b && (b.final
                           ? <span className="final-chip"><Hourglass size={15} weight="duotone" /> {b.text}</span>
                           : <span className={b.soon ? 'soon-birthday' : ''}>{b.text}</span>)}</td>
@@ -187,15 +242,17 @@ function EmptySims({ onAdd, onQuick, phone }: { onAdd(): void; onQuick(): void; 
   );
 }
 
-function SimCard({ r, info, view, onOpen }: { r: SimRow; info: SaveInfo; view: BirthdayView; onOpen(): void }) {
+function SimCard({ r, info, view, onOpen, household, picked }: { r: SimRow; info: SaveInfo; view: BirthdayView; onOpen(): void; household?: boolean; picked?: boolean }) {
   const b = birthdayCell(r.age, info.cal, view, !!r.sim.deceased);
   return (
-    <button type="button" className="sim-card" onClick={onOpen}>
+    <button type="button" className={`sim-card${picked ? ' picked' : ''}`} onClick={onOpen} aria-pressed={picked}>
+      {picked !== undefined && <span className={`pick-tick${picked ? ' on' : ''}`} aria-hidden="true">{picked && <Check size={14} weight="bold" />}</span>}
       {r.sim.portrait ? <PhotoBox photo={r.sim.portrait} aspect={1} size="thumb" className="sim-card-img" />
         : <span className="sim-card-img initials">{(r.sim.first[0] ?? '') + (r.sim.last[0] ?? '')}</span>}
       <span className="sim-card-body">
         <span className="sim-card-name"><b>{r.name}</b>{r.realAgeShort && <span className="sim-card-age">, {r.realAgeShort}</span>}</span>
         <span>{r.sim.deceased ? 'Deceased' : stageLabel(r.stage)}</span>
+        {household && (r.household ? <span className="sim-card-hh">{r.household}</span> : <span>No household</span>)}
         {b?.soon && <span className="sim-card-bday"><Cake size={13} weight="duotone" /> Birthday {view === 'date' ? `on ${b.text}` : b.text}</span>}
       </span>
     </button>

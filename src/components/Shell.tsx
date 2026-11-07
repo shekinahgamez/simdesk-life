@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   CalendarBlank, CaretLeft, CaretRight, CaretUpDown, Check, DotsThreeCircle, GearSix, House, MapPin, Plus, Sparkle as SparkleIcon, User, UserCircle,
+  ArrowsClockwise,
 } from '@phosphor-icons/react';
 import { Wordmark } from './brand';
 import { needsPack, ObjIcon, SECTIONS } from './categories';
@@ -9,6 +10,7 @@ import { Sheet } from './ui';
 import { useLayer } from '../lib/layers';
 import { go, savePath, type Route } from '../lib/router';
 import { moduleOn, saveData, todayOf } from '../lib/saves';
+import { DateSheet, NextDayButton } from './DayMove';
 import { useSaves } from '../lib/sync/react';
 import type { SaveRow } from '../lib/sync/types';
 import { formatDate, SEASONS } from '../lib/time';
@@ -43,6 +45,7 @@ function Sidebar({ save, route }: { save: SaveRow | null; route: Route }) {
         <Wordmark size={24} />
       </a>
       {save && d && <SaveSwitcher save={save} />}
+      {save && d?.trackDate && <NextDayButton save={save} className="btn sm side-nextday" />}
       {save && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {cats.map((c) => (
@@ -50,6 +53,11 @@ function Sidebar({ save, route }: { save: SaveRow | null; route: Route }) {
               <ObjIcon cat={c.id} /> {c.label}
             </a>
           ))}
+          {d && moduleOn(d, 'rotation') && (
+            <a href={savePath(save.id, 'rotation')} className={`nav-link ${section === 'rotation' ? 'active' : ''}`} aria-current={section === 'rotation' ? 'page' : undefined}>
+              <span className="obj worlds" aria-hidden="true"><ArrowsClockwise size={16} weight="duotone" /></span> Rotation
+            </a>
+          )}
         </div>
       )}
       <span className="grow" />
@@ -144,10 +152,12 @@ function TabBar({ saveId, route }: { saveId: string; route: Route }) {
 export function PhoneTop({ save }: { save: SaveRow }) {
   const { active } = useSaves();
   const [open, setOpen] = useState(false);
+  const [dateOpen, setDateOpen] = useState(false);
   const d = saveData(save);
   const t = todayOf(d);
   return (
     <>
+      {dateOpen && <DateSheet save={save} onClose={() => setDateOpen(false)} />}
       <div className="m-top">
         <button type="button" className="m-savechip" onClick={() => setOpen(true)} aria-label={`${d.name}. Switch save`}>
           <span className="dot" style={{ background: `${d.color}33` }}><SparkleIcon size={16} weight="fill" color={d.color} /></span>
@@ -156,7 +166,7 @@ export function PhoneTop({ save }: { save: SaveRow }) {
         </button>
         <span className="row" style={{ gap: 4, flexWrap: 'nowrap' }}>
           <SyncCloud />
-          {d.trackDate && <span className="m-datepill">{SEASONS[t.season]} {t.day} · Y{t.year}</span>}
+          {d.trackDate && <button type="button" className="m-datepill" onClick={() => setDateOpen(true)} aria-label={`Today is ${SEASONS[t.season]} ${t.day}, year ${t.year}. Change`}>{SEASONS[t.season]} {t.day} · Y{t.year}</button>}
         </span>
       </div>
       {open && (
