@@ -15,11 +15,15 @@ export type Rotation = {
   round: number;
   /** The household each new round starts with. */
   roundStart: string | null;
+  /** Days added to the turn being played now only. Goes back to 0 when the next turn starts. */
+  extra: number;
+  /** Paused: keep playing the current household with no turn length, until resumed. */
+  paused: boolean;
 };
 
 export const DEFAULT_TURN = 3;
 export const TURN_CHOICES = [1, 2, 3, 4, 5, 7, 14];
-export const EMPTY_ROTATION: Rotation = { order: [], lengths: {}, current: null, startDay: 0, round: 1, roundStart: null };
+export const EMPTY_ROTATION: Rotation = { order: [], lengths: {}, current: null, startDay: 0, round: 1, roundStart: null, extra: 0, paused: false };
 
 /** Cleans a stored rotation and drops households that no longer exist. */
 export function cleanRotation(raw: unknown, exists?: (id: string) => boolean): Rotation {
@@ -36,10 +40,22 @@ export function cleanRotation(raw: unknown, exists?: (id: string) => boolean): R
     order, lengths, current, roundStart,
     startDay: typeof o.startDay === 'number' ? o.startDay : 0,
     round: typeof o.round === 'number' && o.round >= 1 ? Math.floor(o.round) : 1,
+    extra: typeof o.extra === 'number' && o.extra > 0 ? Math.round(o.extra) : 0,
+    paused: o.paused === true && !!current,
   };
 }
 
 export const turnLength = (r: Rotation, id: string) => r.lengths[id] ?? DEFAULT_TURN;
+
+/** How long the turn being played now lasts: its usual length plus any days added to this turn. */
+export const currentLength = (r: Rotation) => (r.current ? turnLength(r, r.current) + r.extra : 0);
+
+/** Pause: the current household plays until you say so. Resume starts a fresh turn for them today. */
+export const pause = (r: Rotation): Rotation => (r.current ? { ...r, paused: true } : r);
+export const resume = (r: Rotation, today: number): Rotation => (r.current ? { ...r, paused: false, startDay: today, extra: 0 } : r);
+
+/** Adds days to this turn only. The household's usual length stays the same for its next turn. */
+export const addDays = (r: Rotation, days: number): Rotation => (r.current ? { ...r, extra: Math.max(0, r.extra + days) } : r);
 
 /** Households after the one playing now, in the order they'll play. */
 export function upNext(r: Rotation): string[] {
@@ -57,13 +73,13 @@ export const turnSpan = (r: Rotation, today: number) => ({ from: r.startDay, to:
 /** Starts `id`'s turn today. The round ticks over when the turn comes back around to roundStart. */
 function startTurn(r: Rotation, id: string, today: number): Rotation {
   const newRound = id === r.roundStart && r.current !== null && id !== r.current;
-  return { ...r, current: id, startDay: today, round: newRound ? r.round + 1 : r.round };
+  return { ...r, current: id, startDay: today, round: newRound ? r.round + 1 : r.round, extra: 0, paused: false };
 }
 
 /** Ends the current turn; the next household in the loop starts today. */
 export function endTurn(r: Rotation, today: number): Rotation {
   const next = upNext(r)[0];
-  if (!next) return { ...r, startDay: today };
+  if (!next) return { ...r, startDay: today, extra: 0, paused: false };
   return startTurn(r, next, today);
 }
 
@@ -98,7 +114,7 @@ export function addHouseholds(r: Rotation, ids: string[], days: number, today: n
   // New households join just before the one playing now comes back around (the end of the loop).
   const loop = r.current ? [r.current, ...upNext(r)] : [];
   const order = [...loop, ...fresh];
-  if (!r.current) return { ...r, order, lengths, current: fresh[0], startDay: today, round: 1, roundStart: fresh[0] };
+  if (!r.current) return { ...r, order, lengths, current: fresh[0], startDay: today, round: 1, roundStart: fresh[0], extra: 0 };
   return { ...r, order, lengths };
 }
 

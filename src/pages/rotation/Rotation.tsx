@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ArrowRight, ArrowsClockwise, Check, Clock, DotsSixVertical, DotsThree, Play, Plus, SkipForward, Trash } from '@phosphor-icons/react';
+import { ArrowRight, ArrowsClockwise, ArrowsLeftRight, MagnifyingGlass, Pause, CalendarPlus, Check, Clock, DotsSixVertical, DotsThree, Play, Plus, SkipForward, Trash } from '@phosphor-icons/react';
 import { BackLink, PhoneTop } from '../../components/Shell';
 import { Modal, Sheet, toast } from '../../components/ui';
 import { householdLabel, householdName, simData, type SimData } from '../../lib/sims';
 import { savePath } from '../../lib/router';
 import {
-  addHouseholds, cleanRotation, DEFAULT_TURN, endTurn, ordinal, playNext, playNow, removeHousehold, reorder, setLength,
+  addDays, addHouseholds, cleanRotation, currentLength, pause, resume, DEFAULT_TURN, endTurn, ordinal, playNext, playNow, removeHousehold, reorder, setLength,
   standing, turnDay, turnLength, turnSpan, TURN_CHOICES, upNext, type Rotation,
 } from '../../lib/rotation';
 import { moduleOn, saveData } from '../../lib/saves';
@@ -56,10 +56,12 @@ function DayBar({ day, len }: { day: number; len: number }) {
 function turnLine(rot: Rot) {
   const { r, today, track } = rot;
   if (!r.current) return '';
-  const len = turnLength(r, r.current);
-  if (!track) return `${len}-day turn`;
+  const len = currentLength(r);
   const day = turnDay(r, today);
-  return day > len ? `Day ${day} · turn was ${plural(len, 'day')}` : `Day ${day} of ${len} · since ${rot.when(r.startDay)}`;
+  if (r.paused) return track ? `Day ${day} · no end set · since ${rot.when(r.startDay)}` : 'No end set';
+  const extra = r.extra ? ` (${r.extra} extra)` : '';
+  if (!track) return `${len}-day turn${extra}`;
+  return day > len ? `Day ${day} · turn was ${plural(len, 'day')}` : `Day ${day} of ${len}${extra} · since ${rot.when(r.startDay)}`;
 }
 
 /** Playing now: the household, day N of M, End turn. `where` = the Today page card or the Rotation page's big card. */
@@ -68,6 +70,7 @@ export function PlayingNow({ save, where }: { save: SaveRow; where: 'today' | 'p
   const phone = useIsPhone();
   const [ending, setEnding] = useState(false);
   const [adding, setAdding] = useState(false);
+  const [switching, setSwitching] = useState(false);
   const { r } = rot;
   if (!rot.on) return null;
   const page = savePath(save.id, 'rotation');
@@ -83,14 +86,14 @@ export function PlayingNow({ save, where }: { save: SaveRow; where: 'today' | 'p
     );
   }
   const cur = r.current;
-  const len = turnLength(r, cur);
+  const len = currentLength(r);
   const day = turnDay(r, rot.today);
   const next = upNext(r)[0];
   const faces = rot.members(cur);
   return (
-    <section className={`card rot-now rot-${where}${rot.track && day > len ? ' over' : ''}`}>
+    <section className={`card rot-now rot-${where}${rot.track && !r.paused && day > len ? ' over' : ''}${r.paused ? ' paused' : ''}`}>
       <div className="rot-top">
-        <div className="rot-kicker"><Play size={14} weight="fill" /> Playing now</div>
+        <div className="rot-kicker">{r.paused ? <><Pause size={14} weight="fill" /> Playing now · paused</> : <><Play size={14} weight="fill" /> Playing now</>}</div>
         {where === 'today' && <a className="rot-link" href={page}>Rotation</a>}
       </div>
       <div className={`rot-who rot-${phone ? 'page' : where}`}>
@@ -100,7 +103,14 @@ export function PlayingNow({ save, where }: { save: SaveRow; where: 'today' | 'p
           <div className="rot-line">{turnLine(rot)}</div>
         </div>
       </div>
-      {rot.track && <DayBar day={day} len={len} />}
+      {rot.track && !r.paused && <DayBar day={day} len={len} />}
+      <div className="rot-acts">
+        {!r.paused && <button type="button" className="btn sm" onClick={() => rot.update(addDays(r, 1), `${rot.name(cur)} gets 1 more day this turn`)}><CalendarPlus size={14} weight="bold" /> Add a day</button>}
+        {r.paused
+          ? <button type="button" className="btn sm" onClick={() => rot.update(resume(r, rot.today), `Rotation is back on. ${rot.name(cur)}’s turn starts today`)}><Play size={14} weight="fill" /> Resume rotation</button>
+          : <button type="button" className="btn sm" onClick={() => rot.update(pause(r), `Rotation paused. Keep playing ${rot.name(cur)} as long as you like`)}><Pause size={14} weight="fill" /> Pause rotation</button>}
+        <button type="button" className="btn sm" onClick={() => setSwitching(true)}><ArrowsLeftRight size={14} weight="bold" /> Play someone else</button>
+      </div>
       <div className="rot-foot">
         {where === 'today' && next ? (
           <span className="rot-next"><span className="muted">Up next:</span> <b>{rot.name(next)}</b></span>
@@ -108,6 +118,7 @@ export function PlayingNow({ save, where }: { save: SaveRow; where: 'today' | 'p
         {next && <button type="button" className={`btn${where === 'page' ? ' primary' : ''}`} onClick={() => setEnding(true)}>End turn <ArrowRight size={16} weight="bold" /></button>}
       </div>
       {ending && <EndTurnDialog rot={rot} phone={phone} onClose={() => setEnding(false)} />}
+      {switching && <SwitchDialog rot={rot} phone={phone} onClose={() => setSwitching(false)} />}
     </section>
   );
 }
@@ -146,6 +157,42 @@ export function EndTurnDialog({ rot, phone, onClose }: { rot: Rot; phone: boolea
         <Faces sims={rot.members(next)} size={36} max={4} />
         <div><b>{rot.name(next)}</b><div className="muted small">{turnLength(r, next)}-day turn{rot.track ? `, starting ${rot.when(rot.today)}` : ''}</div></div>
       </div>
+    </Pop>
+  );
+}
+
+/** Switch: tap a household to play it now. Ones not in the rotation join it as they start. */
+function SwitchDialog({ rot, phone, onClose }: { rot: Rot; phone: boolean; onClose(): void }) {
+  const { r } = rot;
+  const [q, setQ] = useState('');
+  const match = (id: string) => !q.trim() || rot.name(id).toLowerCase().includes(q.trim().toLowerCase());
+  const inLine = upNext(r).filter(match);
+  const out = rot.households.filter((h) => !r.order.includes(h.id)).map((h) => h.id).filter(match)
+    .sort((a, b) => rot.name(a).localeCompare(rot.name(b), undefined, { sensitivity: 'base' }));
+  const play = (id: string) => {
+    onClose();
+    const joined = r.order.includes(id) ? r : addHouseholds(r, [id], DEFAULT_TURN, rot.today);
+    rot.update(playNow(joined, id, rot.today), `${rot.name(id)} is playing now`);
+  };
+  const add = (id: string) => rot.update(addHouseholds(r, [id], DEFAULT_TURN, rot.today), `${rot.name(id)} joined the rotation`);
+  const row = (id: string, sub: string, extra?: ReactNode) => (
+    <div key={id} className="rot-swrow">
+      <button type="button" className="rot-swpick" onClick={() => play(id)}>
+        <span className="rot-swfaces"><Faces sims={rot.members(id)} size={28} max={2} /></span>
+        <span className="grow"><b>{rot.name(id)}</b><span className="muted small">{sub}</span></span>
+        <Play size={14} weight="fill" className="rot-swplay" aria-hidden="true" />
+      </button>
+      {extra}
+    </div>
+  );
+  return (
+    <Pop phone={phone} title="Play someone else" onClose={onClose} footer={<button type="button" className="btn" onClick={onClose}>Cancel</button>}>
+      <label className="rot-search"><MagnifyingGlass size={16} /><input className="input" placeholder="Search households" value={q} onChange={(e) => setQ(e.target.value)} /></label>
+      <p className="muted small" style={{ margin: 0 }}>Tap one to play it now. {rot.name(r.current!)} keeps its place in line.</p>
+      {inLine.length > 0 && <><div className="rot-label">In the rotation</div><div className="rot-swlist">{inLine.map((id) => { const st = standing(r, id); return row(id, st && st.kind === 'next' ? (st.place === 1 ? 'Up next' : `${ordinal(st.place)} in line`) : ''); })}</div></>}
+      {out.length > 0 && <><div className="rot-label">Not in the rotation yet</div><div className="rot-swlist">{out.map((id) => row(id, plural(rot.members(id).length, 'Sim'),
+        <button type="button" className="btn sm ghost" aria-label={`Add ${rot.name(id)} to the end of the line`} onClick={() => add(id)}><Plus size={14} weight="bold" /><span className="rot-swaddtxt"> Add to line</span></button>))}</div></>}
+      {!inLine.length && !out.length && <p className="muted">No household called “{q}”.</p>}
     </Pop>
   );
 }

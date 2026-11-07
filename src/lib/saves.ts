@@ -28,6 +28,8 @@ export type SaveData = {
   cover?: PhotoRef | null;
   /** Rotation module: who's playing now and who's up next (see rotation.ts). */
   rotation?: unknown;
+  /** When this save was last downloaded as a backup file (ISO time). */
+  backedUpAt?: string;
   /** Household funds module: mod add-ons and wealth classes (see money.ts). */
   money?: unknown;
 };
@@ -63,6 +65,7 @@ export function saveData(row: SaveRow | undefined): SaveData {
     modules: d.modules ?? {},
     cover: d.cover ?? null,
     rotation: d.rotation,
+    backedUpAt: d.backedUpAt,
     money: d.money,
   };
 }
