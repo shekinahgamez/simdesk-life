@@ -124,7 +124,7 @@ const shot = (p, f) => p.screenshot({ path: `${out}/${f}.png` });
 
   // ---------- phone ----------
   ({ p } = await start(b, 390, 844));
-  ok(await p.getByRole('button', { name: 'Quick actions' }).isVisible(), 'lightning button on Today');
+  ok(await p.getByRole('button', { name: 'Quick actions' }).isVisible(), 'plus button on Today');
   await p.keyboard.press('Control+k'); await p.waitForTimeout(200); ok(!(await p.getByRole('dialog', { name: 'Command bar' }).count()), 'no command bar on phone');
   await shot(p, 'p0-today');
   await p.getByRole('button', { name: 'Quick actions' }).click(); await p.waitForTimeout(500);
@@ -143,7 +143,7 @@ const shot = (p, f) => p.screenshot({ path: `${out}/${f}.png` });
   await p.getByRole('dialog', { name: 'Quick actions' }).getByRole('button', { name: 'New Sim' }).click(); await p.waitForTimeout(600);
   ok(await p.getByRole('dialog').filter({ hasText: 'New Sim' }).first().isVisible(), 'phone: New Sim opens the form');
   await p.goto(`http://localhost:4173/#/s/${SID}/more`); await p.waitForTimeout(1200);
-  ok(await p.getByRole('button', { name: 'Quick actions' }).isVisible(), 'lightning button on More');
+  ok(await p.getByRole('button', { name: 'Quick actions' }).isVisible(), 'plus button on More');
   await p.context().close();
   await b.close();
   console.log(`testcommands: ${pass} passed, ${fail} failed`);

@@ -47,7 +47,7 @@
 .side-search:hover { color: var(--text); }
 .side-search .kk { margin-left: auto; font-size: 11.5px; font-weight: 600; border: 1px solid var(--line); border-radius: 5px; padding: 0 5px; }
 
-/* Phone: lightning button and the Quick actions sheet */
+/* Phone: plus button and the Quick actions sheet */
 .qa-btn { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 10px; background: var(--accent-soft); color: var(--accent); cursor: pointer; flex-shrink: 0; }
 .qa { padding-bottom: 8px; }
 .qa .cb-h { padding-left: 0; }
