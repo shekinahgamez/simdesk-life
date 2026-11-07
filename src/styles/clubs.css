@@ -57,3 +57,34 @@
 .club-item:hover { border-color: color-mix(in srgb, var(--clubs-ink) 35%, var(--line)); }
 .club-form .ph-pk-tick { color: var(--clubs-ink); }
 .club-form .ph-pk-tick.club-chev-t { color: var(--muted); }
+
+/* a club's page, tighter: faces, chips, a pencil per card */
+.club-card .card-head { display: flex; align-items: center; gap: 8px; }
+.club-card .card-head h2 { flex: 1; min-width: 0; }
+.club-pen { color: var(--muted); }
+.club-line { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin-top: 8px; font-size: 14px; font-weight: 600; }
+.club-where { display: inline-flex; gap: 4px; align-items: center; color: var(--accent); text-decoration: none; min-width: 0; }
+.club-where.plain { color: var(--muted); }
+.club-faces { display: flex; flex-wrap: wrap; gap: 14px 10px; }
+.club-face { width: 64px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: var(--text); font: inherit; font-size: 13px; font-weight: 600; text-align: center; background: none; border: 0; padding: 0; cursor: pointer; }
+.club-face-pic { position: relative; display: block; width: 48px; height: 48px; }
+.club-face-pic > .sim-avatar { width: 48px !important; height: 48px !important; }
+.club-face-nm { max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.club-face.add .club-face-nm { color: var(--muted); }
+.club-lead { position: absolute; top: -3px; right: -3px; width: 20px; height: 20px; border-radius: 50%; background: var(--clubs-ink); color: #fff; display: flex; align-items: center; justify-content: center; border: 2px solid var(--surface); }
+.club-plus { width: 48px; height: 48px; border-radius: 50%; border: 1.5px dashed color-mix(in srgb, var(--muted) 50%, transparent); display: flex; align-items: center; justify-content: center; color: var(--muted); }
+.club-face.add:hover .club-plus { color: var(--accent); border-color: var(--accent); }
+.club-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.club-rule { min-height: 32px; padding: 0 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; }
+.club-rule.yes { background: color-mix(in srgb, #2E8B57 14%, transparent); color: #1f6b42; }
+.club-rule.no { background: color-mix(in srgb, #C0392B 12%, transparent); color: #9b2c20; }
+.club-rule .club-pill { height: 24px; }
+.club-card .club-sub { margin: 14px 0 6px; }
+.club-card .club-sub:nth-child(2) { margin-top: 0; }
+.club-sub + .club-kv { padding-top: 2px; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .club-rule.yes { color: #8fd8ad; }
+  :root:not([data-theme="light"]) .club-rule.no { color: #f0a49a; }
+}
+:root[data-theme="dark"] .club-rule.yes { color: #8fd8ad; }
+:root[data-theme="dark"] .club-rule.no { color: #f0a49a; }

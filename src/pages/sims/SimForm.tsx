@@ -12,7 +12,7 @@ import { useDraft, useEditGuard, useStore } from '../../lib/sync/react';
 import { STAGE_IDS, stageName, type StageId } from '../../lib/time';
 import { useIsPhone } from '../../lib/useIsPhone';
 import {
-  aspirationOptions, occultOptions, traitOptions, useCustomTraits, useHouseholds, type SaveInfo,
+  aspirationOptions, occultOptions, traitOptions, useCustomTraits, useHouseholds, useRealAgeRanges, type SaveInfo,
 } from './shared';
 
 const PRONOUNS = ['she/her', 'he/him', 'they/them', 'she/they', 'he/they'];
@@ -43,6 +43,7 @@ export function SimForm({ info, simId, householdId = null, onClose, onSaved }: {
   const draft = useDraft<FormState>(draftKey);
   const guard = useEditGuard(simId);
   const custom = useCustomTraits();
+  const realRanges = useRealAgeRanges().ranges;
   const hh = useHouseholds();
   const ids = { stage: useId() };
   const firstId = useRef('');
@@ -209,7 +210,7 @@ export function SimForm({ info, simId, householdId = null, onClose, onSaved }: {
               <button type="button" className="btn sm" onClick={() => set({ changeAge: true })}>Change age</button>
             </div>
           ) : info.track ? (
-            <AgeFields value={f.age} onChange={(age) => set({ age })} table={info.table} today={info.today} calendar={info.cal} />
+            <AgeFields value={f.age} onChange={(age) => set({ age })} table={info.table} today={info.today} calendar={info.cal} realAges={info.d.realAges ? realRanges : null} />
           ) : (
             <div className="field">
               <label htmlFor={ids.stage}>Life stage</label>

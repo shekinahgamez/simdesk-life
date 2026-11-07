@@ -8,7 +8,10 @@ import type { CategoryId } from '../components/categories';
 import { go, savePath, useRoute } from '../lib/router';
 import { getLastSave, setLastSave } from '../lib/saves';
 import { useIsPhone } from '../lib/useIsPhone';
-import { HomeDeck, More, OnItsWay, PhoneToday } from './InApp';
+import { More, OnItsWay } from './InApp';
+import { TodayPage } from './Today';
+import { RotationPage } from './rotation/Rotation';
+import { rememberVisit, visitOf } from '../lib/recent';
 import { HouseholdsList } from './households/HouseholdsList';
 import { LotTypeRegistry } from './worlds/shared';
 import { CalendarPage } from './calendar/CalendarPage';
@@ -21,6 +24,7 @@ import { AppSettings } from './AppSettings';
 import { AskSettings } from './worlds/AskSettings';
 import { RealAgesSettings } from './sims/RealAgesSettings';
 import { Setup } from './Setup';
+import { Intro, introDue } from '../components/Intro';
 import { SyncProvider, useSaves, useStore, useStoreVersion } from '../lib/sync/react';
 import { SyncStore } from '../lib/sync/store';
 import { supabaseBackend } from '../lib/sync/supabaseBackend';
@@ -243,8 +247,19 @@ function AccountPage({ profile, onProfile, pretend }: { profile: Profile; onProf
 
 const SECTION_CATS: Record<string, CategoryId> = { sims: 'sims', households: 'households', worlds: 'worlds', lots: 'worlds', calendar: 'calendar', photos: 'photos', clubs: 'clubs', storylines: 'storylines' };
 
-/** Everything after logging in: picks the page from the address and keeps the right save open. */
-export function AppRoot({ userId, profile, onProfile, pretend }: { userId: string; profile: Profile; onProfile(p: Profile): void; pretend?: boolean }) {
+/** Everything after logging in, with the opening intro over it on the first open of each day. */
+export function AppRoot(props: { userId: string; profile: Profile; onProfile(p: Profile): void; pretend?: boolean }) {
+  const [intro, setIntro] = useState(() => !props.pretend && introDue(props.userId));
+  return (
+    <>
+      <AppPages {...props} />
+      {intro && <Intro onDone={() => setIntro(false)} />}
+    </>
+  );
+}
+
+/** Picks the page from the address and keeps the right save open. */
+function AppPages({ userId, profile, onProfile, pretend }: { userId: string; profile: Profile; onProfile(p: Profile): void; pretend?: boolean }) {
   const route = useRoute();
   const store = useStore();
   useStoreVersion();
@@ -269,6 +284,8 @@ export function AppRoot({ userId, profile, onProfile, pretend }: { userId: strin
       if (phone && route.section === '') return go(savePath(routeSave.id, 'today'), { replace: true });
       if (!phone && (route.section === 'today' || route.section === 'more')) return go(savePath(routeSave.id), { replace: true });
       setLastSave(userId, routeSave.id);
+      const v = visitOf(route.section, route.rest);
+      if (v) rememberVisit(routeSave.id, v.kind, v.id);
       if (store.openId !== routeSave.id) void store.openSave(routeSave.id);
       else store.purgeExpired();
     }
@@ -296,8 +313,9 @@ export function AppRoot({ userId, profile, onProfile, pretend }: { userId: strin
   const sec = route.section;
   let page: ReactNode;
   if (sec === 'settings') page = <SaveSettings save={routeSave} />;
-  else if (sec === 'today') page = <PhoneToday save={routeSave} />;
+  else if (sec === 'today') page = <TodayPage save={routeSave} />;
   else if (sec === 'more') page = <More save={routeSave} />;
+  else if (sec === 'rotation') page = <RotationPage save={routeSave} />;
   else if (sec === 'worlds' || sec === 'lots') {
     const [a, b] = sec === 'lots' ? ['lots'] : route.rest;
     if (a === 'lot' && b) page = <LotPage key={b} save={routeSave} lotId={b} />;
@@ -312,7 +330,7 @@ export function AppRoot({ userId, profile, onProfile, pretend }: { userId: strin
   else if (sec === 'households') page = route.rest[0] ? <HouseholdPage key={route.rest[0]} save={routeSave} hhId={route.rest[0]} /> : <HouseholdsList save={routeSave} />;
   else if (sec === 'sims') page = route.rest[0] ? <SimProfile key={route.rest[0]} save={routeSave} simId={route.rest[0]} /> : <SimsList save={routeSave} />;
   else if (SECTION_CATS[sec]) page = <OnItsWay cat={SECTION_CATS[sec]} />;
-  else page = <HomeDeck save={routeSave} />;
+  else page = <TodayPage save={routeSave} />;
   return <><LotTypeRegistry /><Shell save={routeSave} route={route}>{page}</Shell></>;
 }
 

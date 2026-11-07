@@ -3,12 +3,34 @@
 Read this before drawing or building any screen. Each rule comes from something the owner already told us. If a rule is wrong, change it here first.
 
 ## Process
-1. Mockup screenshots first (desktop and phone). No code until the screens are approved.
+1. Mockup screenshots first, at desktop 1440 wide and iPhone 390 wide, drawn on the latest shared code with real save data. Show the screen as it is now next to the new one. No code until the screens are approved.
    - Before drawing, check this file and reuse the app's existing approved pieces (calendar picker, filter sheet, sheets and popups). Don't invent a new control for something that already has one.
 2. One feature at a time: describe it, get an OK, build it, test it.
 3. Show screenshots of the real app as proof. Send images, not interactive links.
 4. Don't guess. If something is ambiguous, ask or say which reading was used.
-5. Don't publish the preview until asked.
+5. Don't publish the preview, commit or push until asked.
+6. One code copy. Every SimDesk thread builds on the same shared copy and keeps every other thread's changes. Get the latest before editing and put it back when done. Never redraw or rebuild a page from an older copy.
+7. Review the whole app, not one area, unless the owner names the area. Say the scope up front.
+
+## Fewer clicks (Nov 6 2026)
+The owner said SimDesk was "beautiful but everything takes a million clicks". Every new screen is checked for this before it is shown. Count the taps for the everyday job, now and new, and put the counts on the mockup.
+- **Edit in place.** Tapping a row on a profile edits just that field. A card's pencil edits just that card (for example a club's members, rules or details). The big Edit button stays for editing everything.
+- **Autosave with Undo.** Small edits save as soon as the popover or sheet closes and show a toast with Undo. No Save button for one field.
+- **Pick right in the list.** A cell in a list (like a Sim's household) opens a popover with search and a "New …" row. No trip to another page.
+- **Select mode for bulk.** Lists that need sorting get a Select button: tick rows or cards, then one action in a bottom sheet (phone) or bar (desktop).
+- **"Save and add another"** on forms you fill in many times in a row (relationships, Sims).
+- **The common choice first, as one tap.** Example: housemates come first in the relationship picker. Rare options sit behind one link.
+- **Today is the home page.** It shows the date with Next day, Jump ahead and Go back, Playing now (when Rotation is on), "To sort" counts that open filtered lists, save-wide Coming up and Jump back in. No deck of section cards in between.
+- **Compact pages.** A page should fit the job without long scrolling. The Sim profile is a small portrait with one fact line, not a wall of fact tiles. Merge cards that hold one or two lines each.
+- **Rare and risky actions go in the ⋯ menu** (Delete, Play now), not as big buttons.
+- Don't trade a click for something the owner needs to see. Lot photos stay big ("lots are hard to view small").
+
+## Buttons and tap sizes (Nov 6 2026)
+- Buttons are **40px** tall. Small buttons and links are **32px**. Same on desktop and iPhone. Nothing is 44px or bigger (this replaces the old iPad 44px rule). A tiny ✕ still gets a 32px tap area.
+- **One filled button per screen or sheet.** Everything else is plain or outlined.
+- **No teal buttons.** Teal is the Worlds color, not a button color.
+- Buttons say what happens ("End turn", "Restore as a new save"), not "OK" or "Done" when a verb fits.
+- Icons beat text labels where the icon is clear (the owner has autism and ADHD). Keep the label as `aria-label` or a short word next to it.
 
 ## Lists and filters
 - **Never use pills or chips for names of Sims, worlds, lots or anything that can grow.** A save can have hundreds of Sims. Use a dropdown with a search box, checkboxes, and a count per row.
@@ -35,7 +57,13 @@ Read this before drawing or building any screen. Each rule comes from something 
 - Lean, in SimDesk's voice. Friendly, short. No filler hints that repeat what's obvious.
 - No "Plot Matcher", no map art, no EA art.
 
+## Art and type
+- **Never draw or generate the owner's Sims.** No drawn portraits, avatars or placeholder people. Use real in-game photos, initials or icons only.
+- **No plumbob** anywhere (it's trademarked). No other Sims trademarks.
+- **No rounded fonts.**
+- No sound. The intro is animation only.
+
 ## Never
 - Never touch the simbase Supabase project (pczvxbuipkeksnpeqehp). SimDesk's is simdesk (pyszlcaaotkituvvpvvw).
 - Never put the owner's personal views anywhere on the site.
-- Never start another map creation.
+- Never start another map creation. Maps are shelved for v1 (they need an artist).

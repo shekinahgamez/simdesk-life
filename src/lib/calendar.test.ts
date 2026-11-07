@@ -46,6 +46,21 @@ describe('calendar', () => {
     expect(comingUp(s, ['mo'], 19).map((i) => i.key)).toEqual(['v:trip']);
     expect(comingUp(s, ['zz'], 0)).toEqual([]);
   });
+  it('coming up: only each Sim\u2019s next birthday', () => {
+    const s = base();
+    s.events = []; s.vacations = [];
+    // A toddler ages up again and again within the year; only the next one shows.
+    s.sims = [
+      { id: 'kid', name: 'Kid', bornDay: -table.find((r) => r.id === 'toddler')!.start - 2, addedDay: 0 },
+      { id: 'mom', name: 'Mom', bornDay: -table.find((r) => r.id === 'adult')!.start + 30, addedDay: 0 },
+    ];
+    const all = itemsBetween(s, 0, 400).filter((i) => i.kind === 'birthday' && i.id === 'kid');
+    expect(all.length).toBeGreaterThan(1);
+    const list = comingUp(s, ['kid', 'mom'], 0, 5);
+    expect(list.filter((i) => i.id === 'kid')).toHaveLength(1);
+    expect(list.filter((i) => i.id === 'mom')).toHaveLength(1);
+    expect(list.find((i) => i.id === 'kid')!.day).toBe(all[0].day);
+  });
   it('finds the next time a holiday comes round', () => {
     expect(nextHolidayDay({ season: 0, day: 7 }, 0, cal)).toBe(6);
     expect(nextHolidayDay({ season: 0, day: 7 }, 6, cal)).toBe(6);

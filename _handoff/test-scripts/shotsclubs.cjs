@@ -52,7 +52,7 @@ const wait = (p, ms) => p.waitForTimeout(ms);
     await dlg().getByRole('button', { name: /^Trait/ }).click(); await wait(p, 300); await shot('trait');
     await dlg().getByRole('button', { name: 'Back' }).click(); await dlg().getByRole('button', { name: 'Back' }).click(); await wait(p, 300);
     await dlg().getByRole('button', { name: 'Add a perk' }).scrollIntoViewIfNeeded(); await dlg().getByRole('button', { name: 'Add a perk' }).click(); await wait(p, 300); await shot('perk');
-    await go(`sims/${U(1)}`); if (phone) await p.getByRole('tab', { name: 'About' }).click(); await wait(p, 300);
+    await go(`sims/${U(1)}`);  await wait(p, 300);
     await p.getByText(/^Clubs/).first().scrollIntoViewIfNeeded(); await wait(p, 200); await shot('simcard');
     console.log(n, 'errors', errs.length, errs.slice(0, 2).join('|'));
     await ctx.close();

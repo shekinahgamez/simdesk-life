@@ -12,6 +12,8 @@ export type SaveData = {
   color: string;
   packs: string[];
   secretLots: string[];
+  /** Worlds this save doesn't play (game ids). They keep their lots, they just stay out of the way. New packs' worlds show. */
+  hiddenWorlds?: string[];
   /** Day number for "today" (days since the save began). */
   today: number;
   calendar: Calendar;
@@ -24,6 +26,8 @@ export type SaveData = {
   modules: Record<string, boolean>;
   /** Optional cover photo (setup step 1, Save settings, the desktop home page). */
   cover?: PhotoRef | null;
+  /** Rotation module: who's playing now and who's up next (see rotation.ts). */
+  rotation?: unknown;
 };
 
 export const SAVE_COLORS: { label: string; hex: string }[] = [
@@ -47,6 +51,7 @@ export function saveData(row: SaveRow | undefined): SaveData {
     color: d.color ?? SAVE_COLORS[0].hex,
     packs: d.packs ?? [],
     secretLots: d.secretLots ?? [],
+    hiddenWorlds: d.hiddenWorlds ?? [],
     today: d.today ?? 0,
     calendar: d.calendar ?? newCalendar(7, 0),
     lifespan: d.lifespan ?? { preset: 'normal' },
@@ -55,6 +60,7 @@ export function saveData(row: SaveRow | undefined): SaveData {
     realAges: d.realAges ?? false,
     modules: d.modules ?? {},
     cover: d.cover ?? null,
+    rotation: d.rotation,
   };
 }
 

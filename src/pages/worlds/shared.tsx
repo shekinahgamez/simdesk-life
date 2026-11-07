@@ -2,12 +2,13 @@ import { useMemo, useState, type ReactNode } from 'react';
 import { CaretLeft, MapPin } from '@phosphor-icons/react';
 import { BY_ID, type GameLot } from '../../data/game';
 import { WORLD_SCENES } from '../../components/worldScenes';
-import { Confirm, Modal, toast } from '../../components/ui';
+import { bannerScene } from '../../components/worldBanner';
+import { Confirm, Modal, SearchBox, toast } from '../../components/ui';
 import {
   APARTMENT, apartmentsOf, CUSTOM_TYPE_PREFIX, fitOf, lotRows, setCustomLotTypes, type CustomLotType, lotsBySpot, placeChanges, spotsOf, worldData, type Fit, type LotRow, type WorldData,
 } from '../../lib/lots';
 import { useAccount, useRecords, useStore } from '../../lib/sync/react';
-import { plural } from '../../lib/text';
+import { matches, plural } from '../../lib/text';
 import type { SaveRow } from '../../lib/sync/types';
 import { newId, type SyncStore } from '../../lib/sync/store';
 import { useSaveInfo } from '../sims/shared';
@@ -23,20 +24,26 @@ export function useLotsCtx(save: SaveRow) {
     const recOfWorld = new Map(worldRecs.map((r) => [(r.data as { gameId?: string }).gameId ?? '', r]));
     const world = (gameId: string): WorldData => worldData(recOfWorld.get(gameId), gameId);
     const worldName = (gameId: string | null) => (gameId ? world(gameId).name.trim() || BY_ID.worlds.get(gameId)?.name || 'Unknown world' : '');
-    const worlds = info.avail.worlds.map((w) => ({ id: w.id, name: worldName(w.id), pack: BY_ID.packs.get(w.pack)?.name ?? '' }))
+    const hidden = new Set(info.d.hiddenWorlds ?? []);
+    const worlds = info.avail.worlds.map((w) => ({ id: w.id, name: worldName(w.id), game: BY_ID.worlds.get(w.id)?.name ?? '', pack: BY_ID.packs.get(w.pack)?.name ?? '' }))
       .sort((a, b) => a.name.localeCompare(b.name));
-    return { info, rows, bySpot: lotsBySpot(rows), world, worldName, worlds, recOfWorld, apartments: apartmentsOf(info.avail) };
+    /** The worlds you play (Worlds you play hides the rest). */
+    const shownWorlds = worlds.filter((w) => !hidden.has(w.id));
+    /** A neighborhood's name as you call it (falls back to the game's). */
+    const hoodName = (gameId: string | null | undefined, hood: string | undefined) => (gameId && hood ? world(gameId).hoodNames?.[hood]?.trim() || hood : hood ?? '');
+    return { info, rows, bySpot: lotsBySpot(rows), world, worldName, worlds, shownWorlds, hidden, hoodName, recOfWorld, apartments: apartmentsOf(info.avail) };
   }, [info, lotRecs, worldRecs, customTypes]);
 }
 export type LotsCtx = ReturnType<typeof useLotsCtx>;
 
-/** A world's scene picture (flat pastel art), or a plain tile with a pin for worlds that don't have one yet. */
-export function WorldPicture({ worldId, className, children }: { worldId: string; className?: string; children?: ReactNode }) {
+/** A world's scene picture (flat pastel art; `banner` gives the zoomed-out wide view), or a plain tile with a pin for worlds that don't have one yet. */
+export function WorldPicture({ worldId, className, children, banner }: { worldId: string; className?: string; children?: ReactNode; banner?: boolean }) {
   const scene = WORLD_SCENES[worldId];
   if (scene) {
+    const pic = banner ? bannerScene(worldId, scene) : { html: scene, viewBox: '0 0 400 300', fit: 'xMidYMid slice' };
     return (
       <div className={`${className ?? ''} world-pic`}>
-        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true" dangerouslySetInnerHTML={{ __html: scene }} />
+        <svg viewBox={pic.viewBox} preserveAspectRatio={pic.fit} aria-hidden="true" dangerouslySetInnerHTML={{ __html: pic.html }} />
         {children}
       </div>
     );
@@ -113,7 +120,7 @@ export function PlaceFlow({ ctx, lotId, onClose }: { ctx: LotsCtx; lotId: string
       return { spot, fit: apt ? 'fits' : fitOf(lot.size, spot.size), taken: t && t.id !== lotId ? t : null };
     });
   };
-  const worlds = ctx.worlds.map((w) => {
+  const worlds = ctx.worlds.filter((w) => !ctx.hidden.has(w.id) || w.id === row.world).map((w) => {
     const s = statesFor(w.id);
     return { ...w, total: s.length, fits: s.filter((x) => !x.taken && x.fit !== 'too-big').length };
   }).filter((w) => w.total > 0);
@@ -136,7 +143,7 @@ export function PlaceFlow({ ctx, lotId, onClose }: { ctx: LotsCtx; lotId: string
     <Modal title={<>Place {lot.name}<span className="muted title-note">{sizeNote}</span></>} onClose={onClose} wide className="place-modal" autoFocus={false}
       footer={(close) => worldId ? (
         <>
-          {sel && <div className="place-sel"><b>{sel.spot.name}</b><span className="muted small">{[sel.spot.neighborhood, !apt && sel.spot.size].filter(Boolean).join(' · ')}</span></div>}
+          {sel && <div className="place-sel"><b>{sel.spot.name}</b><span className="muted small">{[ctx.hoodName(sel.spot.world, sel.spot.neighborhood), !apt && sel.spot.size].filter(Boolean).join(' · ')}</span></div>}
           <span className="grow" />
           <button type="button" className="btn" onClick={close}>Cancel</button>
           <button type="button" className="btn primary" disabled={!sel} onClick={tryPlace}>Place here</button>
@@ -160,7 +167,7 @@ export function PlaceFlow({ ctx, lotId, onClose }: { ctx: LotsCtx; lotId: string
             <span className="label-caps">{ctx.worldName(worldId)}</span>
             <button type="button" className="btn ghost sm" onClick={() => { setWorldId(null); setPicked(null); }}><CaretLeft size={14} weight="bold" /> Other world</button>
           </div>
-          <SpotPicker states={statesFor(worldId)} picked={picked} onPick={setPicked} apt={apt} />
+          <SpotPicker states={statesFor(worldId)} picked={picked} onPick={setPicked} apt={apt} hoodName={(h) => ctx.hoodName(worldId, h)} />
         </div>
       )}
       {ask === 'swap' && sel?.taken && (
@@ -176,8 +183,8 @@ export function PlaceFlow({ ctx, lotId, onClose }: { ctx: LotsCtx; lotId: string
 }
 
 /** The world's lots to pick from, by neighborhood. */
-function SpotPicker({ states, picked, onPick, apt }: {
-  states: SpotState[]; picked: string | null; onPick(id: string): void; apt: boolean;
+function SpotPicker({ states, picked, onPick, apt, hoodName }: {
+  states: SpotState[]; picked: string | null; onPick(id: string): void; apt: boolean; hoodName(h: string): string;
 }) {
   const cls = (s: SpotState) => (s.taken ? 'taken' : s.fit === 'too-big' ? 'small' : 'fit');
   const label = (s: SpotState) => (s.taken ? `Has ${s.taken.lot.name}` : s.fit === 'too-big' ? 'Too small' : apt ? 'Empty' : 'Fits');
@@ -191,7 +198,7 @@ function SpotPicker({ states, picked, onPick, apt }: {
       <div className="spot-list">
         {groups.map(([hood, list]) => (
           <div key={hood} className="spot-group">
-            <div className="label-caps">{hood}</div>
+            <div className="label-caps">{hood === 'Other' ? hood : hoodName(hood)}</div>
             {list.map((s) => (
               <button key={s.spot.id} type="button" className={`spot-row ${picked === s.spot.id ? 'on' : ''}`} aria-pressed={picked === s.spot.id} onClick={() => onPick(s.spot.id)}>
                 <span className="grow"><b>{s.spot.name}</b>{!apt && s.spot.size && <span className="muted small"> · {s.spot.size}</span>}</span>
@@ -237,3 +244,62 @@ export function useCustomLotTypes() {
 }
 /** Renders nothing; just keeps custom lot type names ready before the page draws. */
 export function LotTypeRegistry() { useCustomLotTypes(); return null; }
+
+/** Worlds you play: tick the worlds this save uses. Hidden worlds keep their lots, they just stay out of the way. */
+export function ChooseWorlds({ ctx, save, onClose }: { ctx: LotsCtx; save: SaveRow; onClose(): void }) {
+  const store = useStore();
+  const [q, setQ] = useState('');
+  const [all, setAll] = useState(false);
+  const lotsIn = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const r of ctx.rows) if (r.world) m.set(r.world, (m.get(r.world) ?? 0) + 1);
+    return m;
+  }, [ctx.rows]);
+  const toggle = (id: string) => {
+    const n = new Set(ctx.hidden);
+    if (n.has(id)) n.delete(id); else n.add(id);
+    store.updateSave(save.id, { hiddenWorlds: [...n] });
+  };
+  const match = (w: LotsCtx['worlds'][number]) => matches(w.name, q) || matches(w.game, q) || matches(w.pack, q);
+  const showing = ctx.worlds.filter((w) => !ctx.hidden.has(w.id) && match(w));
+  const hidden = ctx.worlds.filter((w) => ctx.hidden.has(w.id) && match(w));
+  const searching = !!q.trim();
+  const FOLD = 8;
+  const hiddenShown = searching || all ? hidden : hidden.slice(0, FOLD);
+  const row = (w: LotsCtx['worlds'][number], on: boolean) => {
+    const n = lotsIn.get(w.id) ?? 0;
+    return (
+      <button key={w.id} type="button" className="ph-pk-opt choose-world" role="checkbox" aria-checked={on} onClick={() => toggle(w.id)}>
+        <span className="grow" style={{ minWidth: 0 }}>
+          <span className="cw-name">{w.name}</span>
+          <span className="cw-sub">{[w.name !== w.game && w.game, w.pack].filter(Boolean).join(' · ')}</span>
+        </span>
+        {n > 0 && <span className="cw-lots">{plural(n, 'lot')}</span>}
+        <span className={`ph-cb ${on ? 'on' : ''}`} aria-hidden="true" />
+      </button>
+    );
+  };
+  return (
+    <Modal title="Worlds you play" onClose={onClose} autoFocus={false} className="choose-worlds"
+      footer={<><span className="small muted grow">Hidden worlds keep their lots.</span><button type="button" className="btn primary" onClick={onClose}>Done</button></>}>
+      <div className="stack" style={{ gap: 14 }}>
+        <SearchBox value={q} onChange={setQ} placeholder="Search worlds" />
+        {searching && !showing.length && !hidden.length && <p className="muted">No worlds match that.</p>}
+        {(showing.length > 0 || !searching) && (
+          <div>
+            <div className="label-caps cw-head">Showing · {showing.length}</div>
+            {showing.length ? showing.map((w) => row(w, true)) : <p className="small muted">None yet. Tick the worlds you play below.</p>}
+          </div>
+        )}
+        {hidden.length > 0 && (
+          <div>
+            <div className="label-caps cw-head"><span className="grow">Hidden · {hidden.length}</span>
+              {!searching && hidden.length > FOLD && <button type="button" className="link-btn" onClick={() => setAll((v) => !v)}>{all ? 'Show fewer' : 'Show all'}</button>}
+            </div>
+            {hiddenShown.map((w) => row(w, false))}
+          </div>
+        )}
+      </div>
+    </Modal>
+  );
+}

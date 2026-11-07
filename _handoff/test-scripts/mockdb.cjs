@@ -5,6 +5,8 @@ const jwt = (sub) => `${b64({ alg: 'HS256', typ: 'JWT' })}.${b64({ sub, role: 'a
 const USER = { id: 'u1', aud: 'authenticated', role: 'authenticated', email: 'nia@example.com', app_metadata: {}, user_metadata: {}, created_at: new Date().toISOString() };
 function newState() { return { saves: {}, records: {}, drafts: {}, profile: { user_id: 'u1', username: 'NiaPlays', plan: 'free' }, account: null, photos: {}, files: {}, photoLimit: 100, calls: [], offline: false }; }
 async function mock(page, st) {
+  // skip the once-a-day opening intro (it covers the screen for ~3.4s); intro tests set __SD_INTRO_TEST__ to keep it
+  await page.addInitScript(() => { if (!window.__SD_INTRO_TEST__) window.__SD_NO_INTRO__ = true; });
   await page.route(`${SB}/**`, async (route) => {
     const req = route.request(); const url = req.url(); const m = req.method();
     const body = req.postData() ? (() => { try { return JSON.parse(req.postData()); } catch { return {}; } })() : {};

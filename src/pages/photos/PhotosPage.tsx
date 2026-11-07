@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { CalendarBlank, Camera, CaretLeft, Check, CaretRight, FunnelSimple, PencilSimple, Plus, TextAlignLeft, Trash, UsersThree } from '@phosphor-icons/react';
 import { PhotoBox } from '../../components/photo';
 import { DateField, RangePanel } from '../../components/SeasonPicker';
@@ -267,7 +267,7 @@ export function ClubPhotos({ save, clubId }: { save: SaveRow; clubId: string }) 
 }
 
 /** Photos a Sim is tagged in, on their profile. */
-export function SimPhotos({ save, simId, phone }: { save: SaveRow; simId: string; phone?: boolean }) {
+export function SimPhotos({ save, simId, phone, extra }: { save: SaveRow; simId: string; phone?: boolean; extra?: ReactNode }) {
   const album = useAlbum(save);
   const adder = usePhotoAdder(save, { simIds: [simId] });
   const rows = photosOfSim(album.rows, simId, album.info.track);
@@ -278,6 +278,7 @@ export function SimPhotos({ save, simId, phone }: { save: SaveRow; simId: string
         <button type="button" className="btn sm" onClick={adder.start}><Camera size={15} weight="duotone" /> Add photo</button>
         {rows.length > 12 && <a className="btn sm ghost" href={savePath(save.id, 'photos')}>See all {rows.length}</a>}
       </div>
+      {extra}
       {adder.ui}
     </>
   );

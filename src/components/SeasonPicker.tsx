@@ -34,15 +34,17 @@ function Trigger({ label, text, onOpen }: { label: string; text: string; onOpen(
 }
 
 /** The pop-up: a bottom sheet on phones, a small window elsewhere. */
-function Frame({ title, onClose, children }: { title: string; onClose(): void; children: React.ReactNode }) {
+export function DateFrame({ title, onClose, children }: { title: string; onClose(): void; children: React.ReactNode }) {
   const phone = useIsPhone();
   if (phone) return <Sheet title={title} onClose={onClose}>{children}</Sheet>;
   return <Modal title={title} onClose={onClose} autoFocus={false} className="dp-modal">{children}</Modal>;
 }
 
-function Grid({ view, setView, seasonLength, today, yearless, isSel, inRange, onPick, note }: {
+export function DateGrid({ view, setView, seasonLength, today, yearless, isSel, inRange, onPick, note, isOff }: {
   view: { year: number; season: Season }; setView(v: { year: number; season: Season }): void; seasonLength: SeasonLength; today?: SimDate | null; yearless?: boolean;
   isSel(d: SimDate): boolean; inRange?(d: SimDate): boolean; onPick(d: SimDate): void; note?: string;
+  /** Days that can't be picked (greyed out), like past days for Jump ahead. */
+  isOff?(d: SimDate): boolean;
 }) {
   const isToday = (d: SimDate) => !!today && today.year === d.year && today.season === d.season && today.day === d.day;
   return (
@@ -59,8 +61,9 @@ function Grid({ view, setView, seasonLength, today, yearless, isSel, inRange, on
         {Array.from({ length: seasonLength }, (_, i) => {
           const d: SimDate = { year: view.year, season: view.season, day: i + 1 };
           const sel = isSel(d);
+          const off = !!isOff?.(d);
           return (
-            <button key={i} type="button" className={`dp-day ${sel ? 'sel' : ''} ${!sel && inRange?.(d) ? 'mid' : ''} ${isToday(d) ? 'today' : ''}`} aria-pressed={sel} aria-label={`${seasonDay(d)}${isToday(d) ? ', today' : ''}`} onClick={() => onPick(d)}>{i + 1}</button>
+            <button key={i} type="button" className={`dp-day ${sel ? 'sel' : ''} ${!sel && inRange?.(d) ? 'mid' : ''} ${isToday(d) ? 'today' : ''} ${off ? 'off' : ''}`} disabled={off} aria-pressed={sel} aria-label={`${seasonDay(d)}${isToday(d) ? ', today' : ''}`} onClick={() => onPick(d)}>{i + 1}</button>
           );
         })}
       </div>
@@ -78,11 +81,11 @@ export function DateField({ value, onChange, label, ...s }: Shared & { value: Si
     <>
       <Trigger label={label} text={fieldText({ ...value, day }, s.yearless)} onOpen={() => { setView({ year: value.year, season: value.season }); setOpen(true); }} />
       {open && (
-        <Frame title={label} onClose={() => setOpen(false)}>
-          <Grid view={view} setView={setView} seasonLength={s.seasonLength} today={s.today} yearless={s.yearless}
+        <DateFrame title={label} onClose={() => setOpen(false)}>
+          <DateGrid view={view} setView={setView} seasonLength={s.seasonLength} today={s.today} yearless={s.yearless}
             isSel={(d) => d.year === value.year && d.season === value.season && d.day === day}
             onPick={(d) => { onChange(s.yearless ? { ...d, year: value.year } : d); setOpen(false); }} />
-        </Frame>
+        </DateFrame>
       )}
     </>
   );
@@ -107,7 +110,7 @@ export function RangePanel({ from, to, onPick, seasonLength, today, start, hint 
   };
   const [a, b] = first ? [first, first] : [from, to];
   return (
-    <Grid view={view} setView={setView} seasonLength={seasonLength} today={today}
+    <DateGrid view={view} setView={setView} seasonLength={seasonLength} today={today}
       isSel={(d) => (!!a && same(d, a)) || (!!b && same(d, b))} inRange={(d) => !!a && !!b && idx(d) > idx(a) && idx(d) < idx(b)} onPick={pick} note={note} />
   );
 }
@@ -121,9 +124,9 @@ export function RangeField({ from, to, onChange, label, ...s }: Shared & { from:
     <>
       <Trigger label={label} text={text} onOpen={() => setOpen(true)} />
       {open && (
-        <Frame title={label} onClose={() => setOpen(false)}>
+        <DateFrame title={label} onClose={() => setOpen(false)}>
           <RangePanel from={from} to={to} start={from} seasonLength={s.seasonLength} today={s.today} onPick={(a, b) => { onChange(a, b); setOpen(false); }} />
-        </Frame>
+        </DateFrame>
       )}
     </>
   );

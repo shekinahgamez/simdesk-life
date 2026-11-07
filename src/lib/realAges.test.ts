@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_REAL_AGES, rangeText, realAgeShort, realAgeText, realAgeYears, sanitizeRanges } from './realAges';
+import { DEFAULT_REAL_AGES, rangeText, stageForRealAge, realAgeShort, realAgeText, realAgeYears, sanitizeRanges } from './realAges';
 import { ageOf, stageTable } from './time';
 
 const table = stageTable({ preset: 'normal' });
@@ -53,5 +53,31 @@ describe('real-life ages', () => {
     expect(realAgeShort(0.75)).toBe('9M');
     expect(realAgeShort(0.1)).toBe('5w');
     expect(realAgeShort(0)).toBe('<1w');
+  });
+});
+
+describe('picking a real-life age', () => {
+  const days = table.map((r) => r.days);
+  it('every whole age round-trips to the same age (where the stage has enough days)', () => {
+    const long = stageTable({ preset: 'custom', days: { newborn: 2, infant: 19, toddler: 84, child: 168, teen: 105, youngAdult: 462, adult: 420, elder: 525 } } as never);
+    const at2 = (stage: string, inStage: number) => { const row = long.find((r) => r.id === stage)!; return ageOf(0, row.start + inStage, long) as Extract<ReturnType<typeof ageOf>, { born: true }>; };
+    for (let y = 0; y < 100; y++) {
+      const { stage, inStage } = stageForRealAge(y, DEFAULT_REAL_AGES, long.map((r) => r.days));
+      expect(Math.floor(realAgeYears(at2(stage, inStage), DEFAULT_REAL_AGES) + 1e-9), `age ${y}`).toBe(y);
+    }
+  });
+  it('on a short lifespan it gets within a year, before elder', () => {
+    for (let y = 0; y < 60; y++) {
+      const { stage, inStage } = stageForRealAge(y, DEFAULT_REAL_AGES, days);
+      const back = Math.floor(realAgeYears(at(stage, inStage), DEFAULT_REAL_AGES) + 1e-9);
+      expect(Math.abs(back - y), `age ${y}`).toBeLessThanOrEqual(1);
+    }
+  });
+  it('lands in the right stage and never on the birthday itself', () => {
+    expect(stageForRealAge(24, DEFAULT_REAL_AGES, days).stage).toBe('youngAdult');
+    expect(stageForRealAge(13, DEFAULT_REAL_AGES, days).stage).toBe('teen');
+    expect(stageForRealAge(70, DEFAULT_REAL_AGES, days).stage).toBe('elder');
+    const ya = stageForRealAge(29, DEFAULT_REAL_AGES, days);
+    expect(ya.inStage).toBeLessThan(table.find((r) => r.id === 'youngAdult')!.days);
   });
 });

@@ -13,7 +13,7 @@ export type PhotoRef = { id: string; w: number; h: number; crop?: Crop };
 export const DEFAULT_CROP: Crop = { cx: 0.5, cy: 0.5, zoom: 1 };
 export const MAX_ZOOM = 3;
 const FULL_SIDE = 1600;
-const THUMB_SIDE = 360;
+const THUMB_SIDE = 720;
 
 export class PhotoError extends Error {}
 export const PHOTO_MESSAGES = {
@@ -61,7 +61,7 @@ function encode(canvas: HTMLCanvasElement, type: string, quality?: number): Prom
  * see-through photos stay PNG (JPEG would turn those parts black), everything else becomes JPEG.
  */
 async function toBlob(canvas: HTMLCanvasElement): Promise<Blob> {
-  const webp = await encode(canvas, 'image/webp', 0.82);
+  const webp = await encode(canvas, 'image/webp', 0.9);
   if (webp && webp.type === 'image/webp') return webp;
   const out = hasTransparency(canvas) ? await encode(canvas, 'image/png') : await encode(canvas, 'image/jpeg', 0.84);
   if (!out) throw new PhotoError(PHOTO_MESSAGES.decode);
@@ -96,6 +96,12 @@ export async function preparePhoto(file: Blob): Promise<Prepared> {
 
 // ---------- where photos are kept ----------
 export type PhotoSize = 'full' | 'thumb';
+/** How many pixels of the small copy fall across a box, when the photo is drawn at `widthPct` % of the box width. */
+export function thumbPixelsAcross(w: number, h: number, widthPct: number): number {
+  // Older photos were saved with 360px small copies; assume the smaller size so they upgrade when needed.
+  const tw = w * Math.min(1, 360 / Math.max(w, h));
+  return tw * (100 / widthPct);
+}
 export interface PhotoService {
   upload(p: Prepared, saveId: string | null): Promise<string>;
   url(id: string, size: PhotoSize): Promise<string>;

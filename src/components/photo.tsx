@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import { Camera } from '@phosphor-icons/react';
 import { Modal, toast } from './ui';
 import {
-  clampCrop, DEFAULT_CROP, MAX_ZOOM, PhotoError, PHOTO_MESSAGES, placement, preparePhoto, usePhotos, usePhotoUrl,
+  clampCrop, DEFAULT_CROP, MAX_ZOOM, PhotoError, thumbPixelsAcross, PHOTO_MESSAGES, placement, preparePhoto, usePhotos, usePhotoUrl,
   type Crop, type PhotoRef, type PhotoSize, type Prepared,
 } from '../lib/photos';
 
@@ -12,19 +12,22 @@ export function PhotoBox({ photo, aspect, size = 'full', className = '', style, 
   /** The box takes whatever size its container gives it: measure it so the photo never stretches. */
   fill?: boolean;
 }) {
-  const url = usePhotoUrl(photo.id, size);
   const box = useRef<HTMLDivElement>(null);
   const [measured, setMeasured] = useState<number | null>(null);
+  const [boxW, setBoxW] = useState(0);
   useEffect(() => {
-    if (!fill || !box.current) return;
+    if (!box.current) return;
     const el = box.current;
-    const read = () => { if (el.clientWidth && el.clientHeight) setMeasured(el.clientWidth / el.clientHeight); };
+    const read = () => { setBoxW(el.clientWidth); if (fill && el.clientWidth && el.clientHeight) setMeasured(el.clientWidth / el.clientHeight); };
     read();
     const ro = new ResizeObserver(read);
     ro.observe(el);
     return () => ro.disconnect();
   }, [fill]);
   const p = placement(photo.w, photo.h, fill ? measured ?? aspect : aspect, photo.crop);
+  // The small copy is only used when it's sharp at this size (zoomed-in crops and big tiles get the full photo).
+  const sharpEnough = boxW > 0 && thumbPixelsAcross(photo.w, photo.h, p.width) >= boxW * (window.devicePixelRatio || 1) * 0.9;
+  const url = usePhotoUrl(photo.id, size === 'thumb' && !sharpEnough ? 'full' : size);
   return (
     <div ref={box} className={`photo-box ${className}`} style={{ ...(fill ? { height: '100%' } : { aspectRatio: String(aspect) }), ...style }}>
       {url && (

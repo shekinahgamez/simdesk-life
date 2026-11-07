@@ -122,3 +122,58 @@
 .lt-game { border: 0; background: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; padding: 4px 0; }
 .lt-gamelist { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; max-height: 180px; overflow: auto; }
 .lt-note { background: var(--accent-soft); border-radius: 12px; padding: 10px 12px; font-size: 14px; line-height: 1.45; }
+
+/* ---------- Lot page refresh (Nov 2026) ---------- */
+.lot-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.lot-cols.has-units .lot-notes { grid-column: 1 / -1; }
+.lot-place { display: flex; gap: 8px; align-items: flex-start; color: var(--muted); font-size: 14px; }
+.lot-place svg { flex: none; margin-top: 2px; color: var(--worlds-ink); }
+.lot-place b { color: var(--text); font-weight: 600; }
+.lot-menu { position: relative; }
+.unit-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+.unit-tile { border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.unit-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px; }
+.unit-top .lot-menu { margin: -6px -6px 0 0; }
+.unit-top .lot-menu .btn { color: var(--muted); }
+.unit-ic { width: 34px; height: 34px; border-radius: 10px; background: var(--households-tint); color: var(--households-ink); display: grid; place-items: center; }
+.unit-tile.is-empty .unit-ic { background: transparent; border: 1px dashed var(--line); color: var(--muted); }
+.unit-name { font-weight: 700; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.unit-sub { font-size: 13px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.unit-sub .link-btn { display: inline-flex; align-items: center; gap: 3px; font-weight: 600; }
+.build-card .edit-pen { color: var(--muted); }
+.build-card.can-edit { cursor: pointer; transition: box-shadow .15s ease; }
+.build-card.can-edit:hover { box-shadow: 0 0 0 2px color-mix(in srgb, var(--worlds-ink) 25%, transparent); }
+.build-card.editing { box-shadow: 0 0 0 2px color-mix(in srgb, var(--worlds-ink) 40%, transparent); }
+.build-kv { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px 14px; align-items: center; margin: 0; font-size: 15px; }
+.build-kv dt, .build-kv > label { color: var(--muted); font-weight: 400; font-size: 15px; }
+.build-kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.build-kv.edit { align-items: start; }
+.build-kv.edit > label { padding-top: 10px; }
+.build-kv .hint { margin-top: 4px; }
+.edit-foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+@media (max-width: 860px) {
+  .lot-cols { grid-template-columns: 1fr; }
+  .build-kv { grid-template-columns: 128px minmax(0, 1fr); gap: 12px 10px; }
+  .unit-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* world page: a small + on empty lots instead of a "Place a lot" chip (Nov 2026) */
+.open-add { width: 32px; height: 32px; padding: 0; justify-content: center; border-radius: 50%; }
+
+/* Worlds you play */
+.worlds-hidden-row { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border: 1.5px dashed var(--line); border-radius: 16px; color: var(--muted); }
+.worlds-hidden-row b { color: var(--text); }
+.worlds-hidden-row .btn { min-height: 40px; }
+.choose-worlds .cw-head { display: flex; align-items: center; gap: 8px; margin: 4px 0 2px; min-height: 32px; }
+.choose-world { min-height: 56px; }
+.choose-world .cw-name { display: block; font-weight: 600; }
+.choose-world .cw-sub { display: block; font-size: 14px; font-weight: 500; color: var(--muted); margin-top: 2px; }
+.choose-world .cw-lots { font-size: 14px; font-weight: 500; color: var(--muted); white-space: nowrap; }
+.choose-world .ph-cb { width: 22px; height: 22px; margin-right: 6px; }
+.choose-world .ph-cb.on::after { left: 7px; top: 3px; }
+/* Renaming a neighborhood */
+.hood-card h2 { display: flex; align-items: center; gap: 4px; }
+.hood-pencil { display: inline-grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 8px; background: none; color: var(--muted); cursor: pointer; }
+.hood-pencil:hover { background: color-mix(in srgb, var(--text) 6%, transparent); color: var(--text); }
+.hood-pencil:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.hood-card header.hood-edit { flex-direction: column; align-items: stretch; gap: 6px; }
+.hood-edit .btn { min-height: 40px; }

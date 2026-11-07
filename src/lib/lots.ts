@@ -39,14 +39,19 @@ export type LotData = {
   /** The household that owns it (a household id), or null. Game apartments are never owned. */
   owner: string | null;
   photo: PhotoRef | null;
+  /** The creator (shown as "Creator"; the old free-text build credits). */
   credits: string;
+  /** The creator's EA ID, for finding the build on the Gallery. */
+  galleryId: string;
+  /** What the build is called on the Gallery. */
+  galleryName: string;
   traits: string[];
   history: HistoryRow[];
   notes: string;
 };
 
 export const BLANK_LOT: LotData = {
-  name: '', type: '', size: '', price: null, spot: null, meantFor: null, units: [], owner: null, photo: null, credits: '', traits: [], history: [], notes: '',
+  name: '', type: '', size: '', price: null, spot: null, meantFor: null, units: [], owner: null, photo: null, credits: '', galleryId: '', galleryName: '', traits: [], history: [], notes: '',
 };
 
 export function lotData(r: Rec | undefined): LotData {
@@ -54,14 +59,19 @@ export function lotData(r: Rec | undefined): LotData {
   return {
     ...BLANK_LOT, ...d,
     units: d.units ?? [], traits: d.traits ?? [], history: d.history ?? [],
+    galleryId: typeof d.galleryId === 'string' ? d.galleryId : '', galleryName: typeof d.galleryName === 'string' ? d.galleryName : '',
     price: typeof d.price === 'number' ? d.price : null,
     owner: typeof d.owner === 'string' ? d.owner : null,
   };
 }
 
 /** A world as the player sees it: the game's world, with their own name and notes on top. */
-export type WorldData = { gameId: string; name: string; inspiredBy: string; vibe: string };
-export const BLANK_WORLD: Omit<WorldData, 'gameId'> = { name: '', inspiredBy: '', vibe: '' };
+export type WorldData = {
+  gameId: string; name: string; inspiredBy: string; vibe: string;
+  /** Your names for this world's neighborhoods, keyed by the game's name. */
+  hoodNames: Record<string, string>;
+};
+export const BLANK_WORLD: Omit<WorldData, 'gameId'> = { name: '', inspiredBy: '', vibe: '', hoodNames: {} };
 export function worldData(r: Rec | undefined, gameId: string): WorldData {
   return { ...BLANK_WORLD, ...((r?.data ?? {}) as Partial<WorldData>), gameId };
 }

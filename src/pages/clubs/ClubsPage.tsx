@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { CaretLeft, CaretRight, Plus, UsersThree } from '@phosphor-icons/react';
+import { CaretLeft, Check, MapPin, PencilSimple, Plus, Prohibit, Star, UsersThree } from '@phosphor-icons/react';
 import { ObjIcon } from '../../components/categories';
-import { admissionLabel, perkKindLabel, reqCatLabel, MAX_ACTIVITIES, type Activity, type ClubRow } from '../../lib/clubs';
+import { admissionLabel, perkKindLabel, reqCatLabel, type Activity, type ClubRow } from '../../lib/clubs';
 import { go, savePath } from '../../lib/router';
 import { saveData } from '../../lib/saves';
 import type { SaveRow } from '../../lib/sync/types';
@@ -10,7 +10,7 @@ import { useIsPhone } from '../../lib/useIsPhone';
 import { Faces } from '../households/shared';
 import { ClubPhotos } from '../photos/PhotosPage';
 import { SimAvatar } from '../sims/shared';
-import { ClubForm } from './ClubForm';
+import { ClubForm, type ClubPart } from './ClubForm';
 import { clubsOn, useClubs, type ClubsCtx } from './shared';
 
 /** The Clubs section: the list, and one club's page. Only there when the save has Get Together on. */
@@ -95,75 +95,101 @@ function ClubPill({ save, row }: { save: SaveRow; row: ClubRow }) {
   return <a className="tag clubs club-pill" href={clubHref(save, row.id)}><UsersThree size={15} weight="duotone" aria-hidden="true" />{row.club.name}</a>;
 }
 
-function ActivityList({ save, ctx, list }: { save: SaveRow; ctx: ClubsCtx; list: Activity[] }) {
-  return (
-    <ul className="club-list">
-      {list.map((a, i) => {
-        const target = a.club ? ctx.byId.get(a.club) : undefined;
-        return <li key={i}>{a.text}{target && <> <span className="club-arrow" aria-label="aimed at">→</span> <ClubPill save={save} row={target} /></>}</li>;
-      })}
-    </ul>
-  );
-}
-
 function ClubPage({ save, clubId }: { save: SaveRow; clubId: string }) {
   const ctx = useClubs(save);
   const phone = useIsPhone();
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState<null | { part?: ClubPart; pick?: boolean }>(null);
   const row = ctx.byId.get(clubId);
   if (!row) return <div className="page"><p>That club isn’t here anymore.</p><a className="btn" href={savePath(save.id, 'clubs')}>Back to Clubs</a></div>;
   const c = row.club;
   const place = ctx.placeOf(c.place);
-  const card = (title: string, count: string | null, body: React.ReactNode) => (
+  const pen = (part: ClubPart) => (
+    <button type="button" className="btn ghost icon sm club-pen" aria-label={`Edit ${part}`} onClick={() => setEditing({ part })}><PencilSimple size={16} /></button>
+  );
+  const card = (title: string, part: ClubPart, count: string | null, body: React.ReactNode) => (
     <section className="card club-card">
-      <div className="card-head"><h2>{title}{count && <span className="cnt">{count}</span>}</h2></div>
+      <div className="card-head"><h2>{title}{count && <span className="cnt">{count}</span>}</h2>{pen(part)}</div>
       {body}
     </section>
   );
-  const members = card('Members', String(c.members.length), c.members.length ? (
-    <div className="club-members">
-      {c.members.map((sid) => (
-        <a key={sid} className="club-member" href={ctx.sims.has(sid) ? savePath(save.id, `sims/${sid}`) : undefined}>
-          {ctx.sims.has(sid) ? <SimAvatar sim={ctx.sims.get(sid)!} size={36} /> : <span className="sim-avatar initials" style={{ width: 36, height: 36 }} aria-hidden="true" />}
-          <span className="grow">{ctx.nameOf(sid)}</span>
-          {c.leader === sid && <span className="tag clubs">Leader</span>}
-          <CaretRight size={16} weight="bold" className="club-chev" aria-hidden="true" />
-        </a>
-      ))}
+  const members = card('Members', 'members', c.members.length ? String(c.members.length) : null, (
+    <div className="club-faces">
+      {c.members.map((sid) => {
+        const sim = ctx.sims.get(sid);
+        const inner = (
+          <>
+            <span className="club-face-pic">
+              {sim ? <SimAvatar sim={sim} size={48} /> : <span className="sim-avatar initials" style={{ width: 48, height: 48 }} aria-hidden="true" />}
+              {c.leader === sid && <span className="club-lead" title="Leader"><Star size={10} weight="fill" aria-hidden="true" /></span>}
+            </span>
+            <span className="club-face-nm">{ctx.firstOf(sid)}</span>
+          </>
+        );
+        const label = `${ctx.nameOf(sid)}${c.leader === sid ? ', leader' : ''}`;
+        return sim
+          ? <a key={sid} className="club-face" href={savePath(save.id, `sims/${sid}`)} aria-label={label} title={label}>{inner}</a>
+          : <span key={sid} className="club-face" aria-label={label}>{inner}</span>;
+      })}
+      <button type="button" className="club-face add" onClick={() => setEditing({ part: 'members', pick: true })}>
+        <span className="club-face-pic"><span className="club-plus"><Plus size={18} weight="bold" aria-hidden="true" /></span></span>
+        <span className="club-face-nm">Add</span>
+      </button>
     </div>
-  ) : <p className="muted" style={{ margin: 0 }}>No members yet.</p>);
-  const meets = c.place && card('Meets at', null, place.lot ? (
-    <a className="club-member" href={savePath(save.id, `worlds/lot/${place.lot}`)}><span className="grow"><b>{place.text}</b>{place.sub && <small>{place.sub}</small>}</span><CaretRight size={16} weight="bold" className="club-chev" aria-hidden="true" /></a>
-  ) : <div className="club-member"><span className="grow"><b>{place.text}</b>{place.sub && <small>{place.sub}</small>}</span></div>);
-  const rules = (c.encouraged.length > 0 || c.banned.length > 0) && card('Rules', null, (
+  ));
+  const chips = (list: Activity[], yes: boolean) => (
+    <div className="club-chips">
+      {list.map((a, i) => {
+        const target = a.club ? ctx.byId.get(a.club) : undefined;
+        return (
+          <span key={i} className={`club-rule ${yes ? 'yes' : 'no'}`}>
+            {yes ? <Check size={14} weight="bold" aria-label="Encouraged:" /> : <Prohibit size={14} weight="bold" aria-label="Banned:" />}
+            {a.text}{target && <> <span className="club-arrow" aria-label="aimed at">→</span> <ClubPill save={save} row={target} /></>}
+          </span>
+        );
+      })}
+    </div>
+  );
+  const noRules = !c.encouraged.length && !c.banned.length;
+  const rules = card('Rules', 'rules', null, noRules ? <p className="muted" style={{ margin: 0 }}>No rules yet.</p> : (
     <>
-      {c.encouraged.length > 0 && <><div className="club-sub">Encouraged<span className="cnt">{c.encouraged.length} of {MAX_ACTIVITIES}</span></div><ActivityList save={save} ctx={ctx} list={c.encouraged} /></>}
-      {c.banned.length > 0 && <><div className="club-sub">Banned<span className="cnt">{c.banned.length} of {MAX_ACTIVITIES}</span></div><ActivityList save={save} ctx={ctx} list={c.banned} /></>}
+      {c.encouraged.length > 0 && <><div className="club-sub">Encouraged</div>{chips(c.encouraged, true)}</>}
+      {c.banned.length > 0 && <><div className="club-sub">Banned</div>{chips(c.banned, false)}</>}
     </>
   ));
-  const reqs = c.requirements.length > 0 && card('Requirements', `${c.requirements.length} of 5`, c.requirements.map((r, i) => <div key={i} className="club-kv"><b>{reqCatLabel(r.cat)}</b><span>{r.value}</span></div>));
-  const perks = c.perks.length > 0 && card('Perks', null, c.perks.map((p, i) => <div key={i} className="club-kv"><b>{perkKindLabel(p.kind)}</b><span>{p.text}</span></div>));
-  const notes = c.notes && card('Notes', null, <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{c.notes}</p>);
+  const noDetails = !c.requirements.length && !c.perks.length && !c.notes;
+  const details = card('Details', 'details', null, noDetails ? <p className="muted" style={{ margin: 0 }}>No requirements, perks or notes yet.</p> : (
+    <>
+      {c.requirements.length > 0 && <><div className="club-sub">Requirements</div>{c.requirements.map((r, i) => <div key={i} className="club-kv"><b>{reqCatLabel(r.cat)}</b><span>{r.value}</span></div>)}</>}
+      {c.perks.length > 0 && <><div className="club-sub">Perks</div>{c.perks.map((p, i) => <div key={i} className="club-kv"><b>{perkKindLabel(p.kind)}</b><span>{p.text}</span></div>)}</>}
+      {c.notes && <><div className="club-sub">Notes</div><p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{c.notes}</p></>}
+    </>
+  ));
   const photos = <ClubPhotos save={save} clubId={clubId} />;
+  const where = c.place && (place.lot
+    ? <a className="club-where" href={savePath(save.id, `worlds/lot/${place.lot}`)}><MapPin size={15} weight="duotone" aria-hidden="true" />{place.text}{place.sub && ` · ${place.sub}`}</a>
+    : <span className="club-where plain"><MapPin size={15} weight="duotone" aria-hidden="true" />{place.text}{place.sub && ` · ${place.sub}`}</span>);
 
   return (
     <div className={phone ? 'm-stack' : 'page stack'} style={{ gap: 14 }}>
       <a className="ph-back" href={savePath(save.id, 'clubs')}><CaretLeft size={18} weight="bold" /> Clubs</a>
       <div className="club-head">
         <ObjIcon cat="clubs" size="lg" />
-        <div className="grow"><h1 style={phone ? { fontSize: 24, margin: 0 } : { margin: 0 }}>{c.name || 'Unnamed club'}</h1>{c.description && <div className="sub" style={{ marginTop: 4 }}>{c.description}</div>}</div>
-        <button type="button" className="btn" onClick={() => setEditing(true)}>Edit</button>
+        <div className="grow">
+          <h1 style={phone ? { fontSize: 24, margin: 0 } : { margin: 0 }}>{c.name || 'Unnamed club'}</h1>
+          {c.description && <div className="sub" style={{ marginTop: 4 }}>{c.description}</div>}
+          <div className="club-line"><span className="tag outline-soft">{admissionLabel(c.admission)}</span>{where}</div>
+        </div>
+        <button type="button" className="btn" onClick={() => setEditing({})}>Edit</button>
       </div>
-      <div className="row" style={{ gap: 6 }}><span className="tag outline-soft">{admissionLabel(c.admission)}</span></div>
       {phone ? (
-        <div className="stack" style={{ gap: 12 }}>{members}{meets}{rules}{reqs}{perks}{notes}{photos}</div>
+        <div className="stack" style={{ gap: 12 }}>{members}{rules}{details}{photos}</div>
       ) : (
         <div className="hh-grid">
-          <div className="stack" style={{ gap: 14 }}>{members}{rules}{photos}</div>
-          <div className="stack" style={{ gap: 14 }}>{meets}{reqs}{perks}{notes}</div>
+          <div className="stack" style={{ gap: 14 }}>{members}{rules}</div>
+          <div className="stack" style={{ gap: 14 }}>{details}{photos}</div>
         </div>
       )}
-      {editing && <ClubForm ctx={ctx} id={clubId} onClose={() => setEditing(false)} onSaved={() => setEditing(false)} onDeleted={() => go(savePath(save.id, 'clubs'))} />}
+      {editing && <ClubForm ctx={ctx} id={clubId} part={editing.part} pickMembers={editing.pick} onClose={() => setEditing(null)} onSaved={() => setEditing(null)} onDeleted={() => go(savePath(save.id, 'clubs'))} />}
     </div>
   );
 }

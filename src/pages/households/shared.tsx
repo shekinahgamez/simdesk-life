@@ -35,7 +35,7 @@ export function useHhCtx(save: SaveRow) {
       const row = o.lotId ? own.find((r) => r.id === o.lotId) : null;
       const apt = o.kind === 'apt' ? lots.apartments.find((a) => `apt:${a.id}` === o.key) : null;
       const world = lots.worldName(o.world);
-      if (apt) return [world, apt.neighborhood].filter(Boolean).join(' · ');
+      if (apt) return [world, lots.hoodName(apt.world, apt.neighborhood)].filter(Boolean).join(' · ');
       if (!row?.spot) return 'Not placed';
       return [world, row.spot.name].filter(Boolean).join(' · ');
     };

@@ -30,13 +30,22 @@ function PickRow({ label, count, text, empty, action, onClick, disabled }: { lab
   );
 }
 
-/** The New club / Edit club window. One window, many screens: the form, and a list for each thing you pick. */
-export function ClubForm({ ctx, id, onClose, onSaved, onDeleted }: { ctx: ClubsCtx; id: string | null; onClose(): void; onSaved(id: string): void; onDeleted?(): void }) {
+export type ClubPart = 'members' | 'rules' | 'details';
+const PART_TITLE: Record<ClubPart, string> = { members: 'Members', rules: 'Rules', details: 'Details' };
+
+/**
+ * The New club / Edit club window. One window, many screens: the form, and a list for each thing you pick.
+ * With `part`, it edits just that part of a club (from the pencil on its card) and saves when you close it, with Undo.
+ * `pickMembers` opens straight on the member list.
+ */
+export function ClubForm({ ctx, id, onClose, onSaved, onDeleted, part, pickMembers }: {
+  ctx: ClubsCtx; id: string | null; onClose(): void; onSaved(id: string): void; onDeleted?(): void; part?: ClubPart; pickMembers?: boolean;
+}) {
   const store = useStore();
   const existing = id ? ctx.byId.get(id) : undefined;
   const [start] = useState<ClubData>(() => existing?.club ?? BLANK_CLUB);
   const [f, setF] = useState<ClubData>(start);
-  const [view, setView] = useState<View>({ t: 'form' });
+  const [view, setView] = useState<View>(pickMembers ? { t: 'members' } : { t: 'form' });
   const [q, setQ] = useState('');
   const [tried, setTried] = useState(false);
   const [focus, setFocus] = useState<string | null>(null);
@@ -121,29 +130,40 @@ export function ClubForm({ ctx, id, onClose, onSaved, onDeleted }: { ctx: ClubsC
     setPending(true);
     const data = cleanClub(withMembers(f, f.members), id, new Set(ctx.rows.map((r) => r.id)));
     const newId = store.put('club', data, id ?? undefined);
-    toast(id ? 'Saved' : `${data.name} added`);
+    if (part && id) {
+      const before = start;
+      toast(`${PART_TITLE[part]} saved`, { label: 'Undo', run: () => store.put('club', before, id) });
+    } else toast(id ? 'Saved' : `${data.name} added`);
     onSaved(newId);
   };
 
+  const show = (p: ClubPart) => !part || part === p;
   const form = (
     <form className="stack" style={{ gap: 16 }} onSubmit={(e) => { e.preventDefault(); save(); }}>
+      {!part && <>
       <Field label="Club name" hint={tried && !f.name.trim() ? <span className="field-err">Give it a name.</span> : undefined}>
         {(fid) => <TextInput kind="name" id={fid} value={f.name} maxLength={40} placeholder="Like Page Turners" onChange={(e) => set({ name: e.target.value })} />}
       </Field>
       <Field label="Description">
         {(fid) => <textarea id={fid} className="textarea" rows={2} maxLength={200} value={f.description} placeholder="What the club is about" onChange={(e) => set({ description: e.target.value })} />}
       </Field>
-      <div className="field">
+      </>}
+      {show('details') && <div className="field">
         <span className="label">Who can join</span>
         <div className="ph-seg" role="group" aria-label="Who can join">
           {(['open', 'invite'] as const).map((a) => <button key={a} type="button" aria-pressed={f.admission === a} onClick={() => set({ admission: a })}>{admissionLabel(a)}</button>)}
         </div>
-      </div>
+      </div>}
+      {show('members') && <>
       <PickRow label="Members" text={f.members.length ? namesText(f.members) : 'None yet'} empty={!f.members.length} action={f.members.length ? 'Change' : 'Add'} onClick={() => go({ t: 'members' })} />
       <PickRow label="Leader" text={f.members.length ? (f.leader ? ctx.nameOf(f.leader) : 'Pick a leader') : 'Add members first'} empty={!f.members.length} action={f.members.length ? 'Change' : undefined} disabled={!f.members.length} onClick={() => go({ t: 'leader' })} />
-      <PickRow label="Meets at" text={f.place ? placeText : 'No specific place'} empty={!f.place} action={f.place ? 'Change' : 'Choose'} onClick={() => { setPlaceTab(f.place?.kind ?? 'lot'); go({ t: 'place' }); }} />
+      </>}
+      {show('details') && <PickRow label="Meets at" text={f.place ? placeText : 'No specific place'} empty={!f.place} action={f.place ? 'Change' : 'Choose'} onClick={() => { setPlaceTab(f.place?.kind ?? 'lot'); go({ t: 'place' }); }} />}
+      {show('rules') && <>
       {activities('encouraged', 'Encouraged activities')}
       {activities('banned', 'Banned activities')}
+      </>}
+      {show('details') && <>
       <div className="field">
         <span className="label">Requirements<span className="cnt">{f.requirements.length} of {MAX_REQUIREMENTS}</span></span>
         {f.requirements.map((r, i) => (
@@ -167,6 +187,7 @@ export function ClubForm({ ctx, id, onClose, onSaved, onDeleted }: { ctx: ClubsC
       <Field label="Notes">
         {(fid) => <textarea id={fid} className="textarea" rows={3} value={f.notes} placeholder="Anything worth remembering…" onChange={(e) => set({ notes: e.target.value })} />}
       </Field>
+      </>}
     </form>
   );
 
@@ -328,7 +349,7 @@ export function ClubForm({ ctx, id, onClose, onSaved, onDeleted }: { ctx: ClubsC
     </span>
   );
   const formBack: View = { t: 'form' };
-  const title: ReactNode = view.t === 'form' ? (id ? 'Edit club' : 'New club')
+  const title: ReactNode = view.t === 'form' ? (part ? PART_TITLE[part] : id ? 'Edit club' : 'New club')
     : view.t === 'members' ? sub('Members', formBack, <span className="cnt ph-ft-n">{f.members.length}</span>)
       : view.t === 'leader' ? sub('Leader', formBack)
         : view.t === 'place' ? sub('Meets at', formBack, f.place ? <button type="button" className="ph-ft-clear" onClick={() => { set({ place: null }); toForm(); }}>Clear</button> : undefined)
@@ -339,7 +360,10 @@ export function ClubForm({ ctx, id, onClose, onSaved, onDeleted }: { ctx: ClubsC
   const body = view.t === 'form' ? form : view.t === 'members' ? membersView : view.t === 'leader' ? leaderView : view.t === 'place' ? placeView
     : view.t === 'aim' ? aimView(view) : view.t === 'reqcat' ? reqCatView : view.t === 'reqval' ? reqValView(view.cat) : perkView;
 
-  const footer = view.t === 'form'
+  // Editing one part: closing saves (there's Undo), so there's no Cancel.
+  const close = () => (part && dirty ? save() : onClose());
+  const footer = view.t === 'form' && part ? <button type="button" className="btn primary" onClick={close}>Done</button>
+    : view.t === 'form'
     ? (close: () => void) => (
       <>
         {existing && <button type="button" className="btn ghost danger" style={{ marginRight: 'auto' }} onClick={() => setDel(true)}><Trash size={16} weight="duotone" /> Delete</button>}
@@ -347,13 +371,13 @@ export function ClubForm({ ctx, id, onClose, onSaved, onDeleted }: { ctx: ClubsC
         <button type="button" className="btn primary" onClick={save}>{id ? 'Save' : 'Add club'}</button>
       </>
     )
-    : view.t === 'members' ? <button type="button" className="btn primary" onClick={toForm}>{f.members.length ? `Done · ${f.members.length} selected` : 'Done'}</button>
+    : view.t === 'members' ? <button type="button" className="btn primary" onClick={pickMembers ? close : toForm}>{f.members.length ? `Done · ${f.members.length} selected` : 'Done'}</button>
       : view.t === 'reqval' ? <button type="button" className="btn primary" disabled={!reqValue(view.cat)} onClick={() => addReq(view.cat)}>Add requirement</button>
         : view.t === 'perk' ? <button type="button" className="btn primary" disabled={!draftText.trim()} onClick={addPerk}>Add perk</button>
           : undefined;
 
   return (
-    <Modal title={title} onClose={onClose} dirty={dirty} autoFocus={false} className="pinned club-form ph-modal" footer={footer}>
+    <Modal title={title} onClose={part ? close : onClose} dirty={part ? false : dirty} autoFocus={false} className="pinned club-form ph-modal" footer={footer}>
       {body}
       {del && (
         <Confirm title="Delete this club?" text="It goes to Trash for 7 days. Rules in other clubs aimed at it stop pointing at it." onCancel={() => setDel(false)}

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { HouseSimple, MapPin, PencilSimple, Plus, Trash, X } from '@phosphor-icons/react';
+import { useEffect, useRef, useState } from 'react';
+import { DotsThree, HouseSimple, MapPin, PencilSimple, Plus, Trash, X } from '@phosphor-icons/react';
 import { PhotoBox } from '../../components/photo';
 import { BackLink } from '../../components/Shell';
 import { AutoText, Confirm, Modal, Picker, toast } from '../../components/ui';
@@ -17,6 +17,7 @@ import { HomePicker } from './HomePicker';
 import { ComingUp } from '../calendar/shared';
 import { NewHousehold } from './HouseholdsList';
 import { HhPill, useHhCtx, type HhCtx } from './shared';
+import { HouseholdRotation } from '../rotation/Rotation';
 
 /** One household: its Sims, the lots it lives on and owns, and notes. */
 export function HouseholdPage({ save, hhId }: { save: SaveRow; hhId: string }) {
@@ -116,12 +117,13 @@ export function HouseholdPage({ save, hhId }: { save: SaveRow; hhId: string }) {
           <button type="button" className="btn sm" onClick={() => setDialog('sim')}><Plus size={14} weight="bold" /> New Sim</button>
           {moveInBtn}
           <button type="button" className="btn ghost icon sm" aria-label="Edit household" onClick={() => setDialog('rename')}><PencilSimple size={16} /></button>
+          <HhMore onDelete={() => setDialog('delete')} />
         </div>
+        <HouseholdRotation save={save} hhId={hh.id} />
         {tiles}
         <ComingUp save={save} simIds={members.map((m) => m.id)} seeAll={`calendar/household/${hh.id}`} showFaces />
         {lotsCard}
         <div className="card"><div className="card-head"><h2>Notes</h2></div>{notes}</div>
-        <div><button type="button" className="btn danger" onClick={() => setDialog('delete')}><Trash size={16} weight="duotone" /> Delete household</button></div>
         {dialogs}
       </div>
     );
@@ -133,9 +135,11 @@ export function HouseholdPage({ save, hhId }: { save: SaveRow; hhId: string }) {
         <div><h1>{label}</h1><div className="sub">{sub}</div></div>
         <div className="row">
           <button type="button" className="btn" onClick={() => setDialog('rename')}><PencilSimple size={16} /> Edit</button>
+          <HhMore onDelete={() => setDialog('delete')} />
           <button type="button" className="btn primary" onClick={() => setDialog('sim')}><Plus size={18} weight="bold" /> New Sim</button>
         </div>
       </div>
+      <HouseholdRotation save={save} hhId={hh.id} />
       <div className="hh-grid">
         <div className="card">
           <div className="card-head"><h2>Sims</h2>{moveInBtn}</div>
@@ -146,7 +150,6 @@ export function HouseholdPage({ save, hhId }: { save: SaveRow; hhId: string }) {
         <div className="stack" style={{ gap: 18, minWidth: 0 }}>
           <ComingUp save={save} simIds={members.map((m) => m.id)} seeAll={`calendar/household/${hh.id}`} showFaces />
           {lotsCard}
-          <div><button type="button" className="btn danger" onClick={() => setDialog('delete')}><Trash size={16} weight="duotone" /> Delete household</button></div>
         </div>
       </div>
       {dialogs}
@@ -217,5 +220,29 @@ function OwnLot({ ctx, hh, onClose }: { ctx: HhCtx; hh: HH; onClose(): void }) {
           actions={[{ label: 'Cancel', run: () => setAsking(null) }, { label: 'Make them the owner', kind: 'primary', run: () => take(asking.id, asking.name) }]} />
       )}
     </Modal>
+  );
+}
+
+/** The ⋯ menu on a household (Delete lives here, like on a Sim). */
+function HhMore({ onDelete }: { onDelete(): void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const away = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false); };
+    const key = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', away);
+    document.addEventListener('keydown', key);
+    return () => { document.removeEventListener('mousedown', away); document.removeEventListener('keydown', key); };
+  }, [open]);
+  return (
+    <span ref={ref} style={{ position: 'relative' }}>
+      <button type="button" className="btn icon hh-more-btn" aria-label="More" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((x) => !x)}><DotsThree size={20} weight="bold" /></button>
+      {open && (
+        <div className="combo-list more-menu" role="menu" style={{ right: 0, left: 'auto' }}>
+          <button type="button" role="menuitem" className="danger" onClick={() => { setOpen(false); onDelete(); }}><Trash size={16} weight="duotone" /> Delete household</button>
+        </div>
+      )}
+    </span>
   );
 }

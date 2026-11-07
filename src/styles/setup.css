@@ -2,20 +2,7 @@
 .flow { position: fixed; inset: 0; background: var(--bg); overflow: auto; z-index: 10; }
 .flow-center { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
 
-/* ---------- welcome: six icons fly in, gather, burst into the sparkle ---------- */
-.welcome { position: fixed; inset: 0; display: grid; place-items: center; overflow: hidden; }
-.fly {
-  position: absolute; left: 50%; top: 42%; width: 48px; height: 48px; margin: -24px 0 0 -24px; border-radius: 14px;
-  display: flex; align-items: center; justify-content: center; opacity: 0;
-  animation: fly 2.3s cubic-bezier(.3,.7,.3,1) forwards;
-}
-@keyframes fly {
-  0% { transform: translate(var(--sx), var(--sy)) scale(1.4) rotate(var(--sr)); opacity: 0; }
-  15% { opacity: 1; }
-  55% { transform: translate(var(--gx), var(--gy)) scale(1) rotate(0); }
-  70% { transform: translate(calc(var(--gx) * .4), calc(var(--gy) * .4)) scale(.9) rotate(calc(var(--sr) * -3)); opacity: 1; }
-  82%, 100% { transform: translate(0, 0) scale(.2); opacity: 0; }
-}
+/* ---------- the save-made burst (the opening intro lives in intro.css) ---------- */
 .burst-sparkle { position: absolute; left: 50%; top: 42%; margin: -44px 0 0 -44px; opacity: 0; animation: big 1.3s cubic-bezier(.3,.8,.3,1) 1.85s forwards; }
 @keyframes big {
   0% { transform: scale(0) rotate(-120deg); opacity: 0; }
@@ -136,7 +123,7 @@
   @keyframes grow-m { to { transform: scale(3); opacity: 0; } }
 }
 @media (prefers-reduced-motion: reduce) {
-  .fly, .ring { display: none; }
+  .ring { display: none; }
   .burst-sparkle { animation: none; opacity: 1; }
   .deck-card { animation: none !important; transform: translate(var(--fx), var(--fy)) rotate(var(--fr)); }
 }
@@ -193,10 +180,6 @@
 .ms-dcard h3 { font-family: var(--font-head); font-size: 24px; font-weight: 800; }
 .ms-dcard.grow { animation: grow-m .45s ease-in forwards; }
 @keyframes grow-m { to { transform: scale(3); opacity: 0; } }
-.ms-welcome { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center; }
-.ms-iconrow { display: flex; gap: 10px; }
-.ms-iconrow .obj { width: 40px; height: 40px; border-radius: 12px; opacity: 0; animation: droprow .6s cubic-bezier(.3,1.4,.4,1) forwards; }
-@keyframes droprow { from { opacity: 0; transform: translateY(-40px) rotate(-20deg) scale(.6); } to { opacity: 1; transform: rotate(var(--r)); } }
 
 .world-chip {
   display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 10px; border-radius: 999px;
@@ -226,7 +209,3 @@
 .deck.home .deck-card { animation: fanin .6s cubic-bezier(.3,.8,.3,1) var(--d) both; }
 @keyframes fanin { from { opacity: 0; transform: translate(0, 60px) rotate(0); } to { opacity: 1; transform: translate(var(--fx), var(--fy)) rotate(var(--fr)); } }
 .deck-card .live { font-size: 13px; font-weight: 700; }
-/* Clicking during the desktop intro skips to the end. */
-.skip-intro .fly, .skip-intro .ring { display: none; }
-.skip-intro .burst-sparkle { animation: none; opacity: 1; }
-.skip-intro .fu { animation-delay: 0s !important; animation-duration: .2s; }

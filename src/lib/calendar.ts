@@ -111,8 +111,11 @@ export function itemsBetween(s: CalState, from: number, to: number): CalItem[] {
 /** The next few things for some Sims (a profile or a household page), from today on. Holidays aren't linked to Sims. */
 export function comingUp(s: CalState, simIds: string[], today: number, count = 3, horizon = 400): CalItem[] {
   const mine = new Set(simIds);
+  const hadBirthday = new Set<string>();
   return itemsBetween(s, today, today + horizon)
     .filter((i) => i.kind !== 'holiday' && i.sims.some((x) => mine.has(x)) && i.end >= today)
+    // Only each Sim's next birthday: later ones show on the calendar.
+    .filter((i) => i.kind !== 'birthday' || (!hadBirthday.has(i.id) && !!hadBirthday.add(i.id)))
     .slice(0, count);
 }
 

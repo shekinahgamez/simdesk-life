@@ -20,6 +20,7 @@ export function WorldPage({ save, worldId }: { save: SaveRow; worldId: string })
   const store = useStore();
   const [editing, setEditing] = useState(false);
   const [spotMenu, setSpotMenu] = useState<GameLot | null>(null);
+  const [renaming, setRenaming] = useState<string | null>(null);
   const game = BY_ID.worlds.get(worldId);
   const spots = useMemo(() => spotsOf(ctx.info.avail, worldId), [ctx.info.avail, worldId]);
   const apts = ctx.apartments.filter((a) => a.world === worldId);
@@ -45,7 +46,7 @@ export function WorldPage({ save, worldId }: { save: SaveRow; worldId: string })
 
   const banner = (
     <div className="world-banner">
-      <WorldPicture worldId={worldId} className="world-banner-pic" />
+      <WorldPicture worldId={worldId} className="world-banner-pic" banner />
       <div className="world-banner-name"><h1>{name}</h1><div className="sub">{sub}</div></div>
       <button type="button" className="btn fog sm world-banner-edit" onClick={() => setEditing(true)}><PencilSimple size={16} /> Edit</button>
     </div>
@@ -56,7 +57,9 @@ export function WorldPage({ save, worldId }: { save: SaveRow; worldId: string })
         const placed = h.list.filter((s) => ctx.bySpot.has(s.id)).length;
         return (
           <section key={h.name} className="card hood-card">
-            <header><h2>{h.name}</h2><span className="hood-count">{placed} of {h.list.length} filled</span></header>
+            <HoodHead game={h.name} name={ctx.hoodName(worldId, h.name)} editing={renaming === h.name} canRename={h.name !== 'Other'}
+              count={`${placed} of ${h.list.length} filled`} onEdit={() => setRenaming(h.name)} onCancel={() => setRenaming(null)}
+              onSave={(v) => { putWorld({ hoodNames: { ...w.hoodNames, [h.name]: v === h.name ? '' : v } }); setRenaming(null); toast('Saved'); }} />
             <div className="hood-rows">
               {h.list.map((s) => {
                 const r = ctx.bySpot.get(s.id);
@@ -68,7 +71,7 @@ export function WorldPage({ save, worldId }: { save: SaveRow; worldId: string })
                 ) : (
                   <button key={s.id} type="button" className="hood-row open" onClick={() => openSpot(s)} aria-label={`${s.name}, empty lot`}>
                     <span className="grow"><span className="open-name">{s.name}</span><span className="small">Empty{s.size && ` · ${s.size}`}</span></span>
-                    <span className="open-add"><Plus size={13} weight="bold" aria-hidden="true" /> Place a lot</span>
+                    <span className="open-add" title="Place a lot"><Plus size={14} weight="bold" aria-hidden="true" /></span>
                   </button>
                 );
               })}
@@ -127,7 +130,7 @@ function AptGroup({ ctx, save, apts: every, phone }: { ctx: LotsCtx; save: SaveR
         {apts.length > 0 && <div className="m-group">
           {apts.map((a) => (
             <button key={a.id} type="button" className="m-row" onClick={() => open(a)}>
-              <span className="grow"><span className="t" style={{ display: 'block' }}>{a.name}</span><span className="s" style={{ display: 'block' }}>{[a.neighborhood, ctx.bySpot.get(a.id)?.lot.name].filter(Boolean).join(' · ')}</span></span>
+              <span className="grow"><span className="t" style={{ display: 'block' }}>{a.name}</span><span className="s" style={{ display: 'block' }}>{[ctx.hoodName(a.world, a.neighborhood), ctx.bySpot.get(a.id)?.lot.name].filter(Boolean).join(' · ')}</span></span>
             </button>
           ))}
         </div>}
@@ -144,7 +147,7 @@ function AptGroup({ ctx, save, apts: every, phone }: { ctx: LotsCtx; save: SaveR
           <tbody>
             {apts.map((a) => (
               <tr key={a.id} tabIndex={0} onClick={() => open(a)} onKeyDown={(e) => e.key === 'Enter' && open(a)}>
-                <td><b className="cell-main">{a.name}</b></td><td>{a.neighborhood}</td><td>{ctx.bySpot.get(a.id)?.lot.name ?? ''}</td><td>{hhCell({ id: `apt:${a.id}`, lot: { ...BLANK_LOT, type: APARTMENT, spot: a.id } })}</td>
+                <td><b className="cell-main">{a.name}</b></td><td>{ctx.hoodName(a.world, a.neighborhood)}</td><td>{ctx.bySpot.get(a.id)?.lot.name ?? ''}</td><td>{hhCell({ id: `apt:${a.id}`, lot: { ...BLANK_LOT, type: APARTMENT, spot: a.id } })}</td>
               </tr>
             ))}
           </tbody>
@@ -152,6 +155,32 @@ function AptGroup({ ctx, save, apts: every, phone }: { ctx: LotsCtx; save: SaveR
       </div>}
       {fold}
     </>
+  );
+}
+
+/** A neighborhood card's heading. The pencil renames it (your name; the game's name stays as a hint). */
+function HoodHead({ game, name, count, editing, canRename, onEdit, onCancel, onSave }: {
+  game: string; name: string; count: string; editing: boolean; canRename: boolean; onEdit(): void; onCancel(): void; onSave(v: string): void;
+}) {
+  const [v, setV] = useState(name);
+  if (editing) {
+    return (
+      <header className="hood-edit">
+        <form className="row" style={{ gap: 8, flexWrap: 'nowrap', width: '100%' }} onSubmit={(e) => { e.preventDefault(); onSave(v.trim() || game); }}>
+          <TextInput autoFocus aria-label="Neighborhood name" value={v} placeholder={game} maxLength={50} onChange={(e) => setV(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Escape') onCancel(); }} style={{ flex: 1, minWidth: 0 }} />
+          <button type="submit" className="btn primary sm">Save</button>
+          <button type="button" className="btn ghost sm" onClick={onCancel}>Cancel</button>
+        </form>
+        <span className="hood-game small muted">Game name: {game}</span>
+      </header>
+    );
+  }
+  return (
+    <header>
+      <h2>{name}{canRename && <button type="button" className="hood-pencil" aria-label={`Rename ${name}`} title="Rename" onClick={() => { setV(name); onEdit(); }}><PencilSimple size={18} /></button>}</h2>
+      <span className="hood-count">{count}</span>
+    </header>
   );
 }
 
@@ -186,7 +215,7 @@ function SpotMenu({ ctx, spot, onClose }: { ctx: LotsCtx; spot: GameLot; onClose
     onClose();
   };
   const tryPlace = (r: LotRow) => (fitOf(r.lot.size, spot.size) === 'too-big' ? setBig(r) : place(r));
-  const sub = [spot.neighborhood, spot.size, 'Empty lot'].filter(Boolean).join(' · ');
+  const sub = [ctx.hoodName(spot.world, spot.neighborhood), spot.size, 'Empty lot'].filter(Boolean).join(' · ');
 
   if (step === 'new') {
     return <LotForm ctx={ctx} lotId={null} onClose={onClose} onSaved={(id) => {

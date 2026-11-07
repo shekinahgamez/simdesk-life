@@ -127,6 +127,8 @@
 .rel-who:hover { color: var(--accent); }
 .rel-what { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13.5px; white-space: nowrap; }
 .notes-box { min-height: 110px; }
+/* Notes read like the rest of the card. Phones keep 16px so Safari doesn't zoom in when you tap. */
+@media (min-width: 861px) { .notes-box { font-size: 14px; line-height: 1.55; } }
 .cu-row { display: flex; align-items: center; gap: 10px; font-size: 14px; }
 .cu-row .grow { display: flex; flex-direction: column; }
 .cu-t { font-weight: 600; }
@@ -180,3 +182,142 @@
 .sim-card-age { font-weight: 400; white-space: nowrap; color: var(--text); }
 .sim-card-body > .sim-card-name { font-size: 15px; color: var(--text); line-height: 1.3; }
 .sim-card-body > .sim-card-name .sim-card-age { font-size: 15px; }
+
+/* ---------- Sim profile: Age block, edit in place (Nov 2026) ---------- */
+.facts.n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.m-facts.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.empty-dash { letter-spacing: .05em; }
+.edit-card-side { gap: 6px; margin-left: auto; }
+.edit-pen { color: var(--muted); }
+.card.can-edit { cursor: pointer; transition: box-shadow .15s ease; }
+.card.can-edit:hover { box-shadow: 0 0 0 2px color-mix(in srgb, var(--sims-ink) 30%, transparent); }
+.card.editing { box-shadow: 0 0 0 2px color-mix(in srgb, var(--sims-ink) 40%, transparent); }
+.can-edit { cursor: pointer; }
+.m-label.edit-label { display: flex; align-items: center; justify-content: space-between; }
+.m-label.edit-label .edit-pen { margin: -6px -4px -6px 0; }
+.m-group.editing { box-shadow: 0 0 0 2px color-mix(in srgb, var(--sims-ink) 40%, transparent); }
+.edit-grid { display: grid; gap: 10px; }
+.edit-row { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 14px; align-items: center; }
+.edit-row.top { align-items: start; }
+.edit-row.top > label { padding-top: 10px; }
+.edit-row > label, .edit-row > .label-text { color: var(--muted); font-size: 14px; font-weight: 400; }
+.edit-grid.phone .edit-row { grid-template-columns: 96px minmax(0, 1fr); gap: 10px; }
+.edit-foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+.new-sim-box { border: 1px dashed var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 10px; }
+
+/* Sims page: List / Gallery switch (desktop) */
+.view-switch { display: inline-flex; border: 1px solid var(--line); border-radius: 12px; padding: 3px; background: var(--surface); gap: 2px; }
+.view-switch button { border: 0; background: none; width: 40px; height: 34px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; color: var(--muted); cursor: pointer; }
+.view-switch button[aria-pressed='true'] { background: var(--sims-tint); color: var(--sims-ink); }
+.sim-grid.gallery { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+.sim-card-body > .sim-card-hh { color: var(--households-ink); font-weight: 600; font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---------- compact profile (Nov 2026) ---------- */
+.cp-hero { display: flex; gap: 20px; align-items: center; padding: 20px 24px; }
+.cp-pt { width: 112px; height: 112px; border-radius: 20px; border: 0; padding: 0; overflow: hidden; flex-shrink: 0; cursor: pointer; background: var(--sidebar); position: relative; }
+.cp-pt .photo-box { width: 100%; height: 100%; }
+.cp-pt.empty { background: var(--sims-tint); color: var(--sims-ink); font: 800 34px var(--font-head); display: grid; place-items: center; overflow: visible; }
+.cp-cam { position: absolute; right: -6px; bottom: -6px; width: 32px; height: 32px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow); display: grid; place-items: center; color: var(--muted); }
+.cp-who { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+.cp-name { font: 800 32px/1.15 var(--font-head); margin: 0 0 6px; }
+.cp-line { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 15px; color: var(--muted); align-items: center; }
+.cp-it { display: inline-flex; gap: 6px; align-items: center; min-height: 32px; }
+.cp-line b { color: var(--text); font-weight: 600; }
+.cp-age { border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+.cp-age:hover b, .cp-agebar:hover { color: var(--accent); }
+.cp-link { color: var(--accent); font-weight: 600; text-decoration: none; }
+.cp-agebar { display: inline-flex; align-items: center; gap: 10px; margin-top: 4px; font: inherit; font-size: 14px; color: var(--muted); border: 0; background: none; padding: 0; min-height: 32px; cursor: pointer; align-self: flex-start; text-align: left; }
+.cp-agebar .bar { width: 200px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; flex-shrink: 0; }
+.cp-agebar .bar i { display: block; height: 100%; background: var(--sims-ink); border-radius: 3px; }
+.cp-acts { display: flex; gap: 8px; align-self: flex-start; }
+.cp-acts .more-menu { right: 0; left: auto; }
+.cp-cols { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+@media (max-width: 1100px) { .cp-cols { grid-template-columns: minmax(0, 1fr) 300px; } }
+
+.cp-rl { display: grid; grid-template-columns: 110px minmax(0, 1fr); margin: 0; }
+.cp-rl dt, .cp-rl dd { margin: 0; padding: 8px 0; border-top: 1px solid var(--line); font-size: 15px; }
+.cp-rl dt { color: var(--muted); padding-top: 12px; }
+.cp-rl dt:first-of-type, .cp-rl dt:first-of-type + dd { border-top: 0; }
+.cp-ppl { display: flex; flex-wrap: wrap; gap: 2px 16px; }
+.cp-person { display: inline-flex; align-items: center; gap: 2px; }
+.cp-person a { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; color: var(--text); text-decoration: none; font-weight: 500; }
+.cp-person a:hover span { color: var(--accent); }
+
+.cp-about { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; }
+.cp-about.phone { grid-template-columns: 1fr; }
+.cp-arow { display: grid; grid-template-columns: 100px minmax(0, 1fr); align-items: baseline; gap: 8px; text-align: left; border: 0; border-top: 1px solid var(--line); background: none; font: inherit; font-size: 15px; color: var(--text); padding: 10px 6px; margin: 0 -6px; min-height: 40px; cursor: pointer; border-radius: 0; }
+.cp-arow:nth-child(-n+2) { border-top: 0; }
+.cp-about.phone .cp-arow:nth-child(2) { border-top: 1px solid var(--line); }
+.cp-arow.wide { grid-column: 1 / -1; }
+.cp-arow .k { color: var(--muted); }
+.cp-arow:hover, .cp-arow.on { background: var(--sims-tint); border-radius: 10px; }
+.cp-arow:hover + .cp-arow, .cp-arow.on + .cp-arow { border-top-color: transparent; }
+
+.cp-likes { display: flex; flex-direction: column; }
+.cp-lk { display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding: 9px 0; border-top: 1px solid var(--line); font-size: 15px; line-height: 1.45; }
+.cp-lk:first-child { border-top: 0; }
+.cp-lk .ic { color: var(--muted); display: flex; padding-top: 1px; }
+
+.cp-faces { display: flex; gap: 8px; flex-wrap: wrap; }
+.cp-faces a { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 56px; font-size: 12px; color: var(--muted); text-decoration: none; text-align: center; overflow: hidden; }
+.cp-faces a span:last-child { width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cp-faces a.me span:last-child { color: var(--text); font-weight: 700; }
+.cp-hh-link { color: inherit; text-decoration: none; }
+.cp-hh-link:hover { color: var(--accent); }
+.cp-years { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.cp-years .ty-img { width: 72px; height: 90px; }
+
+/* phone */
+.pp-body.cp .cp-hero { padding: 16px; gap: 14px; }
+.pp-body.cp .cp-pt { width: 76px; height: 76px; border-radius: 16px; font-size: 24px; }
+.pp-body.cp .cp-name { font-size: 24px; margin-bottom: 2px; }
+.pp-body.cp .cp-line { font-size: 14px; gap: 0 10px; }
+.pp-body.cp .cp-agebar .bar { width: 100px; }
+.pp-small .pp-bar + .pp-body.cp { padding-top: 0; }
+.cp-pad { padding: 4px 16px; }
+.cp-pad .cp-rl { grid-template-columns: 76px minmax(0, 1fr); }
+.cp-pad .cp-faces { padding: 8px 0; }
+.cp-under { display: flex; flex-direction: column; padding: 0 4px; }
+.m-add { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; text-transform: none; letter-spacing: 0; font-size: 14px; }
+
+/* the small edit pop-up */
+.row-pop { position: fixed; z-index: 900; background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-lg, 0 12px 40px rgba(36,25,31,.18)); border: 1px solid var(--line); padding: 10px; overflow: auto; }
+.choice-list { display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+.choice-search { display: flex; align-items: center; gap: 8px; height: 40px; border-radius: 10px; background: var(--sidebar); padding: 0 12px; color: var(--muted); }
+.choice-search input { border: 0; background: none; font: inherit; color: var(--text); flex: 1; min-width: 0; outline: none; }
+.choice-scroll { max-height: 320px; overflow: auto; display: flex; flex-direction: column; }
+.m-sheet .choice-scroll { max-height: 55vh; }
+.choice-group { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .05em; text-transform: uppercase; padding: 10px 10px 4px; }
+.choice { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 40px; padding: 0 10px; border: 0; background: none; font: inherit; font-size: 15px; color: var(--text); text-align: left; border-radius: 9px; cursor: pointer; }
+.choice:hover, .choice:focus-visible { background: var(--sidebar); }
+.choice[aria-selected="true"] { color: var(--accent); font-weight: 600; }
+.choice.add { color: var(--accent); font-weight: 600; }
+.m-add { text-decoration: none; }
+
+/* household right in the Sims list, and Select mode (Nov 2026) */
+.hh-cell { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 6px; margin: 0 -6px; border: 1px solid transparent; border-radius: 9px; background: none; font: inherit; color: inherit; cursor: pointer; }
+.hh-cell .hh-caret { color: var(--muted); opacity: 0; }
+.sims-table tr:hover .hh-cell { border-color: var(--line); background: var(--surface); }
+.sims-table tr:hover .hh-cell .hh-caret, .hh-cell:focus-visible .hh-caret { opacity: 1; }
+.pick-col { width: 44px; }
+.pick-col input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+.sims-table tr.picked td { background: var(--sims-tint); }
+.sim-card { position: relative; }
+.sim-card.picked { box-shadow: 0 0 0 2px var(--accent); }
+.pick-tick { position: absolute; top: 8px; left: 8px; z-index: 2; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff; background: rgba(36,25,31,.25); display: grid; place-items: center; color: #fff; }
+.pick-tick.on { background: var(--accent); }
+.select-bar { position: fixed; z-index: 800; left: 50%; transform: translateX(-50%); bottom: 24px; display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-lg, 0 12px 40px rgba(36,25,31,.18)); border-radius: 14px; padding: 8px 8px 8px 16px; min-width: 380px; font-size: 15px; }
+.select-bar.phone { left: 12px; right: 12px; transform: none; min-width: 0; bottom: calc(96px + env(safe-area-inset-bottom)); }
+
+/* relationship dialog (Nov 2026) */
+.rel-mates { display: flex; gap: 8px; flex-wrap: wrap; }
+.rel-mate { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px 0 6px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font: inherit; font-size: 14px; color: var(--text); cursor: pointer; }
+.rel-mate[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.rel-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.rel-tile { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); font: inherit; font-size: 13px; color: var(--text); cursor: pointer; text-align: left; }
+.rel-tile svg { color: var(--muted); flex-shrink: 0; }
+.rel-tile[aria-checked="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.rel-tile[aria-checked="true"] svg { color: var(--accent); }
+@media (max-width: 700px) { .rel-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } .rel-tile { padding: 0 8px; gap: 6px; } }
+.cp-pname { display: inline-flex; flex-direction: column; line-height: 1.25; }
+.cp-pname small { font-size: 12px; color: var(--muted); font-weight: 400; }
