@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactN
 import { createPortal } from 'react-dom';
 import {
   ArrowCounterClockwise, ArrowsClockwise, ArrowsLeftRight, CalendarPlus, CloudArrowDown, Command, FastForward, FlagCheckered,
-  GearSix, HouseSimple, ImageSquare, Lightning, MagnifyingGlass, MapPin, Moon, Play, Plus, SunHorizon, UserCircle, UserPlus,
+  GearSix, HouseSimple, ImageSquare, MagnifyingGlass, MapPin, Moon, Play, Plus, SunHorizon, UserCircle, UserPlus,
   UsersThree, type Icon,
 } from '@phosphor-icons/react';
 import {
@@ -611,11 +611,11 @@ export function SideSearch() {
   );
 }
 
-/** Phone top bar: the lightning button that opens Quick actions. */
+/** Phone top bar: the plus button that opens Quick actions. */
 export function QuickButton() {
   return (
     <button type="button" className="qa-btn" onClick={openQuickActions} aria-label="Quick actions">
-      <Lightning size={20} weight="duotone" />
+      <Plus size={20} weight="bold" />
     </button>
   );
 }
