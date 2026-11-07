@@ -60,3 +60,6 @@ export function useLayer(onEscape: () => void): { isTop: () => boolean } {
   }, []);
   return { isTop: () => stack.length > 0 && stack[stack.length - 1].id === idRef.current };
 }
+
+/** How many pop-ups and sheets are open right now. */
+export const layerCount = () => stack.length;

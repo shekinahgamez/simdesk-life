@@ -2,8 +2,8 @@ import { SimPhotos } from '../photos/PhotosPage';
 import { SimClubs } from '../clubs/SimClubs';
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
-  ArrowUp, Briefcase, CalendarBlank, Camera, CaretLeft, CaretRight, DotsThree, Fire, HeartBreak, Hourglass, HouseSimple, LockSimple, PencilSimple, Plus,
-  ThumbsDown, ThumbsUp, User, UsersThree, Baby, HeartStraight, Heart, Diamond, Star, Smiley, Lightning, Bed, TreeStructure, type Icon,
+  ArrowUp, Briefcase, CalendarBlank, Camera, CaretLeft, CaretRight, DotsThree, Fire, HeartBreak, Hourglass, ThumbsDown, ThumbsUp, HouseSimple, LockSimple, PencilSimple, Plus,
+  User, X, MagnifyingGlass, UsersThree, Baby, HeartStraight, Heart, Diamond, Star, Smiley, Lightning, Bed, TreeStructure, type Icon,
 } from '@phosphor-icons/react';
 import { DateFields } from '../../components/savebits';
 import { AgeFields, bornDayFromInput, defaultAge, inputFromBornDay, type AgeInput } from '../../components/AgeFields';
@@ -24,10 +24,12 @@ import { dateOf, dayOf, formatDate, STAGE_IDS, stageName, type StageId } from '.
 import { useIsPhone } from '../../lib/useIsPhone';
 import { SimForm } from './SimForm';
 import { ChoiceList, RowPop } from './RowEdit';
+import { addLike, dropLike, hasLike, LIKE_FIELDS, likeChoices, likeField, type LikeKey } from '../../lib/likes';
 import {
   aspirationOptions, occultOptions, SimAvatar, traitOptions, useCustomTraits, useHouseholds, useRealAge, useRealAgeRanges, useSaveInfo, type SaveInfo,
 } from './shared';
 import { PlayingTag } from '../rotation/Rotation';
+import { SimMoney } from '../money/Money';
 import { ComingUp } from '../calendar/shared';
 
 const an = (s: StageId) => (['infant', 'adult', 'elder'].includes(s) ? 'an' : 'a');
@@ -316,12 +318,10 @@ function DesktopProfile({ c }: { c: Ctx }) {
             <div className="card-head"><h2><span className="obj sims"><User size={16} weight="duotone" /></span>About</h2></div>
             <AboutRows c={c} phone={false} />
           </section>
-          {hasLikes(c) && (
-            <section className="card">
-              <div className="card-head"><h2><span className="obj sims"><Fire size={16} weight="duotone" /></span>Likes and turn ons</h2></div>
-              <LikesBody c={c} phone={false} />
-            </section>
-          )}
+          <section className="card">
+            <div className="card-head"><h2><span className="obj sims"><Fire size={16} weight="duotone" /></span>Likes and turn ons</h2></div>
+            <LikesBody c={c} phone={false} />
+          </section>
           <SimClubs save={c.save} simId={c.rec.id} />
         </div>
         <div className="stack" style={{ gap: 16 }}>
@@ -333,6 +333,7 @@ function DesktopProfile({ c }: { c: Ctx }) {
               <HouseholdFaces c={c} />
             </section>
           )}
+          <SimMoney save={c.save} simId={c.rec.id} hhId={c.sim.householdId} phone={false} />
           <section className="card">
             <div className="card-head"><h2>Notes</h2></div>
             <Notes c={c} />
@@ -367,7 +368,8 @@ function PhoneProfile({ c }: { c: Ctx }) {
       <ComingUp save={c.save} simIds={[c.rec.id]} seeAll={`calendar/sim/${c.rec.id}`} />
       <div className="m-label">About</div>
       <div className="m-group cp-pad"><AboutRows c={c} phone /></div>
-      {hasLikes(c) && (<><div className="m-label">Likes and turn ons</div><div className="m-group cp-pad"><LikesBody c={c} phone /></div></>)}
+      <div className="m-label">Likes and turn ons</div>
+      <div className="m-group cp-pad"><LikesBody c={c} phone /></div>
       <SimClubs save={c.save} simId={c.rec.id} phone />
       {c.hhName && (
         <>
@@ -376,6 +378,7 @@ function PhoneProfile({ c }: { c: Ctx }) {
           <div className="m-group cp-pad"><HouseholdFaces c={c} /></div>
         </>
       )}
+      <SimMoney save={c.save} simId={c.rec.id} hhId={c.sim.householdId} phone />
       <div className="m-label">Notes</div>
       <Notes c={c} />
       <PhotosAndYears c={c} phone />
@@ -914,33 +917,98 @@ function CareerField({ c, onSave }: { c: Ctx; onSave(v: string): void }) {
   );
 }
 
-/** Likes, dislikes, turn ons and turn offs, as plain lines with an icon each. Shown once a Sim has any. */
+const LIKE_ICONS: Record<LikeKey, ReactNode> = {
+  likes: <ThumbsUp size={20} weight="duotone" color="var(--success, #2e8b57)" />,
+  dislikes: <ThumbsDown size={20} weight="duotone" />,
+  turnOns: <Fire size={20} weight="duotone" color="#d6492e" />,
+  turnOffs: <HeartBreak size={20} weight="duotone" />,
+};
+
+/** Likes, dislikes, turn ons and turn offs: one row each, an icon then the words (the owner kept the icons). Tap a row to change it. */
 function LikesBody({ c, phone }: { c: Ctx; phone: boolean }) {
-  const d = c.rec.data as Record<string, unknown>;
-  const arr = (k: string) => (Array.isArray(d[k]) ? (d[k] as unknown[]).filter((x): x is string => typeof x === 'string' && !!x.trim()) : []);
-  const lines = [
-    { k: 'Likes', icon: <ThumbsUp size={20} weight="duotone" color="var(--success, #2e8b57)" />, v: arr('likes') },
-    { k: 'Dislikes', icon: <ThumbsDown size={20} weight="duotone" />, v: arr('dislikes') },
-    { k: 'Turn ons', icon: <Fire size={20} weight="duotone" color="#d6492e" />, v: arr('turnOns') },
-    { k: 'Turn offs', icon: <HeartBreak size={20} weight="duotone" />, v: arr('turnOffs') },
-  ];
-  if (!lines.some((l) => l.v.length)) return null;
-  return <LikesLines lines={lines} max={phone ? 5 : 8} />;
-}
-function LikesLines({ lines, max }: { lines: { k: string; icon: ReactNode; v: string[] }[]; max: number }) {
+  const [open, setOpen] = useState<{ k: LikeKey; el: HTMLElement | null } | null>(null);
   const [all, setAll] = useState<Record<string, boolean>>({});
+  const max = phone ? 5 : 8;
   return (
-    <div className="cp-likes">
-      {lines.map((l) => (
-        <div key={l.k} className="cp-lk" aria-label={l.k}>
-          <span className="ic" title={l.k}>{l.icon}</span>
-          <span>{l.v.length === 0 ? EMPTY : (all[l.k] || l.v.length <= max) ? l.v.join(' · ') : <>{l.v.slice(0, max).join(' · ')} <button type="button" className="link-btn" onClick={() => setAll((x) => ({ ...x, [l.k]: true }))}>+{l.v.length - max} more</button></>}</span>
+    <>
+      <div className="cp-likes">
+        {LIKE_FIELDS.map((f) => {
+          const v = c.sim[f.k];
+          const more = !all[f.k] && v.length > max;
+          return (
+            <div key={f.k} className={`cp-lk lk-tap${open?.k === f.k ? ' on' : ''}`} role="button" tabIndex={0} aria-label={`Change ${f.label.toLowerCase()}`}
+              onClick={(e) => { if (!(e.target as HTMLElement).closest('.link-btn')) setOpen({ k: f.k, el: e.currentTarget }); }}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen({ k: f.k, el: e.currentTarget }); } }}>
+              <span className="ic" title={f.label}>{LIKE_ICONS[f.k]}</span>
+              <span>{v.length === 0 ? EMPTY : more
+                ? <>{v.slice(0, max).join(' · ')} <button type="button" className="link-btn" onClick={() => setAll((x) => ({ ...x, [f.k]: true }))}>+{v.length - max} more</button></>
+                : v.join(' · ')}</span>
+            </div>
+          );
+        })}
+      </div>
+      {open && (
+        <RowPop anchor={open.el} title={likeField(open.k).label} phone={phone} onClose={() => setOpen(null)} width={340}>
+          <LikesEdit c={c} k={open.k} onClose={() => setOpen(null)} />
+        </RowPop>
+      )}
+    </>
+  );
+}
+
+/** What's on the list now (each with an X), then a search box over every word used in the save. Typing something new adds it. */
+function LikesEdit({ c, k, onClose }: { c: Ctx; k: LikeKey; onClose(): void }) {
+  const f = likeField(k);
+  const other = likeField(f.opposite);
+  const mine = c.sim[k];
+  const theirs = c.sim[f.opposite];
+  const [q, setQ] = useState('');
+  const choices = useMemo(() => likeChoices(c.sims.map((r) => r.data as Partial<Record<LikeKey, unknown>>), k), [c.sims, k]);
+  const needle = q.trim().toLowerCase();
+  // Words already on the other side (liked vs disliked) sink to the bottom, greyed out.
+  const shown = choices.filter((o) => !hasLike(mine, o.label) && (!needle || o.label.toLowerCase().includes(needle)))
+    .sort((a, b) => Number(hasLike(theirs, a.label)) - Number(hasLike(theirs, b.label)));
+  const exact = needle && (choices.some((o) => o.label.toLowerCase() === needle) || hasLike(mine, needle));
+  const add = (w: string) => { c.update({ [k]: addLike(mine, w) } as Partial<SimData>); setQ(''); };
+  const drop = (w: string) => c.update({ [k]: dropLike(mine, w) } as Partial<SimData>);
+  const pickable = shown.filter((o) => !hasLike(theirs, o.label));
+  return (
+    <div className="choice-list lk-edit">
+      {mine.length > 0 && (
+        <div className="lk-mine">
+          {mine.map((w) => (
+            <div key={w} className="lk-item"><span>{w}</span>
+              <button type="button" className="btn ghost icon sm" aria-label={`Remove ${w}`} onClick={() => drop(w)}><X size={16} weight="bold" /></button></div>
+          ))}
         </div>
-      ))}
+      )}
+      <label className="choice-search">
+        <MagnifyingGlass size={16} aria-hidden="true" />
+        <input type="search" placeholder={`Add a ${f.one}`} value={q} onChange={(e) => setQ(e.target.value)} aria-label={`Add a ${f.one}`} maxLength={40}
+          autoCapitalize="sentences" autoCorrect="off" spellCheck={false}
+          onKeyDown={(e) => {
+            if (e.key !== 'Enter') return;
+            e.preventDefault();
+            if (needle && pickable[0]) add(pickable[0].label);
+            else if (needle && !exact) add(q);
+          }} />
+      </label>
+      <div className="choice-scroll" role="listbox" aria-label={`${f.label} to pick from`}>
+        {shown.map((o) => {
+          const off = hasLike(theirs, o.label);
+          return (
+            <button key={o.label} type="button" role="option" aria-selected="false" className={`choice${off ? ' off' : ''}`} disabled={off} onClick={() => add(o.label)}>
+              <span className="grow">{o.label}</span><small>{off ? `Already in ${other.label.toLowerCase()}` : plural(o.sims, 'Sim')}</small>
+            </button>
+          );
+        })}
+        {needle && !exact && <button type="button" className="choice add" onClick={() => add(q)}><Plus size={14} weight="bold" /> Add “{q.trim()}” as new</button>}
+        {!needle && shown.length === 0 && <div className="muted small" style={{ padding: '8px 10px' }}>Type one to start the list.</div>}
+      </div>
+      <div className="row" style={{ justifyContent: 'flex-end' }}><button type="button" className="btn sm primary" onClick={onClose}>Done</button></div>
     </div>
   );
 }
-const hasLikes = (c: Ctx) => ['likes', 'dislikes', 'turnOns', 'turnOffs'].some((k) => Array.isArray((c.rec.data as Record<string, unknown>)[k]) && ((c.rec.data as Record<string, unknown>)[k] as unknown[]).length > 0);
 
 /** The household as a row of faces. */
 function HouseholdFaces({ c }: { c: Ctx }) {

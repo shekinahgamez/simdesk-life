@@ -321,3 +321,20 @@
 @media (max-width: 700px) { .rel-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } .rel-tile { padding: 0 8px; gap: 6px; } }
 .cp-pname { display: inline-flex; flex-direction: column; line-height: 1.25; }
 .cp-pname small { font-size: 12px; color: var(--muted); font-weight: 400; }
+
+/* Likes and turn ons */
+.lk-tap { cursor: pointer; margin: 0 -6px; padding-left: 6px; padding-right: 6px; min-height: 40px; }
+.lk-tap:hover, .lk-tap.on { background: var(--sims-tint); border-radius: 10px; }
+.lk-tap:hover + .lk-tap, .lk-tap.on + .lk-tap { border-top-color: transparent; }
+.lk-mine { border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; }
+.lk-item { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 4px 0 12px; font-size: 15px; border-top: 1px solid var(--line); }
+.lk-item:first-child { border-top: 0; }
+.lk-item span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.lk-item .btn.icon.sm { width: 32px; height: 32px; color: var(--muted); }
+.lk-edit .choice small { color: var(--muted); font-size: 13px; margin-left: 8px; white-space: nowrap; }
+.lk-edit .choice.off { color: var(--muted); cursor: default; }
+.lk-edit .choice.off:hover { background: none; }
+.m-sheet .lk-item { min-height: 44px; font-size: 16px; }
+.m-sheet .lk-item .btn.icon.sm { width: 44px; height: 44px; }
+.m-sheet .lk-edit .choice { min-height: 44px; font-size: 16px; }
+.m-sheet .lk-edit .choice-search input { font-size: 16px; }

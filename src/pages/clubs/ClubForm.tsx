@@ -38,13 +38,13 @@ const PART_TITLE: Record<ClubPart, string> = { members: 'Members', rules: 'Rules
  * With `part`, it edits just that part of a club (from the pencil on its card) and saves when you close it, with Undo.
  * `pickMembers` opens straight on the member list.
  */
-export function ClubForm({ ctx, id, onClose, onSaved, onDeleted, part, pickMembers }: {
-  ctx: ClubsCtx; id: string | null; onClose(): void; onSaved(id: string): void; onDeleted?(): void; part?: ClubPart; pickMembers?: boolean;
+export function ClubForm({ ctx, id, name, onClose, onSaved, onDeleted, part, pickMembers }: {
+  ctx: ClubsCtx; id: string | null; /** New club only: a name to start with. */ name?: string; onClose(): void; onSaved(id: string): void; onDeleted?(): void; part?: ClubPart; pickMembers?: boolean;
 }) {
   const store = useStore();
   const existing = id ? ctx.byId.get(id) : undefined;
   const [start] = useState<ClubData>(() => existing?.club ?? BLANK_CLUB);
-  const [f, setF] = useState<ClubData>(start);
+  const [f, setF] = useState<ClubData>(() => (!id && name ? { ...start, name } : start));
   const [view, setView] = useState<View>(pickMembers ? { t: 'members' } : { t: 'form' });
   const [q, setQ] = useState('');
   const [tried, setTried] = useState(false);

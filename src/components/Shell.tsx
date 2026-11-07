@@ -11,6 +11,7 @@ import { useLayer } from '../lib/layers';
 import { go, savePath, type Route } from '../lib/router';
 import { moduleOn, saveData, todayOf } from '../lib/saves';
 import { DateSheet, NextDayButton } from './DayMove';
+import { CommandHost, QuickButton, SideSearch } from './CommandBar';
 import { useSaves } from '../lib/sync/react';
 import type { SaveRow } from '../lib/sync/types';
 import { formatDate, SEASONS } from '../lib/time';
@@ -24,6 +25,7 @@ export function Shell({ save, route, children }: { save: SaveRow | null; route: 
       <>
         <main className="m-main">{children}</main>
         {save && <TabBar saveId={save.id} route={route} />}
+        {save && <CommandHost save={save} />}
       </>
     );
   }
@@ -31,6 +33,7 @@ export function Shell({ save, route, children }: { save: SaveRow | null; route: 
     <div className="app">
       <Sidebar save={save} route={route} />
       <main className="main">{children}</main>
+      {save && <CommandHost save={save} />}
     </div>
   );
 }
@@ -46,6 +49,7 @@ function Sidebar({ save, route }: { save: SaveRow | null; route: Route }) {
       </a>
       {save && d && <SaveSwitcher save={save} />}
       {save && d?.trackDate && <NextDayButton save={save} className="btn sm side-nextday" />}
+      {save && <SideSearch />}
       {save && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {cats.map((c) => (
@@ -166,6 +170,7 @@ export function PhoneTop({ save }: { save: SaveRow }) {
         </button>
         <span className="row" style={{ gap: 4, flexWrap: 'nowrap' }}>
           <SyncCloud />
+          <QuickButton />
           {d.trackDate && <button type="button" className="m-datepill" onClick={() => setDateOpen(true)} aria-label={`Today is ${SEASONS[t.season]} ${t.day}, year ${t.year}. Change`}>{SEASONS[t.season]} {t.day} · Y{t.year}</button>}
         </span>
       </div>

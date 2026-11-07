@@ -302,7 +302,7 @@ function LotFilterPanel({ ctx, f, onChange, onClose, count, phone }: { ctx: Lots
 // ---------- add / edit ----------
 type Form = Pick<LotData, 'name' | 'type' | 'size' | 'meantFor'> & { price: string };
 /** Add a lot (name, lot type and size required; price optional) or edit one. Apartments ask which apartment instead of a size. */
-export function LotForm({ ctx, lotId, onClose, onSaved }: { ctx: LotsCtx; lotId: string | null; onClose(): void; onSaved(id: string, name: string): void }) {
+export function LotForm({ ctx, lotId, name, onClose, onSaved }: { ctx: LotsCtx; lotId: string | null; /** New lot only: a name to start with. */ name?: string; onClose(): void; onSaved(id: string, name: string): void }) {
   const store = useStore();
   const customTypes = useCustomLotTypes();
   const rec = lotId ? store.get(lotId) : undefined;
@@ -310,7 +310,7 @@ export function LotForm({ ctx, lotId, onClose, onSaved }: { ctx: LotsCtx; lotId:
     const d = lotData(rec);
     return { name: d.name, type: d.type, size: d.size, meantFor: d.meantFor, price: d.price != null ? String(d.price) : '' };
   }, [lotId]); // eslint-disable-line react-hooks/exhaustive-deps
-  const [f, setF] = useState<Form>(start);
+  const [f, setF] = useState<Form>(() => (!lotId && name ? { ...start, name } : start));
   const [tried, setTried] = useState(false);
   const [managing, setManaging] = useState(false);
   const apt = f.type === APARTMENT;

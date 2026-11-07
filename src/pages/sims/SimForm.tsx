@@ -31,8 +31,11 @@ const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
  * New Sim and Edit Sim. The buttons stay pinned at the bottom. Pronouns, orientation, career,
  * game gender settings and notes are tucked under "More details". Drafts save as you type.
  */
-export function SimForm({ info, simId, householdId = null, onClose, onSaved }: {
-  info: SaveInfo; simId: string | null; householdId?: string | null; onClose(): void; onSaved(id: string, another: boolean): void;
+export function SimForm({ info, simId, householdId = null, preset, onClose, onSaved }: {
+  info: SaveInfo; simId: string | null; householdId?: string | null;
+  /** New Sim only: a name to start with (the command bar's "/sim Maya Brooks"). */
+  preset?: { first: string; last: string };
+  onClose(): void; onSaved(id: string, another: boolean): void;
 }) {
   const store = useStore();
   const photos = usePhotos();
@@ -51,7 +54,7 @@ export function SimForm({ info, simId, householdId = null, onClose, onSaved }: {
 
   const initial = useMemo(() => startState(info, rec ? simData(rec) : null, householdId), [simId]); // eslint-disable-line react-hooks/exhaustive-deps
   const [usedDraft] = useState(() => !!draft.draft);
-  const [f, setF] = useState<FormState>(() => (draft.draft ? { ...initial, ...draft.draft } : initial));
+  const [f, setF] = useState<FormState>(() => ({ ...(draft.draft ? { ...initial, ...draft.draft } : initial), ...(!simId && preset ? preset : {}) }));
   const [more, setMore] = useState(() => !!(f.pronouns || f.orientation || f.career || f.notes || Object.keys(f.genderSettings).length));
   const [newHh, setNewHh] = useState<string | null>(null);
   const [error, setError] = useState('');

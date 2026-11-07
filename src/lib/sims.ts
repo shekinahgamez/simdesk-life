@@ -6,6 +6,7 @@
 import { BY_ID } from '../data/game';
 import type { PhotoRef } from './photos';
 import { normalize } from './text';
+import { cleanLikes } from './likes';
 import {
   ageOf, dateOf, formatDate, SEASONS, STAGE_IDS, stageName, type Age, type Calendar, type SimDate, type StageId, type StageRow,
 } from './time';
@@ -45,12 +46,18 @@ export type SimData = {
   portrait: PhotoRef | null;
   stagePhotos: { stage: StageId; photo: PhotoRef }[];
   deceased: { day: number | null; cause: string; notes: string } | null;
+  /** Words typed in by the player (see lib/likes.ts). */
+  likes: string[];
+  dislikes: string[];
+  turnOns: string[];
+  turnOffs: string[];
 };
 
 export const BLANK_SIM: SimData = {
   first: '', last: '', gender: null, householdId: null, bornDay: null, addedDay: null, stage: null,
   traits: [], aspiration: null, occult: null, pronouns: '', orientation: '', career: '', careerLevel: null,
   genderSettings: {}, notes: '', portrait: null, stagePhotos: [], deceased: null,
+  likes: [], dislikes: [], turnOns: [], turnOffs: [],
 };
 
 /** Fills in anything missing, so old or partial records never break a page. */
@@ -62,6 +69,10 @@ export function simData(r: Rec | undefined): SimData {
     traits: Array.isArray(d.traits) ? d.traits : [],
     stagePhotos: Array.isArray(d.stagePhotos) ? d.stagePhotos : [],
     genderSettings: d.genderSettings ?? {},
+    likes: cleanLikes(d.likes),
+    dislikes: cleanLikes(d.dislikes),
+    turnOns: cleanLikes(d.turnOns),
+    turnOffs: cleanLikes(d.turnOffs),
   };
 }
 

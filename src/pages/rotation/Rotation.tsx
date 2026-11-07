@@ -15,6 +15,7 @@ import { plural } from '../../lib/text';
 import { dateOf, formatDate } from '../../lib/time';
 import { useIsPhone } from '../../lib/useIsPhone';
 import { Faces } from '../households/shared';
+import { useMoneyCheck } from '../money/Money';
 
 /** The save's rotation, cleaned, plus what the pages need to show it. */
 export function useRotation(save: SaveRow) {
@@ -33,7 +34,7 @@ export function useRotation(save: SaveRow) {
     store.updateSave(save.id, { rotation: next });
     if (text) toast(text, { label: 'Undo', run: () => store.updateSave(save.id, { rotation: before }) });
   };
-  return { saveId: save.id, on: moduleOn(d, 'rotation'), r, d, today: d.today, track: d.trackDate, members, name, when, update, households: hhRecs };
+  return { save, saveId: save.id, on: moduleOn(d, 'rotation'), r, d, today: d.today, track: d.trackDate, members, name, when, update, households: hhRecs };
 }
 type Rot = ReturnType<typeof useRotation>;
 
@@ -111,22 +112,24 @@ export function PlayingNow({ save, where }: { save: SaveRow; where: 'today' | 'p
   );
 }
 
-function Pop({ phone, title, onClose, children, footer }: { phone: boolean; title: string; onClose(): void; children: ReactNode; footer: ReactNode }) {
-  if (phone) return <Sheet title={title} onClose={onClose}><div className="rot-sheet">{children}<div className="rot-sheet-foot">{footer}</div></div></Sheet>;
+function Pop({ phone, title, onClose, children, footer, pinned }: { phone: boolean; title: string; onClose(): void; children: ReactNode; footer: ReactNode; pinned?: ReactNode }) {
+  if (phone) return <Sheet title={title} onClose={onClose}><div className="rot-sheet">{children}<div className={`rot-sheet-foot${pinned ? ' pinned' : ''}`}>{footer}{pinned}</div></div></Sheet>;
   return <Modal title={title} onClose={onClose} footer={footer} autoFocus={false}><div className="rot-sheet">{children}</div></Modal>;
 }
 
-function EndTurnDialog({ rot, phone, onClose }: { rot: Rot; phone: boolean; onClose(): void }) {
+export function EndTurnDialog({ rot, phone, onClose }: { rot: Rot; phone: boolean; onClose(): void }) {
   const { r } = rot;
   const cur = r.current!;
   const next = upNext(r)[0];
   const span = turnSpan(r, rot.today);
+  const mc = useMoneyCheck(rot.save, cur);
   const go2 = () => {
+    mc.commit();
     onClose();
     rot.update(endTurn(r, rot.today), `${rot.name(next)}’s turn started`);
   };
   return (
-    <Pop phone={phone} title={`End ${the(rot.name(cur))}’s turn?`} onClose={onClose}
+    <Pop phone={phone} title={`End ${the(rot.name(cur))}’s turn?`} onClose={onClose} pinned={mc.on && !mc.skip ? mc.total : undefined}
       footer={<>
         <button type="button" className="btn" onClick={onClose}>Not yet</button>
         <button type="button" className="btn primary" onClick={go2}><Play size={14} weight="fill" /> Start {the(rot.name(next))}’s turn</button>
@@ -137,6 +140,7 @@ function EndTurnDialog({ rot, phone, onClose }: { rot: Rot; phone: boolean; onCl
           <span className="muted"> · {plural(span.days, 'day')}</span>
         </div>
       )}
+      {mc.on && mc.fields(phone, !phone)}
       <div className="rot-label">Next up</div>
       <div className="rot-nextcard">
         <Faces sims={rot.members(next)} size={36} max={4} />
