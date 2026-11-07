@@ -95,14 +95,15 @@ export function whenText(ctx: CalCtx, i: Pick<CalItem, 'kind' | 'day' | 'end'>):
 
 // ---------- Coming up (Sim profile, household page) ----------
 /** The next 3 things for these Sims, with See all. Hidden when the save doesn't track the date. */
-export function ComingUp({ save, simIds, seeAll, showFaces }: { save: SaveRow; simIds: string[]; seeAll: string; showFaces?: boolean }) {
+/** `compact`: tighter rows, birthdays show only the days left on the right (desktop household page). */
+export function ComingUp({ save, simIds, seeAll, showFaces, compact }: { save: SaveRow; simIds: string[]; seeAll: string; showFaces?: boolean; compact?: boolean }) {
   const ctx = useCalCtx(save);
   if (!ctx.info.track || !simIds.length) return null;
   const today = ctx.info.today;
   const list = comingUp(ctx.state, simIds, today);
   const mine = new Set(simIds);
   return (
-    <section className="card">
+    <section className={`card${compact ? ' cu-compact' : ''}`}>
       <div className="card-head"><h2>Coming up</h2><a className="btn ghost sm" style={{ color: 'var(--accent)' }} href={savePath(save.id, seeAll)}>See all</a></div>
       {list.length === 0 ? <p className="muted small" style={{ margin: 0 }}>Nothing on the calendar yet.</p> : (
         <div className="cal-cu">
@@ -117,7 +118,8 @@ export function ComingUp({ save, simIds, seeAll, showFaces }: { save: SaveRow; s
             return (
               <a key={i.key} className={`cal-cu-row k-${i.kind}`} href={i.kind === 'birthday' ? savePath(save.id, `sims/${i.id}`) : savePath(save.id, `calendar/${i.kind}/${i.id}`)}>
                 <span className="cal-when"><b>{d.day}</b><span>{SEASONS[d.season]}</span></span>
-                <span className="grow"><b>{itemTitle(ctx, i)}</b><span className="s">{sub}</span></span>
+                <span className="grow"><b>{itemTitle(ctx, i)}</b>{!(compact && i.kind === 'birthday') && <span className="s">{sub}</span>}</span>
+                {compact && i.kind === 'birthday' && <span className="cu-days">{daysWord(i.day - today)}</span>}
                 {faces.length > 0 && <span className="hh-faces" style={{ ['--f' as string]: '28px' }}>{faces.slice(0, 4).map((id) => <span key={id} className="hh-face"><SimAvatar sim={ctx.simById.get(id) as SimData} size={28} /></span>)}</span>}
               </a>
             );
