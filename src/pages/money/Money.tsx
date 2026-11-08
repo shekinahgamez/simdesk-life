@@ -113,8 +113,8 @@ function Breakdown({ mo }: { mo: Money }) {
 }
 
 /** Household funds, lots, each Sim: a bar and the amount. Tapping a Sim filters to theirs. */
-function BySim({ mo, who, onWho, names = true }: { mo: Money; who?: string | null; onWho?: (id: string | null) => void; names?: boolean }) {
-  const rows: { id: string; label: string; v: number; sim?: SimData }[] = [
+function BySim({ mo, who, onWho, names = true, fundsOnly = false }: { mo: Money; who?: string | null; onWho?: (id: string | null) => void; names?: boolean; fundsOnly?: boolean }) {
+  const rows: { id: string; label: string; v: number; sim?: SimData }[] = fundsOnly ? [{ id: 'funds', label: 'Household funds', v: mo.by.funds }] : [
     { id: 'funds', label: 'Household funds', v: mo.by.funds },
     ...mo.members.map((x) => ({ id: x.id, label: x.sim.first || 'Unnamed', v: mo.by[x.id] ?? 0, sim: x.sim })),
     ...(mo.by.household ? [{ id: 'household', label: 'Shared', v: mo.by.household }] : []),
@@ -143,7 +143,7 @@ function BySim({ mo, who, onWho, names = true }: { mo: Money; who?: string | nul
 
 // ---------- household page ----------
 /** Desktop: the Money card at the top of the household's right column. The whole card opens the details. */
-export function MoneyCard({ save, hhId }: { save: SaveRow; hhId: string }) {
+export function MoneyCard({ save, hhId, compact = false }: { save: SaveRow; hhId: string; compact?: boolean }) {
   const mo = useMoney(save, hhId);
   const [open, setOpen] = useState<null | 'details' | 'check'>(null);
   if (!mo.on) return null;
@@ -158,7 +158,7 @@ export function MoneyCard({ save, hhId }: { save: SaveRow; hhId: string }) {
           <span className="mny-nw-row"><span className="mny-nw">{fmt(mo.t.net)}</span><ClassTag classes={mo.set.classes} net={mo.t.net} /></span>
           <span className="mny-meta">{mo.change ? <Change mo={mo} {...mo.change} /> : <span className="muted">Net worth</span>}</span>
           <Chart mo={mo} height={48} labels={false} />
-          <BySim mo={mo} />
+          <BySim mo={mo} fundsOnly={compact} />
           <span className="mny-link">Details <CaretRight size={14} weight="bold" /></span>
         </button>
       )}
@@ -166,6 +166,15 @@ export function MoneyCard({ save, hhId }: { save: SaveRow; hhId: string }) {
       {open === 'check' && <MoneyCheckDialog save={save} hhId={hhId} onClose={() => setOpen(null)} />}
     </section>
   );
+}
+
+/** Each household member's net worth as short text ("§705k"), or null when there is nothing to show. Used by the desktop household page. */
+export function useSimNet(save: SaveRow, hhId: string): Record<string, string> | null {
+  const mo = useMoney(save, hhId);
+  if (!mo.on || mo.empty) return null;
+  const out: Record<string, string> = {};
+  for (const x of mo.members) out[x.id] = short(mo.by[x.id] ?? 0);
+  return out;
 }
 
 /** Phone: one tappable line under the rotation line. */

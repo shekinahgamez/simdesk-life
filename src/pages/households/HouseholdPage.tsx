@@ -18,7 +18,7 @@ import { ComingUp } from '../calendar/shared';
 import { NewHousehold } from './HouseholdsList';
 import { HhPill, useHhCtx, type HhCtx } from './shared';
 import { HouseholdRotation } from '../rotation/Rotation';
-import { MoneyCard, MoneyStrip } from '../money/Money';
+import { MoneyCard, MoneyStrip, useSimNet } from '../money/Money';
 
 /** One household: its Sims, the lots it lives on and owns, and notes. */
 export function HouseholdPage({ save, hhId }: { save: SaveRow; hhId: string }) {
@@ -27,6 +27,7 @@ export function HouseholdPage({ save, hhId }: { save: SaveRow; hhId: string }) {
   const phone = useIsPhone();
   const [view] = useBirthdayView();
   const [dialog, setDialog] = useState<null | 'home' | 'rename' | 'sim' | 'movein' | 'own' | 'delete'>(null);
+  const net = useSimNet(save, hhId);
   const hh = ctx.byId.get(hhId);
   const back = savePath(save.id, 'households');
   if (!hh) return <div className="page"><p>That household isn’t here anymore.</p><a className="btn" href={back}>Back to Households</a></div>;
@@ -93,6 +94,50 @@ export function HouseholdPage({ save, hhId }: { save: SaveRow; hhId: string }) {
       <button type="button" className="btn sm" style={{ alignSelf: 'flex-start', marginTop: 12 }} onClick={() => setDialog('home')}>{home ? 'Move to a new home' : 'Pick a home'}</button>
     </div>
   );
+  // Desktop: Sims as rows with each Sim's net worth, and a lots card with one dashed row when there is no home.
+  const simRows = (
+    <div className="hh-rows">
+      {members.map((s) => {
+        const age = simAge(s.sim, info.today, info.table, info.track);
+        const b = birthdayCell(age, info.cal, view, false);
+        return (
+          <a key={s.id} className="hh-srow" href={savePath(save.id, `sims/${s.id}`)}>
+            <Tile sim={s.sim} />
+            <span className="grow"><b>{s.sim.first || fullName(s.sim)}</b><span className="s">{stageLabel(stageOf(age))}{b?.soon && <> · <span className="bd">bday {b.text}</span></>}</span></span>
+            {net && <span className="hh-net">{net[s.id]}</span>}
+          </a>
+        );
+      })}
+      {members.length === 0 && <p className="muted small" style={{ margin: 0 }}>No Sims yet.</p>}
+    </div>
+  );
+  const lotsCardDesktop = (
+    <div className="card">
+      <div className="card-head"><h2>Home and lots</h2><button type="button" className="btn ghost sm" style={{ color: 'var(--accent)' }} onClick={() => setDialog('own')}><Plus size={14} weight="bold" /> Add lot</button></div>
+      {home ? <div className="hh-lots">{homeRow}{ownedOthers.map((r) => (
+        <div key={r.id} className="hh-lot">
+          <a className="row grow" style={{ gap: 12, flexWrap: 'nowrap', color: 'inherit', textDecoration: 'none', minWidth: 0 }} href={lotHref(r.id)}>
+            <span className="obj worlds"><MapPin size={18} weight="duotone" /></span>
+            <span className="grow"><b>{r.lot.name}</b><span className="s">{lotTypeLine(ctx, r.id)}</span></span>
+            <span className="tag outline-soft">Own</span>
+          </a>
+          <button type="button" className="btn ghost icon sm" aria-label={`${label} doesn’t own ${r.lot.name}`} onClick={() => unown(r.id, r.lot.name)}><X size={15} /></button>
+        </div>))}
+      </div> : <>
+        {ownedOthers.length > 0 && <div className="hh-lots" style={{ marginBottom: 10 }}>{ownedOthers.map((r) => (
+          <div key={r.id} className="hh-lot">
+            <a className="row grow" style={{ gap: 12, flexWrap: 'nowrap', color: 'inherit', textDecoration: 'none', minWidth: 0 }} href={lotHref(r.id)}>
+              <span className="obj worlds"><MapPin size={18} weight="duotone" /></span>
+              <span className="grow"><b>{r.lot.name}</b><span className="s">{lotTypeLine(ctx, r.id)}</span></span>
+              <span className="tag outline-soft">Own</span>
+            </a>
+            <button type="button" className="btn ghost icon sm" aria-label={`${label} doesn’t own ${r.lot.name}`} onClick={() => unown(r.id, r.lot.name)}><X size={15} /></button>
+          </div>))}</div>}
+        <button type="button" className="hh-pick" onClick={() => setDialog('home')}><HouseSimple size={18} weight="duotone" /> Pick a home</button>
+      </>}
+      {home && <button type="button" className="btn sm" style={{ alignSelf: 'flex-start', marginTop: 12 }} onClick={() => setDialog('home')}>Move to a new home</button>}
+    </div>
+  );
   const notes = <AutoText label="Notes" value={hh.data.notes} onSave={(n) => update({ notes: n })} placeholder="Anything worth remembering…" rows={3} />;
   const dialogs = (
     <>
@@ -136,23 +181,24 @@ export function HouseholdPage({ save, hhId }: { save: SaveRow; hhId: string }) {
       <div className="page-head">
         <div><h1>{label}</h1><div className="sub">{sub}</div></div>
         <div className="row">
-          <button type="button" className="btn" onClick={() => setDialog('rename')}><PencilSimple size={16} /> Edit</button>
-          <HhMore onDelete={() => setDialog('delete')} />
+          <button type="button" className="btn" onClick={() => setDialog('movein')}>Move Sims in</button>
+          <HhMore onEdit={() => setDialog('rename')} onDelete={() => setDialog('delete')} />
           <button type="button" className="btn primary" onClick={() => setDialog('sim')}><Plus size={18} weight="bold" /> New Sim</button>
         </div>
       </div>
       <HouseholdRotation save={save} hhId={hh.id} />
       <div className="hh-grid">
-        <div className="card">
-          <div className="card-head"><h2>Sims</h2>{moveInBtn}</div>
-          {tiles}
-          <h2 className="hh-sub">Notes</h2>
-          {notes}
+        <div className="stack" style={{ gap: 14, minWidth: 0 }}>
+          <div className="card hh-simscard">
+            <div className="card-head"><h2>Sims</h2>{net && <span className="small muted">Net worth</span>}</div>
+            {simRows}
+          </div>
+          <div className="card hh-notescard"><div className="card-head"><h2>Notes</h2></div>{notes}</div>
         </div>
-        <div className="stack" style={{ gap: 18, minWidth: 0 }}>
-          <MoneyCard save={save} hhId={hh.id} />
-          <ComingUp save={save} simIds={members.map((m) => m.id)} seeAll={`calendar/household/${hh.id}`} showFaces />
-          {lotsCard}
+        <div className="stack" style={{ gap: 14, minWidth: 0 }}>
+          <MoneyCard save={save} hhId={hh.id} compact />
+          <ComingUp save={save} simIds={members.map((m) => m.id)} seeAll={`calendar/household/${hh.id}`} showFaces compact />
+          {lotsCardDesktop}
         </div>
       </div>
       {dialogs}
@@ -227,7 +273,7 @@ function OwnLot({ ctx, hh, onClose }: { ctx: HhCtx; hh: HH; onClose(): void }) {
 }
 
 /** The ⋯ menu on a household (Delete lives here, like on a Sim). */
-function HhMore({ onDelete }: { onDelete(): void }) {
+function HhMore({ onDelete, onEdit }: { onDelete(): void; onEdit?(): void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
@@ -243,6 +289,7 @@ function HhMore({ onDelete }: { onDelete(): void }) {
       <button type="button" className="btn icon hh-more-btn" aria-label="More" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((x) => !x)}><DotsThree size={20} weight="bold" /></button>
       {open && (
         <div className="combo-list more-menu" role="menu" style={{ right: 0, left: 'auto' }}>
+          {onEdit && <button type="button" role="menuitem" onClick={() => { setOpen(false); onEdit(); }}><PencilSimple size={16} weight="duotone" /> Edit household</button>}
           <button type="button" role="menuitem" className="danger" onClick={() => { setOpen(false); onDelete(); }}><Trash size={16} weight="duotone" /> Delete household</button>
         </div>
       )}

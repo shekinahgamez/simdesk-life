@@ -11,7 +11,7 @@
 .mny-big { font-family: var(--font-head); font-weight: 800; font-size: 34px; letter-spacing: -.02em; line-height: 1.1; }
 
 /* household card */
-.mny-open { all: unset; display: flex; flex-direction: column; gap: 10px; cursor: pointer; border-radius: 12px; margin: -6px; padding: 6px; }
+.mny-open { all: unset; box-sizing: border-box; width: calc(100% + 12px); display: flex; flex-direction: column; gap: 10px; cursor: pointer; border-radius: 12px; margin: -6px; padding: 6px; }
 .mny-open:hover { background: var(--bg); }
 .mny-open:focus-visible { outline: 2px solid var(--accent); }
 .mny-open .mny-meta { margin-top: -6px; }
