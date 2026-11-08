@@ -71,8 +71,8 @@ export function UsernameHint({ id, state }: { id: string; state: ReturnType<type
   return <div id={id} className="hint">{USERNAME_RULES}</div>;
 }
 
-export function Auth({ confirmed }: { confirmed?: boolean }) {
-  const [mode, setMode] = useState<Mode>(confirmed ? 'login' : 'signup');
+export function Auth({ confirmed, startLogin }: { confirmed?: boolean; startLogin?: boolean }) {
+  const [mode, setMode] = useState<Mode>(confirmed || startLogin ? 'login' : 'signup');
   const [username, setUsername] = useState('');
   const [login, setLogin] = useState('');
   const [email, setEmail] = useState('');

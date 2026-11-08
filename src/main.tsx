@@ -15,9 +15,11 @@ import './styles/photos.css';
 import './styles/clubs.css';
 import './styles/money.css';
 import './styles/commandbar.css';
+import './styles/landing.css';
 import { StyleCheck } from './pages/StyleCheck';
 import { AppSettings } from './pages/AppSettings';
 import { Auth } from './pages/Auth';
+import { LandingPage, BetaApplyPage } from './pages/landing/Landing';
 import { isPretend, PretendApp, SetPassword, SignedIn } from './pages/AccountScreens';
 import { Toaster } from './components/ui';
 import { startTheme } from './lib/theme';
@@ -53,7 +55,12 @@ function App() {
   if (isPretend()) return <PretendApp />;
   if (auth.status === 'loading') return <div className="loading" role="status">Loading…</div>;
   if (auth.status === 'recovery' && !recoveryDone) return <SetPassword onDone={() => setRecoveryDone(true)} />;
-  if (auth.status === 'signed-out') return <Auth confirmed={auth.confirmed} />;
+  if (auth.status === 'signed-out') {
+    // Visitors see the public home page. Beta testers get the sign-in link (#/login) by email; there is no Log in button on the public pages.
+    if (auth.confirmed || hash === '#/login') return <Auth confirmed={auth.confirmed} startLogin />;
+    if (hash === '#/beta') return <BetaApplyPage />;
+    return <LandingPage />;
+  }
   return <SignedIn userId={auth.session.user.id} />;
 }
 
