@@ -2,6 +2,6 @@
 export const APP = {
   name: 'SimDesk',
   wordmark: 'simdesk', // lowercase wordmark; the dot of the "i" is drawn as the sparkle
-  domain: 'simdesk.life',
+  domain: 'getsimdesk.com',
   tagline: 'Run the drama. Rule the details.',
 } as const;
