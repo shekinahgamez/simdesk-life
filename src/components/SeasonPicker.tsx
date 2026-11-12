@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CalendarBlank, CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { useIsPhone } from '../lib/useIsPhone';
-import { dateIndex, SEASONS, WEEKDAYS, type Season, type SeasonLength, type SimDate } from '../lib/time';
+import { dateIndex, yearText, SEASONS, WEEKDAYS, type Season, type SeasonLength, type SimDate } from '../lib/time';
 import { SeasonBanner } from './SeasonArt';
 import { Modal, Sheet } from './ui';
 
@@ -18,12 +18,12 @@ type Shared = {
   label: string;
 };
 
-const shift = (v: { year: number; season: Season }, step: 1 | -1) => {
+const shift = (v: { year: number; season: Season }, step: 1 | -1, minYear = 1) => {
   const i = (v.year - 1) * 4 + v.season + step;
-  return { year: Math.max(1, Math.floor(i / 4) + 1), season: (((i % 4) + 4) % 4) as Season };
+  return { year: Math.max(minYear, Math.floor(i / 4) + 1), season: (((i % 4) + 4) % 4) as Season };
 };
 const seasonDay = (d: SimDate) => `${SEASONS[d.season]} ${d.day}`;
-const fieldText = (d: SimDate, yearless?: boolean) => (yearless ? seasonDay(d) : `${seasonDay(d)} · Year ${d.year}`);
+const fieldText = (d: SimDate, yearless?: boolean) => (yearless ? seasonDay(d) : `${seasonDay(d)} · Year ${yearText(d.year)}`);
 
 function Trigger({ label, text, onOpen }: { label: string; text: string; onOpen(): void }) {
   return (
@@ -40,23 +40,25 @@ export function DateFrame({ title, onClose, children }: { title: string; onClose
   return <Modal title={title} onClose={onClose} autoFocus={false} className="dp-modal">{children}</Modal>;
 }
 
-export function DateGrid({ view, setView, seasonLength, today, yearless, isSel, inRange, onPick, note, isOff }: {
+export function DateGrid({ view, setView, seasonLength, today, yearless, isSel, inRange, onPick, note, isOff, minYear }: {
   view: { year: number; season: Season }; setView(v: { year: number; season: Season }): void; seasonLength: SeasonLength; today?: SimDate | null; yearless?: boolean;
   isSel(d: SimDate): boolean; inRange?(d: SimDate): boolean; onPick(d: SimDate): void; note?: string;
   /** Days that can't be picked (greyed out), like past days for Jump ahead. */
   isOff?(d: SimDate): boolean;
+  /** The earliest year the arrows go to (default 1). Storylines go further back, to years before the save began. */
+  minYear?: number;
 }) {
   const isToday = (d: SimDate) => !!today && today.year === d.year && today.season === d.season && today.day === d.day;
   return (
     <div className="dp">
       <SeasonBanner season={view.season} className="sm">
-        <div><h2>{SEASONS[view.season]}</h2>{!yearless && <div className="s">Year {view.year}</div>}</div>
+        <div><h2>{SEASONS[view.season]}</h2>{!yearless && <div className="s">Year {yearText(view.year)}</div>}</div>
         <div className="cal-nav">
-          <button type="button" className="btn icon fog" aria-label="Previous season" onClick={() => setView(shift(view, -1))}><CaretLeft size={18} weight="bold" /></button>
-          <button type="button" className="btn icon fog" aria-label="Next season" onClick={() => setView(shift(view, 1))}><CaretRight size={18} weight="bold" /></button>
+          <button type="button" className="btn icon fog" aria-label="Previous season" onClick={() => setView(shift(view, -1, minYear))}><CaretLeft size={18} weight="bold" /></button>
+          <button type="button" className="btn icon fog" aria-label="Next season" onClick={() => setView(shift(view, 1, minYear))}><CaretRight size={18} weight="bold" /></button>
         </div>
       </SeasonBanner>
-      <div className="dp-grid" role="grid" aria-label={`${SEASONS[view.season]}${yearless ? '' : ` year ${view.year}`}`}>
+      <div className="dp-grid" role="grid" aria-label={`${SEASONS[view.season]}${yearless ? '' : ` year ${yearText(view.year)}`}`}>
         {WEEKDAYS.map((w) => <span key={w} className="dp-wd" aria-hidden="true">{w.slice(0, 1)}</span>)}
         {Array.from({ length: seasonLength }, (_, i) => {
           const d: SimDate = { year: view.year, season: view.season, day: i + 1 };

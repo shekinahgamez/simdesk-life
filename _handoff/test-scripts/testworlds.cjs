@@ -122,6 +122,10 @@ const shots = process.env.SHOTS;
     await p.goto(`http://localhost:4173/#/s/${sid}/worlds/willow-creek`); await wait(p, 900);
     ok(await p.getByText('21 lots · 2 in use').isVisible(), `${n} world counts`);
     if (shots) await p.screenshot({ path: `${shots}/${n}-world.png`, fullPage: true });
+    // phone: neighborhoods with nothing filled start folded
+    const folded = p.locator('.hood-caret[aria-expanded="false"]');
+    ok(n !== 'phone' || (await folded.count()) > 0, `${n} empty neighborhoods start folded`);
+    while (await folded.count()) await folded.first().click();
     const emptyRow = p.locator('.hood-row', { hasText: 'Oakenstead' });
     await emptyRow.click(); await wait(p, 300);
     ok(await p.getByRole('alertdialog', { name: 'Oakenstead' }).isVisible(), `${n} empty lot menu`);

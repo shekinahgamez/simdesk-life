@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { CalendarBlank, Camera, CaretLeft, Check, CaretRight, FunnelSimple, PencilSimple, Plus, TextAlignLeft, Trash, UsersThree } from '@phosphor-icons/react';
+import { CalendarBlank, Camera, CaretLeft, Crown, Check, CaretRight, FunnelSimple, PencilSimple, Plus, TextAlignLeft, Trash, UsersThree, X } from '@phosphor-icons/react';
 import { PhotoBox } from '../../components/photo';
 import { DateField, RangePanel } from '../../components/SeasonPicker';
 import { ObjIcon } from '../../components/categories';
 import { Confirm, Field, Modal, SearchBox, Sheet, TextInput, toast } from '../../components/ui';
-import { albumFilterOn, filterPhotos, groupPhotos, hasRange, itemKey, rangeText, NO_ALBUM_FILTER, photoDates, photoRows, photosOfClub, photosOfItem, photosOfSim, sortPhotos, suggest, type AlbumFilter, type Namer, type PhotoData, type PhotoItem, type PhotoRow, type SortMode } from '../../lib/album';
+import { albumFilterOn, filterPhotos, groupPhotos, hasRange, itemKey, rangeText, NO_ALBUM_FILTER, photoDates, photoRows, photosOfClub, photosOfLegacy, photosOfItem, photosOfStory, photosOfSim, sortPhotos, suggest, type AlbumFilter, type Namer, type PhotoData, type PhotoItem, type PhotoRow, type SortMode } from '../../lib/album';
 import { clubRows, GET_TOGETHER } from '../../lib/clubs';
 import { PhotoError, PHOTO_MESSAGES, preparePhoto, usePhotos, type Prepared } from '../../lib/photos';
 import { go, savePath } from '../../lib/router';
@@ -12,6 +12,7 @@ import { useRecords, useStore } from '../../lib/sync/react';
 import type { SaveRow } from '../../lib/sync/types';
 import { dateOf, dayOf, SEASONS, type SimDate } from '../../lib/time';
 import { fullName, simData } from '../../lib/sims';
+import { genData, genLabel, genRows, legacyData, legacyRows } from '../../lib/legacy';
 import { normalize, plural } from '../../lib/text';
 import { useIsPhone } from '../../lib/useIsPhone';
 import { SimAvatar, useSaveInfo } from '../sims/shared';
@@ -24,6 +25,8 @@ export function useAlbum(save: SaveRow) {
   const events = useRecords('event');
   const trips = useRecords('vacation');
   const clubRecs = useRecords('club');
+  const legacyRecs = useRecords('legacy');
+  const genRecs = useRecords('generation');
   const info = useSaveInfo(save);
   return useMemo(() => {
     const sims = new Map(simRecs.map((r) => [r.id, simData(r)]));
@@ -33,6 +36,8 @@ export function useAlbum(save: SaveRow) {
       : String((lists[item.kind].find((r) => r.id === item.id)?.data as { name?: string } | undefined)?.name || 'A calendar item'));
     const clubs = clubRows(clubRecs);
     const clubName = (id: string) => clubs.find((c) => c.id === id)?.club.name ?? '';
+    const legacyName = (id: string) => legacyData(legacyRecs.find((r) => r.id === id)).name;
+    const genName = (id: string) => { const r = genRecs.find((x) => x.id === id); return r ? genLabel(genData(r)) : ''; };
     const clubsOn = info.d.packs.includes(GET_TOGETHER);
     const namer: Namer = { simName: nameOf, occasionName, clubName };
     const rows = sortPhotos(photoRows(recs), info.track);
@@ -47,8 +52,8 @@ export function useAlbum(save: SaveRow) {
       if (item.kind === 'holiday' && typeof d?.season === 'number' && typeof d.day === 'number') return `Every ${SEASONS[d.season]} · Day ${d.day}`;
       return '';
     };
-    return { rows, sims, nameOf, occasionName, occasionWhen, clubs, clubName, clubsOn, namer, info, cal, dates: (p: PhotoData) => photoDates(p, cal) };
-  }, [recs, simRecs, holidays, events, trips, clubRecs, info]);
+    return { rows, sims, nameOf, occasionName, occasionWhen, clubs, clubName, legacyName, genName, clubsOn, namer, info, cal, dates: (p: PhotoData) => photoDates(p, cal) };
+  }, [recs, simRecs, holidays, events, trips, clubRecs, info, legacyRecs, genRecs]);
 }
 type Album = ReturnType<typeof useAlbum>;
 
@@ -61,7 +66,7 @@ const openFrom = (saveId: string, rows: PhotoRow[]) => { viewList = { saveId, id
 const gridState = new Map<string, { f: AlbumFilter; sort: SortMode }>();
 
 // ---------- adding and editing ----------
-type Preset = { item?: PhotoItem | null; simIds?: string[]; gameDay?: number | null; clubId?: string | null };
+type Preset = { item?: PhotoItem | null; simIds?: string[]; gameDay?: number | null; clubId?: string | null; storylineId?: string | null; legacyId?: string | null; genId?: string | null };
 
 /** Choose a file, then fill in the details. Photos are saved at their natural shape (no cropping). */
 export function usePhotoAdder(save: SaveRow, preset: Preset = {}) {
@@ -99,13 +104,25 @@ function PhotoForm({ save, prep, existing, preset = {}, onClose }: {
     simIds: start?.simIds ?? preset.simIds ?? [],
     gameDay: start ? start.gameDay : preset.gameDay !== undefined ? preset.gameDay : info.track ? info.today : null,
     clubId: start ? start.clubId : preset.clubId ?? null,
+    legacyId: start ? start.legacyId : preset.legacyId ?? null,
+    genId: start ? start.genId : preset.genId ?? null,
   }));
-  const [view, setView] = useState<'form' | 'sims' | 'club'>('form');
+  const legacies = useRecords('legacy');
+  const gens = useRecords('generation');
+  const tagOptions = useMemo(() => legacyRows(legacies).flatMap((l) => [
+    { legacyId: l.id, genId: null as string | null, label: l.l.name || 'Unnamed legacy' },
+    ...genRows(gens).filter((g) => g.g.legacy === l.id).map((g) => ({ legacyId: l.id, genId: g.id as string | null, label: `${l.l.name || 'Legacy'} · ${genLabel(g.g)}${g.g.title ? ` · ${g.g.title}` : ''}` })),
+  ]), [legacies, gens]);
+  const tagText = (legacyId: string | null, genId: string | null) => {
+    const l = legacies.find((r) => r.id === legacyId); const g = gens.find((r) => r.id === genId);
+    return `${l ? legacyData(l).name || 'Legacy' : 'Removed legacy'}${genId ? ` · ${g ? genLabel(genData(g)) : 'Removed generation'}` : ''}`;
+  };
+  const [view, setView] = useState<'form' | 'sims' | 'club' | 'tag'>('form');
   const [lq, setLq] = useState('');
   const [busy, setBusy] = useState(false);
   const [del, setDel] = useState(false);
   const item = start ? start.item : preset.item ?? null;
-  const dirty = !!prep || f.caption !== (start?.caption ?? '') || f.gameDay !== (start?.gameDay ?? null) || f.simIds.join() !== (start?.simIds ?? []).join() || f.clubId !== (start?.clubId ?? null);
+  const dirty = !!prep || f.caption !== (start?.caption ?? '') || f.gameDay !== (start?.gameDay ?? null) || f.simIds.join() !== (start?.simIds ?? []).join() || f.clubId !== (start?.clubId ?? null) || f.legacyId !== (start?.legacyId ?? null) || f.genId !== (start?.genId ?? null);
   const simOptions = useMemo(() => [...album.sims.entries()].map(([id, s]) => ({ id, label: fullName(s) })).sort((a, b) => a.label.localeCompare(b.label)), [album.sims]);
   const cal = info.cal;
   const clamp = (d: number) => Math.max(0, d);
@@ -114,7 +131,7 @@ function PhotoForm({ save, prep, existing, preset = {}, onClose }: {
     if (busy) return;
     setBusy(true);
     try {
-      const data = { caption: f.caption.trim(), simIds: f.simIds, gameDay: info.track ? f.gameDay : null, item, clubId: f.clubId };
+      const data = { caption: f.caption.trim(), simIds: f.simIds, gameDay: info.track ? f.gameDay : null, item, clubId: f.clubId, storylineId: start ? start.storylineId : preset.storylineId ?? null, legacyId: f.legacyId, genId: f.legacyId ? f.genId : null };
       if (existing) {
         store.put('photo', { ...existing.p, ...data }, existing.id);
         toast('Saved');
@@ -134,11 +151,11 @@ function PhotoForm({ save, prep, existing, preset = {}, onClose }: {
     <Modal title={view === 'form' ? (existing ? 'Edit photo' : 'Add a photo') : (
       <span className="ph-ft">
         <button type="button" className="ph-ft-back" aria-label="Back" onClick={() => { setLq(''); setView('form'); }}><CaretLeft size={22} weight="bold" /></button>
-        <span>{view === 'sims' ? 'Sims in this photo' : 'Club'}</span>
+        <span>{view === 'sims' ? 'Sims in this photo' : view === 'tag' ? 'Add tag' : 'Club'}</span>
         {view === 'club' && f.clubId && <button type="button" className="ph-ft-clear" onClick={() => { setF({ ...f, clubId: null }); setView('form'); }}>Clear</button>}
       </span>
     )} onClose={onClose} dirty={dirty} className="pinned ph-modal"
-      footer={view === 'sims' ? <button type="button" className="btn primary" onClick={() => { setLq(''); setView('form'); }}>{f.simIds.length ? `Done · ${f.simIds.length} selected` : 'Done'}</button> : view === 'club' ? undefined : (close) => (
+      footer={view === 'tag' ? undefined : view === 'sims' ? <button type="button" className="btn primary" onClick={() => { setLq(''); setView('form'); }}>{f.simIds.length ? `Done · ${f.simIds.length} selected` : 'Done'}</button> : view === 'club' ? undefined : (close) => (
         <>
           {existing && <button type="button" className="btn ghost danger" style={{ marginRight: 'auto' }} onClick={() => setDel(true)}><Trash size={16} weight="duotone" /> Delete</button>}
           <button type="button" className="btn" onClick={close}>Cancel</button>
@@ -180,6 +197,18 @@ function PhotoForm({ save, prep, existing, preset = {}, onClose }: {
           </div>
         </div>
       )}
+      {view === 'tag' && (
+        <div className="ph-pk">
+          <div className="ph-pk-search"><SearchBox value={lq} onChange={setLq} placeholder="Search legacies and generations" /></div>
+          <div className="ph-pk-list" role="listbox" aria-label="Tags">
+            {tagOptions.filter((o) => !lq.trim() || normalize(o.label).includes(normalize(lq))).map((o) => (
+              <button key={`${o.legacyId}/${o.genId ?? ''}`} type="button" role="option" aria-selected={f.legacyId === o.legacyId && f.genId === o.genId} className="ph-pk-opt" onClick={() => { setF({ ...f, legacyId: o.legacyId, genId: o.genId }); setLq(''); setView('form'); }}>
+                <span className="ph-pk-ot"><span className="ph-pk-t">{o.label}</span></span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       <form className="stack" style={{ gap: 16, display: view === 'form' ? undefined : 'none' }} onSubmit={(e) => { e.preventDefault(); void save_(); }}>
         <div className="ph-preview">
           {prep ? <img src={prep.previewUrl} alt="Your new photo" /> : existing && <PhotoBox photo={existing.p.photo} aspect={existing.p.photo.w / existing.p.photo.h} alt={existing.p.caption} />}
@@ -197,6 +226,20 @@ function PhotoForm({ save, prep, existing, preset = {}, onClose }: {
             <button type="button" className="ph-fld" aria-label={`Club: ${f.clubId ? album.clubName(f.clubId) || 'A removed club' : 'None'}. ${f.clubId ? 'Change' : 'Choose'}`} onClick={() => { setLq(''); setView('club'); }}>
               <span className={f.clubId ? '' : 'ph-fld-empty'}>{f.clubId ? album.clubName(f.clubId) || 'A removed club' : 'None'}</span><small>{f.clubId ? 'Change' : 'Choose'}</small>
             </button>
+          </div>
+        )}
+        {(f.legacyId || tagOptions.length > 0) && (
+          <div className="field">
+            <span className="label">Tags</span>
+            <div className="ph-tags">
+              {f.legacyId && (
+                <span className="tag legacy ph-tag">
+                  <Crown size={14} weight="duotone" color="var(--accent)" aria-hidden="true" />{tagText(f.legacyId, f.genId)}
+                  <button type="button" className="club-x" aria-label={`Remove tag ${tagText(f.legacyId, f.genId)}`} onClick={() => setF({ ...f, legacyId: null, genId: null })}><X size={14} weight="bold" /></button>
+                </span>
+              )}
+              {!f.legacyId && <button type="button" className="btn ph-addtag" onClick={() => { setLq(''); setView('tag'); }}><Plus size={14} weight="bold" /> Add tag</button>}
+            </div>
           </div>
         )}
         {info.track && (
@@ -261,6 +304,43 @@ export function ClubPhotos({ save, clubId }: { save: SaveRow; clubId: string }) 
       <div className="card-head"><h2>Photos{rows.length > 0 && <span className="cnt">{rows.length}</span>}</h2></div>
       {rows.length > 0 ? <PhotoStrip save={save} rows={rows} album={album} /> : <p className="muted small" style={{ margin: '0 0 10px' }}>No photos yet.</p>}
       <button type="button" className="btn sm" onClick={adder.start}><Camera size={15} weight="duotone" /> Add photo</button>
+      {adder.ui}
+    </section>
+  );
+}
+
+/** The Pictures card on a storyline's page: photos tagged with it, and an Add button. */
+export function StoryPhotos({ save, storylineId }: { save: SaveRow; storylineId: string }) {
+  const album = useAlbum(save);
+  const adder = usePhotoAdder(save, { storylineId });
+  const rows = photosOfStory(album.rows, storylineId, album.info.track);
+  return (
+    <section className="card sl-card">
+      <div className="card-head"><h2>Pictures{rows.length > 0 && <span className="cnt">{rows.length}</span>}</h2>
+        <button type="button" className="btn sm" onClick={adder.start}><Plus size={15} weight="bold" /> Add</button>
+      </div>
+      {rows.length > 0 ? <PhotoStrip save={save} rows={rows} album={album} /> : <p className="muted small" style={{ margin: 0 }}>No pictures yet. They also show up in Photos.</p>}
+      {adder.ui}
+    </section>
+  );
+}
+
+/** The Photos card on a legacy or generation page: one 72px scrolling strip that ends in an Add tile. New photos are tagged with the page they're added from. */
+export function LegacyPhotos({ save, legacyId, genId }: { save: SaveRow; legacyId: string; genId?: string }) {
+  const album = useAlbum(save);
+  const adder = usePhotoAdder(save, { legacyId, genId: genId ?? null });
+  const rows = photosOfLegacy(album.rows, legacyId, album.info.track, genId);
+  return (
+    <section className="card sl-card lg-photos">
+      <div className="card-head"><h2>Photos{rows.length > 0 && <span className="cnt">{rows.length}</span>}</h2></div>
+      <div className="lg-strip">
+        {rows.map((r) => (
+          <a key={r.id} className="lg-ph" href={savePath(save.id, `photos/${r.id}`)} onClick={() => openFrom(save.id, rows)} aria-label={r.p.caption || album.dates(r.p).main || 'Photo'}>
+            <PhotoBox photo={r.p.photo} aspect={1} size="thumb" />
+          </a>
+        ))}
+        <button type="button" className="lg-ph add" aria-label="Add photo" onClick={adder.start}><Plus size={20} weight="bold" /></button>
+      </div>
       {adder.ui}
     </section>
   );
@@ -702,6 +782,7 @@ function PhotoPage({ save, photoId }: { save: SaveRow; photoId: string }) {
           </div>
         )}
         {item && <a className="ph-from" href={savePath(save.id, `calendar/${item.kind}/${item.id}`)}>From {itemName}</a>}
+        {p.legacyId && album.legacyName(p.legacyId) && <a className="ph-from" href={savePath(save.id, `legacy/${p.legacyId}${p.genId ? `/${p.genId}` : ''}`)}>Legacy: {album.legacyName(p.legacyId)}{p.genId && album.genName(p.genId) ? ` · ${album.genName(p.genId)}` : ''}</a>}
         {p.clubId && album.clubName(p.clubId) && <a className="ph-from" href={savePath(save.id, `clubs/${p.clubId}`)}>Club: {album.clubName(p.clubId)}</a>}
       </div>
       {editing && <PhotoForm save={save} existing={row} onClose={() => setEditing(false)} />}

@@ -1,14 +1,15 @@
 import { SimPhotos } from '../photos/PhotosPage';
 import { SimClubs } from '../clubs/SimClubs';
+import { SimStorylines } from '../storylines/StorylinesPage';
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
-  ArrowUp, Briefcase, CalendarBlank, Camera, CaretLeft, CaretRight, DotsThree, Fire, HeartBreak, Hourglass, ThumbsDown, ThumbsUp, HouseSimple, LockSimple, PencilSimple, Plus,
+  ArrowUp, Briefcase, CalendarBlank, Camera, CaretLeft, CaretRight, DotsThree, Fire, HeartBreak, Hourglass, Note, ThumbsDown, ThumbsUp, HouseSimple, LockSimple, PencilSimple, Plus,
   User, X, MagnifyingGlass, UsersThree, Baby, HeartStraight, Heart, Diamond, Star, Smiley, Lightning, Bed, TreeStructure, type Icon,
 } from '@phosphor-icons/react';
 import { DateFields } from '../../components/savebits';
 import { AgeFields, bornDayFromInput, defaultAge, inputFromBornDay, type AgeInput } from '../../components/AgeFields';
 import { PhotoBox, usePhotoPicker } from '../../components/photo';
-import { AutoText, Confirm, Field, Modal, Picker, Seg, TextInput, Toggle, toast } from '../../components/ui';
+import { AutoText, Confirm, Field, Modal, Picker, Seg, Sheet, TextInput, Toggle, toast } from '../../components/ui';
 import { useLayer } from '../../lib/layers';
 import { usePhotos, type PhotoRef } from '../../lib/photos';
 import { go, savePath } from '../../lib/router';
@@ -92,7 +93,7 @@ export function SimProfile({ save, simId }: { save: SaveRow; simId: string }) {
   const ctx: Ctx = {
     info, sim, rec, age, realAge, stage, name, hhName, members, myRels, sims, custom: custom.list, coming,
     canAgeUp, nextManual, ageUp, setPortrait, setStagePhotos, update,
-    edit: () => setDialog('edit'), markDeceased: () => setDialog('deceased'), bringBack: () => { update({ deceased: null }); toast(`${sim.first} is back`); },
+    edit: () => setDialog('edit'), toggleTownie: () => { update({ townie: !sim.townie }); toast(sim.townie ? `${sim.first} is no longer a Townie` : `${sim.first} is a Townie`); }, togglePlanned: () => { update({ planned: !sim.planned }); toast(sim.planned ? `${sim.first} is marked as created` : `${sim.first} is marked as planned`); }, markDeceased: () => setDialog('deceased'), bringBack: () => { update({ deceased: null }); toast(`${sim.first} is back`); },
     del: () => setDialog('delete'), addRel: () => setDialog({ rel: null }), editRel: (r) => setDialog({ rel: r }),
     addStagePhoto: () => setDialog('stagePhoto'), saveId: save.id, save,
   };
@@ -129,7 +130,7 @@ type Ctx = {
   myRels: { rec: Rec; d: RelData }[]; sims: Rec[]; custom: { id: string; name: string }[]; coming: Coming | null;
   canAgeUp: boolean; nextManual: StageId | null; ageUp(): void; setPortrait(p: PhotoRef | null): void;
   setStagePhotos(l: SimData['stagePhotos']): void; update(p: Partial<SimData>): void;
-  edit(): void; markDeceased(): void; bringBack(): void; del(): void; addRel(): void; editRel(r: Rec): void; addStagePhoto(): void; saveId: string; save: SaveRow;
+  edit(): void; togglePlanned(): void; toggleTownie(): void; markDeceased(): void; bringBack(): void; del(): void; addRel(): void; editRel(r: Rec): void; addStagePhoto(): void; saveId: string; save: SaveRow;
 };
 
 type Coming = { title: string; when: string; date: string; short: string };
@@ -292,6 +293,8 @@ function MoreMenu({ c, onClose }: { c: Ctx; onClose(): void }) {
     <div className="combo-list more-menu" role="menu" ref={ref}>
       {c.canAgeUp && c.nextManual && item(`Age up to ${stageName(c.nextManual).toLowerCase()}`, c.ageUp)}
       {c.sim.deceased ? item('Bring back to life', c.bringBack) : item('Mark as deceased', c.markDeceased)}
+      {!c.sim.deceased && item(c.sim.planned ? 'Mark as created' : 'Mark as planned', c.togglePlanned)}
+      {item(c.sim.townie ? 'Not a Townie' : 'Mark as Townie', c.toggleTownie)}
       {item('Delete Sim', c.del, true)}
     </div>
   );
@@ -323,6 +326,7 @@ function DesktopProfile({ c }: { c: Ctx }) {
             <LikesBody c={c} phone={false} />
           </section>
           <SimClubs save={c.save} simId={c.rec.id} />
+          <SimStorylines save={c.save} simId={c.rec.id} />
         </div>
         <div className="stack" style={{ gap: 16 }}>
           <ComingUp save={c.save} simIds={[c.rec.id]} seeAll={`calendar/sim/${c.rec.id}`} />
@@ -349,8 +353,16 @@ function DesktopProfile({ c }: { c: Ctx }) {
 function PhoneProfile({ c }: { c: Ctx }) {
   const picker = usePhotoPicker({ aspect: 1, saveId: c.saveId, label: 'Portrait' });
   const back = <a className="pp-round" href={savePath(c.saveId, 'sims')} aria-label="Back to Sims"><CaretLeft size={20} weight="bold" /></a>;
-  const edit = <button type="button" className="pp-edit" onClick={c.edit}>Edit</button>;
-  const subline = [c.sim.deceased ? 'Deceased' : c.stage ? stageName(c.stage) : 'Age not set', c.sim.occult ? occultName(c.sim.occult) : '', c.hhName ? householdLabel(c.hhName) : '']
+  const [more, setMore] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
+  const [likesOpen, setLikesOpen] = useState(false);
+  const edit = (
+    <span className="row" style={{ gap: 6, flexWrap: 'nowrap' }}>
+      <button type="button" className="pp-edit" onClick={c.edit}>Edit</button>
+      <button type="button" className="pp-edit pp-more" aria-label="More" aria-haspopup="dialog" onClick={() => setMore(true)}><DotsThree size={20} weight="bold" /></button>
+    </span>
+  );
+  const subline = [c.sim.deceased ? 'Deceased' : c.stage ? stageName(c.stage) : 'Age not set', c.sim.planned ? 'Planned' : '', c.sim.townie ? 'Townie' : '', c.sim.occult ? occultName(c.sim.occult) : '', c.hhName ? householdLabel(c.hhName) : '']
     .filter(Boolean).join(' · ');
 
   const [relEdit, setRelEdit] = useState(false);
@@ -358,19 +370,37 @@ function PhoneProfile({ c }: { c: Ctx }) {
     <div className="m-stack pp-body cp">
       {!c.sim.portrait && <CompactHero c={c} phone />}
       {c.sim.portrait && <CompactLine c={c} />}
-      <div className="m-label edit-label"><span>Relationships</span>
-        <span className="row" style={{ gap: 2, flexWrap: 'nowrap' }}>
-          {c.myRels.length > 0 && <button type="button" className={`btn ghost icon sm${relEdit ? ' on' : ''}`} aria-pressed={relEdit} aria-label="Edit relationships" onClick={() => setRelEdit((x) => !x)}><PencilSimple size={16} /></button>}
-          <button type="button" className="link-btn m-add" onClick={c.addRel}><Plus size={14} weight="bold" /> Add</button>
-        </span>
-      </div>
-      <div className="m-group cp-pad"><RelGroups c={c} phone editing={relEdit} /></div>
+      {c.myRels.length === 0 ? (
+        <div className="pp-adds">
+          <button type="button" className="tb-btn" onClick={c.addRel}><Plus size={16} weight="bold" /> Relationship</button>
+        </div>
+      ) : (
+        <>
+          <div className="m-label edit-label"><span>Relationships</span>
+            <span className="row" style={{ gap: 2, flexWrap: 'nowrap' }}>
+              <button type="button" className={`btn ghost icon sm${relEdit ? ' on' : ''}`} aria-pressed={relEdit} aria-label="Edit relationships" onClick={() => setRelEdit((x) => !x)}><PencilSimple size={16} /></button>
+              <button type="button" className="link-btn m-add" onClick={c.addRel}><Plus size={14} weight="bold" /> Add</button>
+            </span>
+          </div>
+          <div className="m-group cp-pad"><RelGroups c={c} phone editing={relEdit} /></div>
+        </>
+      )}
       <ComingUp save={c.save} simIds={[c.rec.id]} seeAll={`calendar/sim/${c.rec.id}`} />
       <div className="m-label">About</div>
       <div className="m-group cp-pad"><AboutRows c={c} phone /></div>
-      <div className="m-label">Likes and turn ons</div>
-      <div className="m-group cp-pad"><LikesBody c={c} phone /></div>
+      {LIKE_FIELDS.every((f) => c.sim[f.k].length === 0) && !likesOpen ? (
+        <button type="button" className="m-group m-row" onClick={() => setLikesOpen(true)}>
+          <span className="pp-likeicons">{LIKE_FIELDS.map((f) => <span key={f.k}>{LIKE_ICONS[f.k]}</span>)}</span>
+          <span className="t grow" style={{ color: 'var(--muted)', fontWeight: 400 }}>Add likes and turn ons</span>
+        </button>
+      ) : (
+        <>
+          <div className="m-label">Likes and turn ons</div>
+          <div className="m-group cp-pad"><LikesBody c={c} phone /></div>
+        </>
+      )}
       <SimClubs save={c.save} simId={c.rec.id} phone />
+      <SimStorylines save={c.save} simId={c.rec.id} phone />
       {c.hhName && (
         <>
           <div className="m-label edit-label"><span>{householdLabel(c.hhName)}</span>
@@ -379,14 +409,26 @@ function PhoneProfile({ c }: { c: Ctx }) {
         </>
       )}
       <SimMoney save={c.save} simId={c.rec.id} hhId={c.sim.householdId} phone />
-      <div className="m-label">Notes</div>
-      <Notes c={c} />
+      {c.sim.notes || notesOpen ? (
+        <>
+          <div className="m-label">Notes</div>
+          <Notes c={c} />
+        </>
+      ) : (
+        <button type="button" className="m-group m-row" onClick={() => setNotesOpen(true)}><span className="obj photos"><Note size={16} weight="duotone" /></span><span className="t grow" style={{ color: 'var(--muted)', fontWeight: 400 }}>Add a note</span></button>
+      )}
       <PhotosAndYears c={c} phone />
-      <div className="m-group">
-        {c.canAgeUp && c.nextManual && <button type="button" className="m-row" onClick={c.ageUp}><span className="t grow">Age up to {stageName(c.nextManual).toLowerCase()}</span><CaretRight size={16} weight="bold" className="chev" /></button>}
-        <button type="button" className="m-row" onClick={c.sim.deceased ? c.bringBack : c.markDeceased}><span className="t grow">{c.sim.deceased ? 'Bring back to life' : 'Mark as deceased'}</span><CaretRight size={16} weight="bold" className="chev" /></button>
-        <button type="button" className="m-row" onClick={c.del}><span className="t grow" style={{ color: 'var(--danger)' }}>Delete Sim</span></button>
-      </div>
+      {more && (
+        <Sheet title={c.name} onClose={() => setMore(false)}>
+          <div className="m-group">
+            {c.canAgeUp && c.nextManual && <button type="button" className="m-row" onClick={() => { setMore(false); c.ageUp(); }}><span className="t grow">Age up to {stageName(c.nextManual).toLowerCase()}</span></button>}
+            <button type="button" className="m-row" onClick={() => { setMore(false); (c.sim.deceased ? c.bringBack : c.markDeceased)(); }}><span className="t grow">{c.sim.deceased ? 'Bring back to life' : 'Mark as deceased'}</span></button>
+            {!c.sim.deceased && <button type="button" className="m-row" onClick={() => { setMore(false); c.togglePlanned(); }}><span className="t grow">{c.sim.planned ? 'Mark as created' : 'Mark as planned'}</span></button>}
+            <button type="button" className="m-row" onClick={() => { setMore(false); c.toggleTownie(); }}><span className="t grow">{c.sim.townie ? 'Not a Townie' : 'Mark as Townie'}</span></button>
+            <button type="button" className="m-row" onClick={() => { setMore(false); c.del(); }}><span className="t grow" style={{ color: 'var(--danger)' }}>Delete Sim</span></button>
+          </div>
+        </Sheet>
+      )}
       {picker.ui}
     </div>
   );
@@ -1051,6 +1093,8 @@ function CompactLine({ c }: { c: Ctx }) {
     <div className="cp-under">
       <div className="cp-line">
         <button type="button" className="cp-it cp-age" onClick={() => setAgeOpen(true)}><b>{c.sim.deceased ? 'Deceased' : c.stage ? stageName(c.stage) : 'Age not set'}</b>{age ? <> · {age}</> : null}</button>
+        {c.sim.planned && <span className="cp-it"><b>Planned</b></span>}
+        {c.sim.townie && <span className="cp-it"><b>Townie</b></span>}
         {bday && <span className="cp-it"><CalendarBlank size={16} aria-hidden="true" />{bday}</span>}
       </div>
       {al && <button type="button" className="cp-agebar" onClick={() => setAgeOpen(true)}><span className="bar"><i style={{ width: `${Math.max(3, al.pct)}%` }} /></span>{al.next}</button>}

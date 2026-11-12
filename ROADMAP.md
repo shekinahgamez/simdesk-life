@@ -11,6 +11,7 @@ Things the owner has asked for that come after the current phase. Newest ideas g
 - A cleanup pass of small fixes once every v1 page exists
 
 ## Done
+- Lore & Storylines: storylines with beats, secrets (who knows what), feelings, Content tab, filters, list/cards/board, pictures, Sim profile card
 - Account page and backups (computer only): password change, backup file with or without photos, spreadsheet and photos downloads, restore as a new save
 - Playing now: Add a day, Pause rotation, Play someone else
 - Fewer clicks (boards 1 to 10): tap a household cell to pick one, Select mode for moving Sims in bulk, relationship picker with housemates first and Save and add another, tap a profile row to edit it with Undo, Next day / Jump ahead / Go back, Pick a home lists the game's lots, compact Sim profile, Today page instead of the deck, smaller world and household page controls, tighter club page with a pencil per card

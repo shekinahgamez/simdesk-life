@@ -19,6 +19,11 @@ export type PhotoData = {
   item: PhotoItem | null;
   /** The club it's tagged with (a club id), or null. */
   clubId: string | null;
+  /** The storyline it's tagged with (a storyline id), or null. */
+  storylineId: string | null;
+  /** The legacy it's tagged with (a legacy id), and the generation (a generation id), or null. */
+  legacyId: string | null;
+  genId: string | null;
 };
 
 export function photoData(r: Rec | undefined): PhotoData | null {
@@ -32,6 +37,9 @@ export function photoData(r: Rec | undefined): PhotoData | null {
     added: d.added ?? r?.edited_at ?? new Date(0).toISOString(),
     item: d.item && d.item.id ? d.item : null,
     clubId: typeof d.clubId === 'string' && d.clubId ? d.clubId : null,
+    storylineId: typeof d.storylineId === 'string' && d.storylineId ? d.storylineId : null,
+    legacyId: typeof d.legacyId === 'string' && d.legacyId ? d.legacyId : null,
+    genId: typeof d.genId === 'string' && d.genId ? d.genId : null,
   };
 }
 
@@ -75,6 +83,9 @@ export function photoDates(p: Pick<PhotoData, 'gameDay' | 'added'>, cal: Calenda
 /** Photos of one Sim (tagged in them), newest first. */
 export const photosOfSim = (rows: PhotoRow[], simId: string, tracksDate: boolean) => sortPhotos(rows.filter((r) => r.p.simIds.includes(simId)), tracksDate);
 /** Photos tagged with one club. */
+export const photosOfStory = (rows: PhotoRow[], storylineId: string, tracksDate: boolean) => sortPhotos(rows.filter((r) => r.p.storylineId === storylineId), tracksDate);
+/** Photos tagged with a legacy (any generation) or, when `genId` is given, with that generation only. */
+export const photosOfLegacy = (rows: PhotoRow[], legacyId: string, tracksDate: boolean, genId?: string) => sortPhotos(rows.filter((r) => r.p.legacyId === legacyId && (!genId || r.p.genId === genId)), tracksDate);
 export const photosOfClub = (rows: PhotoRow[], clubId: string, tracksDate: boolean) => sortPhotos(rows.filter((r) => r.p.clubId === clubId), tracksDate);
 /** Photos attached to one calendar item. */
 export const photosOfItem = (rows: PhotoRow[], kind: PhotoItemKind, id: string, tracksDate: boolean) =>

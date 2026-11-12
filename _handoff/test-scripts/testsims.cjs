@@ -70,19 +70,19 @@ const shots = process.env.SHOTS;
     await p.getByRole('button', { name: /^Filter/ }).click(); await wait(p, 400);
     await p.getByRole('button', { name: 'Male', exact: true }).click(); await wait(p, 200);
     await p.getByRole('button', { name: /^Show 1 Sim$/ }).click(); await wait(p, 400);
-    ok(await p.locator(phone ? '.sim-card' : 'tbody tr').count() === 1, `${n} gender filter`);
+    ok(await p.locator(phone ? '.sim-mrow' : 'tbody tr').count() === 1, `${n} gender filter`);
     await p.getByRole('button', { name: 'Clear', exact: true }).click(); await wait(p, 200);
     await p.getByRole('button', { name: 'Quick add' }).first().click(); await wait(p, 300);
     await p.getByLabel('Names').fill('Rafael Banks\nAdaeze Okafor');
     await p.getByRole('button', { name: 'Add 2 Sims' }).click(); await wait(p, 1500);
     ok(sims(st, sid).length === 4, `${n} quick add`);
-    ok(await p.locator(phone ? '.sim-card' : 'tbody tr').count() === 4, `${n} four in the list`);
+    ok(await p.locator(phone ? '.sim-mrow' : 'tbody tr').count() === 4, `${n} four in the list`);
 
     // profile: relationships, photo, deceased
     const marId = mar.id;
     await p.goto(`http://localhost:4173/#/s/${sid}/sims/${marId}`); await wait(p, 1000);
     // compact profile (Nov 2026): no tabs; relationship dialog has housemate chips, type tiles, names + secret behind a link
-    await p.getByRole('button', { name: 'Add', exact: true }).first().click(); await wait(p, 300);
+    await p.getByRole('button', { name: phone ? 'Relationship' : 'Add', exact: true }).first().click(); await wait(p, 300);
     const rd = p.getByRole('dialog');
     const chip = rd.locator('.rel-mate', { hasText: 'Desmond Okafor' });
     if (await chip.count()) await chip.click();
@@ -122,20 +122,20 @@ const shots = process.env.SHOTS;
     await ed.getByRole('button', { name: 'Save changes' }).click(); await wait(p, 1500);
     ok(Object.keys(st.photos).length === 0 && Object.keys(st.files).length === 0, `${n} removed photo deleted from storage`);
 
-    if (phone) await p.getByRole('button', { name: 'Mark as deceased' }).click();
+    if (phone) { await p.getByRole('button', { name: 'More', exact: true }).click(); await wait(p, 400); await p.getByRole('button', { name: 'Mark as deceased' }).click(); }
     else { await p.getByRole('button', { name: 'More', exact: true }).click(); await p.getByRole('menuitem', { name: 'Mark as deceased' }).click(); }
     await wait(p, 300);
     await p.getByLabel('Cause (optional)').fill('Pufferfish');
     await p.getByRole('dialog').getByRole('button', { name: 'Mark as deceased' }).click(); await wait(p, 800);
     ok(await p.getByText(/Passed/).first().isVisible(), `${n} deceased shows passed`);
     await p.goto(`http://localhost:4173/#/s/${sid}/sims`); await wait(p, 800);
-    ok(await p.locator(phone ? '.sim-card' : 'tbody tr').count() === 3, `${n} deceased leave the living list`);
+    ok(await p.locator(phone ? '.sim-mrow' : 'tbody tr').count() === 3, `${n} deceased leave the living list`);
     if (!phone) ok(await p.getByText('3 living · 1 deceased').isVisible(), `${n} counts`);
 
     // delete Desmond (with his relationship), then restore from Trash
     const desId = sims(st, sid).find((r) => r.data.first === 'Desmond').id;
     await p.goto(`http://localhost:4173/#/s/${sid}/sims/${desId}`); await wait(p, 800);
-    if (phone) await p.getByRole('button', { name: 'Delete Sim' }).click();
+    if (phone) { await p.getByRole('button', { name: 'More', exact: true }).click(); await wait(p, 400); await p.getByRole('button', { name: 'Delete Sim' }).click(); }
     else { await p.getByRole('button', { name: 'More', exact: true }).click(); await p.getByRole('menuitem', { name: 'Delete Sim' }).click(); }
     await p.getByRole('alertdialog').getByRole('button', { name: 'Delete', exact: true }).click();
     await p.waitForURL(/\/sims$/); await wait(p, 1200);

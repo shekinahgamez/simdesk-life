@@ -211,3 +211,13 @@ export function finalChapterDay(bornDay: number, table: StageRow[]): number {
   const elder = table[table.length - 1];
   return bornDay + elder.start + elder.days;
 }
+
+// ---------- dates that aren't exact (Storylines) ----------
+/** "−3" for year -3 (a real minus sign). */
+export const yearText = (y: number) => (y < 0 ? `\u2212${-y}` : String(y));
+
+/** The stand-in day number for "some time in this season" (its middle day) or "some time in this year" (the start of Fall, the middle of the year). */
+export function approxDay(kind: 'season' | 'year', year: number, season: Season, cal: Calendar): number {
+  const len = cal.seasonLength;
+  return dayOf(kind === 'season' ? { year, season, day: Math.ceil(len / 2) } : { year, season: 2, day: 1 }, cal);
+}

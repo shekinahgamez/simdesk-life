@@ -46,11 +46,17 @@ export type SimData = {
   portrait: PhotoRef | null;
   stagePhotos: { stage: StageId; photo: PhotoRef }[];
   deceased: { day: number | null; cause: string; notes: string } | null;
+  /** True for a Sim added to the tracker but not created in the game yet. Cleared (left out) once created. */
+  planned?: boolean;
+  /** A Townie: lives nowhere and is never played (a hired worker, a regular). Hidden from the calendar; their birthday still shows on their own page. */
+  townie?: boolean;
   /** Words typed in by the player (see lib/likes.ts). */
   likes: string[];
   dislikes: string[];
   turnOns: string[];
   turnOffs: string[];
+  /** The Sim's id in the game, saved by Import from game so renamed Sims aren't copied. */
+  gameId?: string;
 };
 
 export const BLANK_SIM: SimData = {
@@ -176,10 +182,12 @@ export type Filters = {
   genders: Gender[];
   birthdayThisWeek: boolean;
   deceased: boolean;
+  /** Created in the game, still planned, or both. */
+  status: 'any' | 'created' | 'planned';
 };
-export const NO_FILTERS: Filters = { stages: [], households: [], genders: [], birthdayThisWeek: false, deceased: false };
+export const NO_FILTERS: Filters = { stages: [], households: [], genders: [], birthdayThisWeek: false, deceased: false, status: 'any' };
 export const filterCount = (f: Filters) =>
-  f.stages.length + f.households.length + f.genders.length + (f.birthdayThisWeek ? 1 : 0) + (f.deceased ? 1 : 0);
+  f.stages.length + f.households.length + f.genders.length + (f.birthdayThisWeek ? 1 : 0) + (f.deceased ? 1 : 0) + (f.status !== 'any' ? 1 : 0);
 
 /** "none" in the household filter means Sims with no household. */
 export const NO_HOUSEHOLD = 'none';
@@ -194,6 +202,8 @@ export function applyFilters(rows: SimRow[], f: Filters): SimRow[] {
   return rows.filter((r) => {
     // Deceased Sims only show when asked for, and then only them.
     if (!!r.sim.deceased !== f.deceased) return false;
+    if (f.status === 'planned' && !r.sim.planned) return false;
+    if (f.status === 'created' && r.sim.planned) return false;
     if (f.stages.length && (!r.stage || !f.stages.includes(r.stage))) return false;
     if (f.households.length && !f.households.includes(r.sim.householdId ?? NO_HOUSEHOLD)) return false;
     if (f.genders.length && (!r.sim.gender || !f.genders.includes(r.sim.gender))) return false;

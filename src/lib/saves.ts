@@ -1,4 +1,4 @@
-import { ArrowsClockwise, Briefcase, Coins, Crown, Lightbulb, Notebook, Path, Storefront, type Icon } from '@phosphor-icons/react';
+import { ArrowsClockwise, Briefcase, Coins, Crown, Notebook, Path, Storefront, type Icon } from '@phosphor-icons/react';
 import { BY_ID, GAME, ownedFrom } from '../data/game';
 import type { SaveRow } from './sync/types';
 import type { PhotoRef } from './photos';
@@ -32,6 +32,10 @@ export type SaveData = {
   backedUpAt?: string;
   /** Household funds module: mod add-ons and wealth classes (see money.ts). */
   money?: unknown;
+  /** Import from game: the game day and SimDesk day at the last import. */
+  gameLink?: { game: number; desk: number };
+  /** Businesses module: the editable list of business kinds (see businesses.ts). */
+  bizKinds?: string[];
 };
 
 export const SAVE_COLORS: { label: string; hex: string }[] = [
@@ -66,7 +70,9 @@ export function saveData(row: SaveRow | undefined): SaveData {
     cover: d.cover ?? null,
     rotation: d.rotation,
     backedUpAt: d.backedUpAt,
+    bizKinds: d.bizKinds,
     money: d.money,
+    gameLink: d.gameLink,
   };
 }
 
@@ -99,14 +105,13 @@ export const lifespanLabel = (l: Lifespan) => l.preset[0].toUpperCase() + l.pres
 export type ModuleDef = { id: string; label: string; desc: string; icon: Icon; tint: string; ready: boolean };
 /** Optional features. Only ready ones can be turned on; the rest say "Coming soon". */
 export const MODULES: ModuleDef[] = [
-  { id: 'rotation', label: 'Rotation', desc: 'Who’s up next and for how long', icon: ArrowsClockwise, tint: 'worlds', ready: true },
+  { id: 'rotation', label: 'Rotation', desc: 'Who’s up next and for how long', icon: ArrowsClockwise, tint: 'rotation', ready: true },
   { id: 'funds', label: 'Household funds', desc: 'Net worth for every household and Sim', icon: Coins, tint: 'households', ready: true },
   { id: 'careers', label: 'Careers', desc: 'Career, level and workplace', icon: Briefcase, tint: 'calendar', ready: false },
-  { id: 'venues', label: 'Businesses & venues', desc: 'Owners, employees and customer activities', icon: Storefront, tint: 'sims', ready: false },
-  { id: 'storylines', label: 'Storylines', desc: 'Threads that link Sims together', icon: Path, tint: 'storylines', ready: false },
+  { id: 'venues', label: 'Businesses', desc: 'Owners, staff, customers and a money log', icon: Storefront, tint: 'businesses', ready: true },
+  { id: 'storylines', label: 'Storylines', desc: 'Threads that link Sims together', icon: Path, tint: 'storylines', ready: true },
   { id: 'journal', label: 'Play journal', desc: 'Day-by-day notes', icon: Notebook, tint: 'clubs', ready: false },
-  { id: 'legacy', label: 'Legacy progress', desc: 'Generations, heirs and challenge rules', icon: Crown, tint: 'households', ready: false },
-  { id: 'prompts', label: 'Story prompts', desc: 'A nudge when you’re stuck on what’s next', icon: Lightbulb, tint: 'storylines', ready: false },
+  { id: 'legacy', label: 'Legacy', desc: 'Generations, heirs, goals and rules', icon: Crown, tint: 'households', ready: true },
 ];
 /** On only when the module has launched and the save switched it on. */
 export const moduleOn = (d: SaveData, id: string) => !!d.modules[id] && !!MODULES.find((m) => m.id === id)?.ready;

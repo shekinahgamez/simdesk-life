@@ -1,0 +1,52 @@
+/* Import from game (desktop only): the review sheet. One row per Sim, expanded on tap. */
+.gi-modal { max-width: 880px; }
+.gi-wrap { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.gi-cols { display: grid; grid-template-columns: 5fr 6fr; gap: 18px; align-items: start; }
+.gi-file { display: flex; align-items: center; gap: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.gi-file b { display: block; font-size: 14px; }
+.gi-file small { color: var(--muted); font-size: 12px; }
+.gi-file .btn { margin-left: auto; }
+.gi-ic { width: 36px; height: 36px; border-radius: 10px; background: var(--households-tint); color: var(--households-ink); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.gi-sec h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font: 700 13px/1 var(--font-body); color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.gi-link { margin-left: auto; border: 0; background: none; color: var(--accent); font: 600 13px var(--font-body); text-transform: none; letter-spacing: 0; cursor: pointer; min-height: 32px; padding: 0 4px; }
+.gi-list { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.gi-row { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 8px 12px; font-size: 14px; border-top: 1px solid var(--line); }
+.gi-list > .gi-row:first-child { border-top: 0; }
+.gi-what { flex: 1; min-width: 0; }
+.gi-what small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+.gi-was { color: var(--muted); text-decoration: line-through; margin-right: 4px; }
+.gi-tag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.gi-ck { width: 22px; height: 22px; padding: 0; border-radius: 6px; border: 2px solid var(--toggle-off); background: transparent; color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; position: relative; }
+.gi-ck::after { content: ''; position: absolute; inset: -9px; }
+.gi-ck.on, .gi-ck.some { background: var(--accent); border-color: var(--accent); }
+.gi-dash { width: 10px; height: 2px; border-radius: 1px; background: #fff; }
+.gi-sim { display: flex; align-items: center; gap: 12px; padding: 0 12px; min-height: 52px; border-top: 1px solid var(--line); }
+.gi-list > .gi-sim:first-child { border-top: 0; }
+.gi-sim.open { background: var(--bg); }
+.gi-simbtn { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; min-height: 52px; border: 0; background: none; padding: 0; color: inherit; font: inherit; cursor: pointer; text-align: left; }
+.gi-av { width: 32px; height: 32px; border-radius: 50%; background: var(--sims-tint); color: var(--sims-ink); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.gi-sim.fresh .gi-av { background: var(--accent-soft); color: var(--accent); }
+.gi-nm { font-weight: 600; font-size: 14px; min-width: 80px; }
+.gi-kinds { display: flex; gap: 6px; flex: 1; overflow: hidden; }
+.gi-k { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); background: var(--bg); border-radius: 8px; padding: 3px 7px; white-space: nowrap; }
+.gi-sim.open .gi-k { background: var(--surface); }
+.gi-car { color: var(--muted); flex-shrink: 0; transition: transform .15s; }
+.gi-sim.open .gi-car { transform: rotate(180deg); }
+.gi-det { background: var(--bg); padding: 0 12px 6px 46px; }
+.gi-det .gi-row { border: 0; min-height: 40px; padding: 6px 0; }
+.gi-quiet { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+.gi-note, .gi-hint { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--muted); padding: 10px 12px; border-radius: 12px; background: var(--bg); }
+.gi-note svg, .gi-hint svg { flex-shrink: 0; margin-top: 1px; }
+.gi-note.warn { background: var(--households-tint); color: var(--households-ink); }
+.gi-sum { margin-right: auto; color: var(--muted); font-size: 13px; align-self: center; }
+.gi-pick { display: flex; flex-direction: column; gap: 14px; }
+.gi-drop { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 160px; border: 2px dashed var(--line); border-radius: 16px; background: var(--bg); color: var(--text); font: inherit; cursor: pointer; }
+.gi-drop:hover { border-color: var(--accent); }
+.gi-drop svg { color: var(--households-ink); }
+.gi-hint code { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 0 5px; }
+.today-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.gi-biz { border-top: 1px solid var(--line); padding-top: 6px; }
+.gi-biz:first-child { border-top: 0; padding-top: 0; }
+.gi-start { display: flex; flex-direction: column; gap: 6px; padding: 8px 12px 12px; font-size: 13px; font-weight: 600; }
+.gi-start .input { max-width: 200px; }
+.gi-biz-n { display: block; padding: 0 12px 8px; }

@@ -301,7 +301,7 @@ function pages(env: Env) {
     .filter((c) => (!c.module || moduleOn(d, c.module)) && needsPack(c, d.packs))
     .map((c) => ({ id: c.id, label: c.label, icon: <ObjIcon cat={c.id} />, href: savePath(sid, c.path) }));
   list.unshift({ id: 'today', label: 'Today', icon: <span className="obj berry"><SunHorizon size={16} weight="duotone" /></span>, href: savePath(sid, 'today') });
-  if (env.rot.on) list.push({ id: 'rotation', label: 'Rotation', icon: <span className="obj worlds"><ArrowsClockwise size={16} weight="duotone" /></span>, href: savePath(sid, 'rotation') });
+  if (env.rot.on) list.push({ id: 'rotation', label: 'Rotation', icon: <span className="obj rotation"><ArrowsClockwise size={16} weight="duotone" /></span>, href: savePath(sid, 'rotation') });
   list.push({ id: 'settings', label: 'Save settings', icon: <span className="obj berry"><GearSix size={16} weight="duotone" /></span>, href: savePath(sid, 'settings') });
   list.push({ id: 'account', label: 'Account', icon: <span className="obj berry"><UserCircle size={16} weight="duotone" /></span>, href: '#/account' });
   return list;

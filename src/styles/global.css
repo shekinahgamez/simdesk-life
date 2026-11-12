@@ -20,6 +20,8 @@
   --clubs-tint: #FBE0F0;     --clubs-ink: #B23A7D;
   --photos-tint: #ECE4FB;    --photos-ink: #6B49C2;
   --storylines-tint: #ECE7FF; --storylines-ink: #5B4BD6;
+  --businesses-tint: #E7F1D4; --businesses-ink: #4C7A12;
+  --rotation-tint: var(--households-tint); --rotation-ink: var(--households-ink);
 
   --shadow-sm: 0 1px 2px rgba(36, 25, 31, 0.05);
   --shadow: 0 1px 2px rgba(36, 25, 31, 0.04), 0 4px 14px rgba(36, 25, 31, 0.06);
@@ -47,6 +49,7 @@
     --clubs-tint: #432039; --clubs-ink: #F28FC9;
     --photos-tint: #2E2547; --photos-ink: #B9A4FF;
     --storylines-tint: #2C2650; --storylines-ink: #ADA2FF;
+    --businesses-tint: #26331A; --businesses-ink: #B4D97E;
     --shadow-sm: 0 1px 2px rgba(0,0,0,.3);
     --shadow: 0 1px 2px rgba(0,0,0,.25), 0 4px 14px rgba(0,0,0,.3);
     --shadow-lg: 0 2px 6px rgba(0,0,0,.3), 0 18px 48px rgba(0,0,0,.5);
@@ -63,6 +66,7 @@
   --clubs-tint: #432039; --clubs-ink: #F28FC9;
   --photos-tint: #2E2547; --photos-ink: #B9A4FF;
   --storylines-tint: #2C2650; --storylines-ink: #ADA2FF;
+  --businesses-tint: #26331A; --businesses-ink: #B4D97E;
   --shadow-sm: 0 1px 2px rgba(0,0,0,.3);
   --shadow: 0 1px 2px rgba(0,0,0,.25), 0 4px 14px rgba(0,0,0,.3);
   --shadow-lg: 0 2px 6px rgba(0,0,0,.3), 0 18px 48px rgba(0,0,0,.5);
@@ -141,6 +145,9 @@ input, select, textarea { font: inherit; color: inherit; }
 .obj.clubs { background: var(--clubs-tint); color: var(--clubs-ink); }
 .obj.photos { background: var(--photos-tint); color: var(--photos-ink); }
 .obj.storylines { background: var(--storylines-tint); color: var(--storylines-ink); }
+.obj.businesses { background: var(--businesses-tint); color: var(--businesses-ink); }
+.obj.legacy { background: var(--accent-soft); color: var(--accent); }
+.obj.rotation { background: var(--households-tint); color: var(--households-ink); }
 .obj.berry { background: var(--accent-soft); color: var(--accent); }
 
 /* ---------- tags ---------- */
@@ -155,6 +162,8 @@ input, select, textarea { font: inherit; color: inherit; }
 .tag.calendar { background: var(--calendar-tint); }
 .tag.clubs { background: var(--clubs-tint); }
 .tag.storylines { background: var(--storylines-tint); }
+.tag.businesses { background: var(--businesses-tint); }
+.tag.legacy { background: var(--accent-soft); }
 .tag.berry { background: var(--accent-soft); color: var(--text); }
 .tag.secret { background: var(--text); color: var(--bg); }
 .tag.outline { background: transparent; border: 1px solid var(--line); color: var(--muted); }

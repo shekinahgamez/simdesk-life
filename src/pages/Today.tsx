@@ -1,4 +1,5 @@
 import { CaretRight, HouseSimple, MapPin, User, UsersThree } from '@phosphor-icons/react';
+import { useIsPhone as usePhone } from '../lib/useIsPhone';
 import type { ReactNode } from 'react';
 import { DayButtons } from '../components/DayMove';
 import { PhotoBox } from '../components/photo';
@@ -20,6 +21,7 @@ import { presetHhFilter } from './households/HouseholdsList';
 import { presetSimsFilter } from './sims/SimsList';
 import { SimAvatar, useHouseholds } from './sims/shared';
 import { PlayingNow } from './rotation/Rotation';
+import { ImportFromGame } from './GameImport';
 
 /** The save's home page: today's date and moving it, what needs sorting, what's coming up, and where you were. */
 export function TodayPage({ save }: { save: SaveRow }) {
@@ -34,16 +36,18 @@ export function TodayPage({ save }: { save: SaveRow }) {
       <PhotoBox photo={d.cover} aspect={4} className="home-cover" alt="">
         <div className="home-cover-text"><h1>{d.name}</h1><div>{d.trackDate ? `${formatDate(t, 'weekday')} · Year ${t.year}` : ''}</div></div>
       </PhotoBox>
-      {d.trackDate && <DayButtons save={save} />}
+      <div className="today-actions"><ImportFromGame save={save} className="btn sm" />{d.trackDate && <DayButtons save={save} />}</div>
     </div>
   ) : (
     <div className={`today-head${phone ? ' phone' : ''}`}>
       <div style={{ minWidth: 0 }}>
         {!phone && <div className="muted small">{d.name}</div>}
-        <h1>{d.trackDate ? formatDate(t, 'weekday') : d.name}</h1>
-        {d.trackDate && <div className="muted">Year {t.year}</div>}
+        <h1>{d.trackDate ? (phone ? formatDate(t, 'short') : formatDate(t, 'weekday')) : d.name}</h1>
+        {d.trackDate && <div className="muted">{phone ? `${formatDate(t, 'weekday').split(',')[0]} · Year ${t.year}` : `Year ${t.year}`}</div>}
       </div>
-      {d.trackDate && <DayButtons save={save} phone={phone} />}
+      {phone ? (d.trackDate && <DayButtons save={save} phone />) : (
+        <div className="today-actions"><ImportFromGame save={save} className="btn sm" />{d.trackDate && <DayButtons save={save} />}</div>
+      )}
     </div>
   );
   const coming = <ComingUp save={save} simIds={living.map((r) => r.id)} seeAll="calendar" showFaces />;
@@ -84,10 +88,29 @@ function Row({ icon, title, sub, onClick, href }: { icon: ReactNode; title: Reac
 }
 
 function ToSort({ save, sims }: { save: SaveRow; sims: Rec[] }) {
+  const phone = usePhone();
   const households = useRecords('household');
   const noHh = sims.filter((r) => !simData(r).householdId).length;
   const noHome = households.filter((r) => !householdData(r).home).length;
   if (!noHh && !noHome) return null;
+  if (phone) {
+    return (
+      <div className="today-tiles">
+        {noHh > 0 && (
+          <button type="button" className="card today-tile today-row" onClick={() => { presetSimsFilter(save.id, { households: [NO_HOUSEHOLD] }); go(savePath(save.id, 'sims')); }}>
+            <span className="obj sims"><User size={16} weight="duotone" /></span>
+            <span><b className="n">{plural(noHh, 'Sim')}</b><span className="s">with no household</span></span>
+          </button>
+        )}
+        {noHome > 0 && (
+          <button type="button" className="card today-tile today-row" onClick={() => { presetHhFilter(save.id, { homes: ['none'] }); go(savePath(save.id, 'households')); }}>
+            <span className="obj households"><HouseSimple size={16} weight="duotone" /></span>
+            <span><b className="n">{plural(noHome, 'household')}</b><span className="s">with no home</span></span>
+          </button>
+        )}
+      </div>
+    );
+  }
   return (
     <TodayCard title="To sort">
       {noHh > 0 && (
@@ -105,12 +128,20 @@ function ToSort({ save, sims }: { save: SaveRow; sims: Rec[] }) {
 }
 
 function JumpBackIn({ save }: { save: SaveRow }) {
+  const phone = usePhone();
   const sims = useRecords('sim');
   const lots = useRecords('lot');
   const clubs = useRecords('club');
   const hh = useHouseholds();
   const rows = recentOf(save.id).map((r) => describe(r, save, { sims, lots, clubs, hh })).filter((x): x is NonNullable<typeof x> => !!x).slice(0, 4);
   if (!rows.length) return null;
+  if (phone) {
+    return (
+      <section className="today-recent"><h2 className="m-label">Jump back in</h2>
+        <div className="m-chips today-chips">{rows.map((r) => <a key={r.href} href={r.href} className="today-chip today-row">{r.icon}<span>{r.title}</span></a>)}</div>
+      </section>
+    );
+  }
   return <TodayCard title="Jump back in">{rows.map((r) => <Row key={r.href} {...r} />)}</TodayCard>;
 }
 

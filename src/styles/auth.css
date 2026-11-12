@@ -21,6 +21,10 @@
 .auth-form { display: flex; flex-direction: column; gap: 14px; }
 .auth-wide { width: 100%; }
 .auth-link { align-self: flex-start; }
+.auth-swap { margin: 4px 0 0; text-align: center; color: var(--muted); }
+.auth-swap-btn { all: unset; cursor: pointer; color: var(--accent); font-weight: 700; padding: 8px 4px; }
+.auth-swap-btn:hover { text-decoration: underline; }
+.auth-swap-btn:focus-visible { outline: 2px solid var(--accent); border-radius: 6px; }
 .auth-done { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
 .auth-done p { margin: 0; }
 .hint { display: flex; align-items: center; gap: 5px; }
@@ -45,10 +49,16 @@
 .signed-in-name { font-family: var(--font-head); font-weight: 800; font-size: 26px; }
 
 @media (max-width: 860px) {
-  .auth { grid-template-columns: 1fr; gap: 24px; align-content: start; padding-top: max(env(safe-area-inset-top), 48px); padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
-  .auth-card { padding: 24px; }
-  .auth-card-head h1 { font-size: 26px; }
-  .auth-tag { font-size: 19px; }
+  .auth { grid-template-columns: 1fr; gap: 16px; align-content: start; padding-top: max(env(safe-area-inset-top), 20px); padding-bottom: 24px; padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+  .auth-card { padding: 18px 16px; }
+  .auth-card-head { margin-bottom: 10px; }
+  .auth-card-head h1 { font-size: 22px; }
+  .auth-tag { font-size: 16px; }
+  .auth-brand .auth-pills { display: none; }
+  .auth-switch { margin-bottom: 12px; }
+  .auth-form { gap: 10px; }
+  .auth-form .field .hint { font-size: 13px; margin-top: 4px; }
+  .auth-form .field label { margin-bottom: 4px; }
 }
 
 /* ---------- Account page (Nov 2026) ---------- */

@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CaretRight, FunnelSimple, HouseSimple, Plus, Rows, SquaresFour, X } from '@phosphor-icons/react';
+import { CaretRight, FunnelSimple, HouseSimple, Play, Plus, Rows, SquaresFour, X } from '@phosphor-icons/react';
+import { AzHeader, AzRail, azKey, letterOf, PhoneBar } from '../../components/AzList';
+import { QuickButton } from '../../components/CommandBar';
+import { cleanRotation } from '../../lib/rotation';
+import { moduleOn, saveData } from '../../lib/saves';
 import { ObjIcon } from '../../components/categories';
 import { Field, Modal, Picker, SearchBox, Sheet, TextInput, Toggle } from '../../components/ui';
 import { householdTags, type HH } from '../../lib/households';
@@ -40,6 +44,18 @@ export function HouseholdsList({ save }: { save: SaveRow }) {
     .filter((h) => !q.trim() || matches(h.data.name, q) || ctx.membersOf(h.id).some((s) => matches(`${s.sim.first} ${s.sim.last}`, q)))
     .filter((h) => passes(facts.get(h.id)!, filters));
   const nf = hhFilterCount(filters);
+  const sd = saveData(save);
+  const playing = moduleOn(sd, 'rotation') ? cleanRotation(sd.rotation).current : null;
+  const noHome = ctx.households.filter((h) => !ctx.homeOf(h)).length;
+  const phoneGroups = useMemo(() => {
+    const m = new Map<string, HH[]>();
+    for (const h of [...shown].sort((a, b) => azKey(a.data.name).localeCompare(azKey(b.data.name)))) {
+      const l = letterOf(h.data.name.trim() || 'Unnamed');
+      (m.get(l) ?? m.set(l, []).get(l)!).push(h);
+    }
+    return [...m.entries()].sort((a, b) => azKey(a[0]).localeCompare(azKey(b[0])));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shown]);
   const worldOpts = [...new Map([...facts.values()].filter((f) => f.world).map((f) => [f.world!, f.worldName])).entries()]
     .map(([id, label]) => ({ id, label })).sort((a, b) => a.label.localeCompare(b.label));
   const open = (id: string) => go(savePath(save.id, `households/${id}`));
@@ -56,8 +72,13 @@ export function HouseholdsList({ save }: { save: SaveRow }) {
         {shown.map((h) => <HhCard key={h.id} ctx={ctx} h={h} onOpen={() => open(h.id)} onPick={() => setPicking(h)} />)}
       </div>
     ) : phone ? (
-      <div className="m-group hh-rows">
-        {shown.map((h) => <HhRowPhone key={h.id} ctx={ctx} h={h} onOpen={() => open(h.id)} />)}
+      <div className="az-list">
+        {phoneGroups.map(([l, list]) => (
+          <div key={l}>
+            <AzHeader letter={l} />
+            <div className="az-card">{list.map((h) => <HhRowPhone key={h.id} ctx={ctx} h={h} playing={h.id === playing} onOpen={() => open(h.id)} />)}</div>
+          </div>
+        ))}
       </div>
     ) : (
       <div className="table-wrap">
@@ -85,12 +106,13 @@ export function HouseholdsList({ save }: { save: SaveRow }) {
   const search = ctx.households.length > 0 && <SearchBox value={q} onChange={setQ} placeholder={phone ? 'Search' : `Search ${plural(ctx.households.length, 'household')}`} />;
 
   if (phone) {
+    const searching = q.trim() !== '' || nf > 0;
     return (
       <div className="m-stack">
-        <h1 className="m-h1" style={{ paddingTop: 6 }}>Sims</h1>
+        <PhoneBar title="Households" right={<QuickButton />} />
         <SimsSwitch saveId={save.id} on="households" />
         {search && (
-          <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
+          <div className="tb-row">
             <div className="m-search grow">{search}</div>
             <button type="button" className="btn icon filter-btn" aria-label={nf ? `Filter, ${nf} on` : 'Filter'} onClick={() => setShowFilter(true)}>
               <FunnelSimple size={20} weight="bold" />{nf > 0 && <span className="count">{nf}</span>}
@@ -98,8 +120,15 @@ export function HouseholdsList({ save }: { save: SaveRow }) {
             {viewSwitch}
           </div>
         )}
+        {noHome > 0 && !filters.homes.includes('none') && !q.trim() && layout === 'list' && (
+          <button type="button" className="attn-row" onClick={() => setFilters({ ...NO_HH_FILTERS, homes: ['none'] })}>
+            <span className="ico"><HouseSimple size={18} weight="duotone" /></span><span><b>{plural(noHome, 'household')}</b> with no home</span>
+            <span className="go">Pick homes <CaretRight size={14} weight="bold" /></span>
+          </button>
+        )}
         {tags}
         {cards}
+        {layout === 'list' && !searching && shown.length >= 12 && <AzRail letters={phoneGroups.map(([l]) => l)} />}
         <button type="button" className="m-fab" aria-label="New household" onClick={() => setAdding(true)}><Plus size={26} weight="bold" /></button>
         {dialogs}
       </div>
@@ -156,18 +185,18 @@ function HhRow({ ctx, h, onOpen, onPick }: { ctx: HhCtx; h: HH; onOpen(): void; 
   );
 }
 
-/** One household as a phone row (List view). */
-function HhRowPhone({ ctx, h, onOpen }: { ctx: HhCtx; h: HH; onOpen(): void }) {
+/** One household as a phone row (List view). "No home yet" is not repeated on every row: the attention row above says it once. */
+function HhRowPhone({ ctx, h, playing, onOpen }: { ctx: HhCtx; h: HH; playing?: boolean; onOpen(): void }) {
   const home = ctx.homeOf(h);
   const members = ctx.membersOf(h.id);
   return (
     <button type="button" className="m-row hh-mrow" onClick={onOpen}>
-      <span className="hh-mrow-faces">{members.length > 0 ? <Faces sims={members} size={30} max={3} /> : <span className="hh-face-empty" />}</span>
+      <span className="hh-mrow-faces">{members.length > 0 ? <Faces sims={members} size={28} max={2} /> : <span className="hh-face-empty" />}</span>
       <span className="grow" style={{ minWidth: 0 }}>
         <span className="t">{h.data.name.trim() || 'Unnamed'}</span>
-        <span className="s">{plural(members.length, 'Sim')} · {home ? home.title : 'No home yet'}</span>
+        <span className="s">{members.length > 0 ? plural(members.length, 'Sim') : 'No Sims yet'}{home ? ` · ${home.title}` : ''}</span>
       </span>
-      <CaretRight size={16} className="chev" />
+      {playing && <span className="tag worlds ink hh-playing"><Play size={11} weight="fill" /> Playing</span>}
     </button>
   );
 }

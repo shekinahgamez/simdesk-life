@@ -56,6 +56,10 @@ describe('filters and sorting', () => {
     expect(applyFilters(rows, { ...NO_FILTERS, deceased: true }).map((r) => r.id)).toEqual(['4']);
   });
   it('filters by household, gender, stage and birthday this week', () => {
+    const withPlanned = [{ ...rows[0], sim: { ...rows[0].sim, planned: true } }, ...rows.slice(1)];
+    expect(applyFilters(withPlanned, { ...NO_FILTERS, status: 'planned' }).map((r) => r.id)).toEqual(['1']);
+    expect(applyFilters(withPlanned, { ...NO_FILTERS, status: 'created' }).map((r) => r.id)).toEqual(['2', '3']);
+    expect(applyFilters(withPlanned, NO_FILTERS).map((r) => r.id)).toEqual(['1', '2', '3']);
     expect(applyFilters(rows, { ...NO_FILTERS, households: ['h1'] }).map((r) => r.id)).toEqual(['2', '3']);
     expect(applyFilters(rows, { ...NO_FILTERS, households: ['none'] }).map((r) => r.id)).toEqual(['1']);
     expect(applyFilters(rows, { ...NO_FILTERS, genders: ['male'] }).map((r) => r.id)).toEqual(['1', '3']);

@@ -1,0 +1,28 @@
+const { chromium } = require('playwright'); const fs=require('fs'),os=require('os'),path=require('path');
+const { mock, newState, logIn } = require('./mockdb.cjs');
+const SID='44444444-4444-4444-8444-444444444444';
+const now=new Date().toISOString();
+const rec=(id,kind,d)=>({id,save_id:SID,kind,data:d,edited_at:now,deleted_at:null,created_at:now});
+const names=[['Darnell','male'],['Monique','female'],['Andre','male'],['Simone','female'],['Jaylen','male'],['Kiara','female'],['Nia','female']];
+const st=newState();
+st.saves[SID]={id:SID,data:{name:'Import Save',color:'#B83C76',packs:[],secretLots:[],today:100,calendar:{seasonLength:21,anchorDay:0,anchorDate:{year:1,season:0,day:1}},lifespan:{preset:'normal'},trackDate:true,modules:{rotation:true,funds:true},money:{snb:true,simfin:false},gameLink:{game:30,desk:98},rotation:{order:['hh','hp'],lengths:{},current:'hp',startDay:98,round:1,roundStart:'hp'}},edited_at:now,deleted_at:null,created_at:now};
+st.records[SID]={hh:rec('hh','household',{name:'Harlow',home:null,notes:''}),hp:rec('hp','household',{name:'Priestley',home:null,notes:''}),
+ mo:rec('money:hh','money',{household:'hh',funds:11800,items:[{id:'snb:a1',type:'snb-checking',name:'Main',owners:['s0'],amount:2900,note:''}],log:[],lastCheck:null})};
+names.forEach(([f,g],i)=>{st.records[SID]['s'+i]=rec('s'+i,'sim',{first:f,last:'Harlow',gender:g,bornDay:i===4?100-300:-9000+i*1000,householdId:'hh',traits:[],career:i===0?'Doctor':'',careerLevel:i===0?6:null,notes:''});});
+const T=['Ambitious','Creative','Cheerful','Geek','Loner'];
+const sims=names.map(([f,g],i)=>({id:i+1,first:f,last:'Harlow',gender:g,age:{stage:i===4?'TEEN':(i>=5?'CHILD':'ADULT')},traits:i<4?[{name:T[i]}]:[],aspiration:null,career:i===0?{name:'Doctor',level:7}:i===3?{name:'Painter',level:2}:null,deceased:false}));
+sims.push({id:8,first:'Baby',last:'Harlow',gender:'female',age:{stage:'INFANT'},traits:[],aspiration:null,career:null,deceased:false});
+const f=path.join(os.tmpdir(),'Harlow-day33.json');
+fs.writeFileSync(f,JSON.stringify({format:'simdesk-log',version:1,loggedAt:'x',game:{absoluteDay:33},household:{id:7,name:'Harlow',sims},money:{funds:12450,snbAccounts:[{id:'a1',name:'Main',type:'CHECKING',owners:[1],balance:3200},{id:'a2',name:'Joint',type:'SAVINGS',owners:[1,2],balance:8000}]},skipped:[]}));
+(async()=>{const b=await chromium.launch();const ctx=await b.newContext({viewport:{width:1440,height:900},deviceScaleFactor:2,serviceWorkers:'block'});
+const p=await ctx.newPage();p.on('pageerror',e=>console.log('ERR',e.message));await mock(p,st);await logIn(p);await p.waitForURL(/#\/s\//);await p.waitForTimeout(1200);
+await p.goto(`http://localhost:4173/#/s/${SID}/`);await p.waitForTimeout(900);
+const out='/mnt/project-files/simdesk/logger/built/screens';
+await p.screenshot({path:out+'/1-today-button.png'});
+await p.getByRole('button',{name:/Import from game/}).click();await p.waitForTimeout(300);await p.screenshot({path:out+'/2-pick-file.png'});
+await p.locator('input[accept=".json,application/json"]').setInputFiles(f);await p.waitForTimeout(600);
+await p.screenshot({path:out+'/3-review-8-sims.png'});
+const m=await p.evaluate(()=>{const e=document.querySelector('.gi-modal');return{sh:e.scrollHeight,ch:e.clientHeight}});console.log('modal',m);
+await p.getByRole('button',{name:'Open all'}).click();await p.waitForTimeout(300);await p.screenshot({path:out+'/4-open-all.png'});
+await p.getByRole('button',{name:/^Add \d+ changes?$/}).click();await p.waitForTimeout(500);await p.screenshot({path:out+'/5-done-undo.png'});
+await b.close();})();
