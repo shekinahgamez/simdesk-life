@@ -1,4 +1,4 @@
-import { ArrowsClockwise, Crown, Storefront, GearSix, Path, UserCircle } from '@phosphor-icons/react';
+import { ArrowsClockwise, Crown, Notebook, Storefront, GearSix, Path, UserCircle } from '@phosphor-icons/react';
 import { BUILT, CATEGORIES, needsPack, ObjIcon, type CategoryId, DECK } from '../components/categories';
 import { DesktopDeck, PhoneDeck, type DeckCard } from '../components/Deck';
 import { PhotoBox } from '../components/photo';
@@ -80,6 +80,7 @@ export function More({ save }: { save: SaveRow }) {
         {d.packs.includes('get-together') && <MRow href={savePath(save.id, 'clubs')} title="Clubs" icon={<ObjIcon cat="clubs" />} />}
         {moduleOn(d, 'rotation') && <MRow href={savePath(save.id, 'rotation')} title="Rotation" icon={<span className="obj rotation"><ArrowsClockwise size={16} weight="duotone" /></span>} />}
         {moduleOn(d, 'venues') && <MRow href={savePath(save.id, 'businesses')} title="Businesses" icon={<span className="obj businesses"><Storefront size={16} weight="duotone" /></span>} />}
+        {moduleOn(d, 'journal') && <MRow href={savePath(save.id, 'docs')} title="Docs" icon={<span className="obj docs"><Notebook size={16} weight="duotone" /></span>} />}
         {moduleOn(d, 'legacy') && <MRow href={savePath(save.id, 'legacy')} title="Legacy" icon={<span className="obj legacy"><Crown size={16} weight="duotone" /></span>} />}
         {moduleOn(d, 'storylines') && <MRow href={savePath(save.id, 'storylines')} title="Storylines" icon={<span className="obj storylines"><Path size={16} weight="duotone" /></span>} />}
       </div>

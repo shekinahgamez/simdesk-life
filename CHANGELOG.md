@@ -2,6 +2,9 @@
 
 Newest first. One line per feature, added by whichever thread builds it: thread, date (UTC), files touched. Before re-packing the shared code copy, diff it against the latest copy and make sure nothing earlier disappeared.
 
+## 2026-11-13
+- **Docs with tabs and sub-tabs** (thread "Add tabs to SimDesk Docs"). The "Play journal" placeholder (module id `journal`) is now **Docs** and ready. Records `doc` and `doctab` (a tab with a `parent` is a sub-tab; two levels only). `src/lib/docs.ts` (+ `docs.test.ts`), `src/pages/docs/DocsPage.tsx`, `src/styles/docs.css`, sidebar and phone More entries, route `#/s/<save>/docs/<doc>/<tab>`. Tab list on the left (desktop) or a bar + bottom sheet (phone); add, rename, move, delete (with Undo), per-tab icon from her icon set (`src/assets/icon-set`, loaded on demand) and ink color; Previous / Next; opens on the last tab read (kept on this device). Pages are plain text with `#` headings and `-` bullets. Not built: search, share, Sim mentions.
+
 ## 2026-11-12
 - **Published the unpublished shared-copy work as one PR** (thread "Combine open pull requests into one"). Everything below dated 2026-11-07 and 2026-11-08 that says "Not published" (Lore & Storylines, Import from game, phone density, sign up page, Dates on Storylines beats, Legacy and Planned Sims, Businesses and Townie, Story prompts removed) ships in this PR. The public home page and beta pages stay exactly as on main. The Episode notes box is gone from the storyline page (she is moving it to Content; the stored `notes` field is kept and still appears in the .md export, nothing is deleted). The Storylines tab, its empty state and the beat tag that said "For video" and "Video material" now say "Content" and "Content material" (stored field and `/video` route unchanged, so nothing saved breaks). `_handoff/test-scripts/commands/mockdb.cjs` logs in through `#/login` now that the signed-out front door is the home page.
 

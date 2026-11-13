@@ -18,6 +18,7 @@ import './styles/money.css';
 import './styles/commandbar.css';
 import './styles/gameimport.css';
 import './styles/businesses.css';
+import './styles/docs.css';
 import './styles/landing.css';
 import { StyleCheck } from './pages/StyleCheck';
 import { AppSettings } from './pages/AppSettings';
