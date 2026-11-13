@@ -9,15 +9,11 @@ import { ThemedBanner } from '../components/Banner';
 import { SeasonBanner } from '../components/SeasonArt';
 import { CATEGORIES, ObjIcon } from '../components/categories';
 import { effectiveTheme } from '../lib/theme';
-import { SharedDemo } from '../demo/SharedDemo';
-import { SavingDemo } from '../demo/SavingDemo';
-import { startPretend } from './AccountScreens';
-import { GameDataDemo } from '../demo/GameDataDemo';
-import { TimeDemo } from '../demo/TimeDemo';
+import { Pieces, PiecesIntro } from './StyleGuidePieces';
 
 /**
- * Style check: one page with every color, font, button, field and icon, for checking the look on
- * iPad and iPhone. It is not part of the app and gets deleted before launch.
+ * Style guide: the reference for how Simdesk looks. Basics (colors, type, buttons, fields, icons) and the shared
+ * pieces every page builds from, shown with the app's real components. Only the owner's account can open it.
  */
 
 const BASE_TOKENS: { name: string; v: string; use: string }[] = [
@@ -72,7 +68,7 @@ function SectionCard({ id, label, theme }: { id: (typeof CATEGORIES)[number]['id
   );
 }
 
-export function StyleCheck() {
+export function StyleGuide() {
   // Color codes are read for whichever theme is showing (set on the App settings page).
   const theme = effectiveTheme();
   const [toggle, setToggle] = useState(true);
@@ -93,24 +89,7 @@ export function StyleCheck() {
         </div>
       </div>
 
-      <div className="sc-note">
-        <b>Style check.</b> This page shows every color, font, button, field and icon so you can check them on iPad and
-        iPhone. It isn’t part of the app and goes away before launch. Switch between light and dark on the App settings page.
-      </div>
-
-      <section>
-        <h2>Try the app</h2>
-        <p className="muted small" style={{ marginTop: 0 }}>Opens the real app with a pretend account kept in this browser. Leave it from Account.</p>
-        <div><button type="button" className="btn primary" onClick={startPretend}>Try the app with a pretend account</button></div>
-      </section>
-
-      <TimeDemo />
-
-      <GameDataDemo />
-
-      <SavingDemo />
-
-      <SharedDemo />
+      <PiecesIntro />
 
       <section>
         <h2>Colors</h2>
@@ -343,14 +322,7 @@ export function StyleCheck() {
         </div>
       </section>
 
-      <section>
-        <h2>Saving dots</h2>
-        <div className="row small">
-          <span className="sync-dot" /> Saved
-          <span className="sync-dot saving" style={{ marginLeft: 12 }} /> Saving…
-          <span className="sync-dot error" style={{ marginLeft: 12 }} /> Couldn’t save
-        </div>
-      </section>
+      <Pieces />
     </main>
   );
 }

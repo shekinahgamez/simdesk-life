@@ -371,7 +371,7 @@ function wirePhotos(store: SyncStore, photos: PhotoService) {
 const PRETEND_KEY = 'sd:pretend';
 export function isPretend() { try { return sessionStorage.getItem(PRETEND_KEY) === '1'; } catch { return false; } }
 export function startPretend() { try { sessionStorage.setItem(PRETEND_KEY, '1'); } catch { /* ignore */ } location.hash = '#/'; location.reload(); }
-function endPretend() { try { sessionStorage.removeItem(PRETEND_KEY); } catch { /* ignore */ } location.hash = '#style-check'; location.reload(); }
+function endPretend() { try { sessionStorage.removeItem(PRETEND_KEY); } catch { /* ignore */ } location.hash = '#style-guide'; location.reload(); }
 
 export function PretendApp() {
   const [store] = useState(() => {
