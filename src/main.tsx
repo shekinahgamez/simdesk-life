@@ -14,6 +14,7 @@ import './styles/calendar.css';
 import './styles/photos.css';
 import './styles/clubs.css';
 import './styles/storylines.css';
+import './styles/pieces.css';
 import './styles/money.css';
 import './styles/commandbar.css';
 import './styles/gameimport.css';

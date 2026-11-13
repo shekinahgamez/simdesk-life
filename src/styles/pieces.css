@@ -1,0 +1,36 @@
+/* Shared pieces (src/components/pieces). Change a piece here and it changes on every page. */
+.p-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.p-search { display: flex; align-items: center; gap: 8px; flex: 1 1 220px; max-width: 320px; min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--muted); }
+.p-search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 16px; color: var(--text); outline: none; }
+.p-fb { gap: 6px; }
+.p-fb.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.p-clear { border: 0; background: none; color: var(--accent); font: inherit; font-weight: 700; cursor: pointer; padding: 6px 4px; min-height: 32px; }
+.p-n { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--muted); }
+.ph-cb.dot { border-radius: 50%; }
+.ph-cb.dot.on::after { left: 4px; top: 4px; width: 6px; height: 6px; border: 0; border-radius: 50%; background: #fff; transform: none; }
+
+.p-views { display: inline-flex; padding: 3px; border-radius: 12px; background: var(--sidebar); gap: 2px; }
+.p-views button { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px; border: 0; border-radius: 9px; background: none; color: var(--muted); font: inherit; font-weight: 600; cursor: pointer; }
+.p-views.sm button { min-height: 28px; padding: 0 10px; font-size: 13px; }
+.p-views button[aria-pressed='true'] { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+.p-views button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 700px) { .p-vl { display: none; } .p-search { max-width: none; flex-basis: 100%; } }
+
+.p-chip.neutral { background: var(--sidebar); color: var(--text); }
+.p-chip.info { background: var(--storylines-tint); color: var(--storylines-ink); }
+.p-chip.warm { background: var(--households-tint); color: var(--households-ink); }
+.p-chip.hot { background: #FDE3E0; color: #B3261E; }
+.p-chip.done { background: var(--worlds-tint); color: var(--worlds-ink); }
+.p-chip.accent { background: var(--accent-soft); color: var(--accent); }
+:root[data-sd-theme='dark'] .p-chip.hot { background: #4A2420; color: #FF9B93; }
+
+.p-board { display: grid; gap: 16px; align-items: start; }
+.p-col { background: var(--sidebar); border-radius: var(--r-lg); padding: 12px; display: flex; flex-direction: column; gap: 10px; min-height: 160px; border: 2px solid transparent; }
+.p-col.over { border-color: var(--accent); }
+.p-kcard { display: flex; flex-direction: column; gap: 8px; padding: 14px; background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow-sm); color: var(--text); cursor: grab; }
+.p-kcard a { color: inherit; text-decoration: none; display: flex; flex-direction: column; gap: 8px; }
+.p-kcard small { color: var(--muted); font-size: 14px; }
+.p-colempty { border: 1.5px dashed var(--toggle-off); border-radius: var(--r); padding: 18px; text-align: center; color: var(--muted); font-size: 14px; }
+@media (max-width: 900px) { .p-board { grid-template-columns: 1fr !important; } }
+.p-chip.planned { background: transparent; color: var(--muted); border: 1.5px dashed var(--toggle-off); }
+.p-chip.due { background: var(--accent-soft); color: var(--accent); }
