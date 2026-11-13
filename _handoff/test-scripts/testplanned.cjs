@@ -18,13 +18,11 @@ const until = async (p, f) => { for (let i = 0; i < 40; i++) { try { if (f()) re
     await mock(p, st); await logIn(p); await p.waitForURL(/#\/s\//); await p.waitForTimeout(1200);
     await p.goto(`http://localhost:4173/#/s/${SID}/sims`); await p.waitForTimeout(900);
     ok(await p.getByText('Planned').count() >= 2, `${n} Planned shows quietly on the Sim rows`);
-    await p.getByRole('button', { name: /^Filter/ }).click(); await p.waitForTimeout(400);
-    await p.getByRole('button', { name: 'Planned', exact: true }).click(); await p.waitForTimeout(300);
-    await p.getByRole('button', { name: /^Show \d+ Sims?$/ }).click(); await p.waitForTimeout(400);
+    await p.getByRole('button', { name: /^In the game/ }).click(); await p.waitForTimeout(400);
+    await p.getByRole('radio', { name: 'Planned', exact: true }).click(); await p.waitForTimeout(400);
     ok(await p.getByText('Plan Test').count() >= 1 && await p.getByText('Made Test').count() === 0, `${n} Planned filter shows only planned Sims`);
-    await p.getByRole('button', { name: /^Filter/ }).click(); await p.waitForTimeout(300);
-    await p.getByRole('button', { name: 'Created', exact: true }).click(); await p.waitForTimeout(300);
-    await p.getByRole('button', { name: /^Show \d+ Sims?$/ }).click(); await p.waitForTimeout(400);
+    await p.getByRole('button', { name: /^In the game/ }).click(); await p.waitForTimeout(300);
+    await p.getByRole('radio', { name: 'Created', exact: true }).click(); await p.waitForTimeout(400);
     ok(await p.getByText('Made Test').count() >= 1 && await p.getByText('Plan Test').count() === 0, `${n} Created filter hides planned Sims`);
     await p.goto(`http://localhost:4173/#/s/${SID}/sims/Plan`); await p.waitForTimeout(900);
     await p.getByRole('button', { name: 'More' }).first().click(); await p.waitForTimeout(300);

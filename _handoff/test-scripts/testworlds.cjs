@@ -85,10 +85,9 @@ const shots = process.env.SHOTS;
     if (shots) await p.screenshot({ path: `${shots}/${n}-lots.png`, fullPage: true });
 
     // filter
-    await p.locator('.filter-btn').click(); await wait(p, 300);
-    await p.getByRole('button', { name: 'Not placed', exact: true }).click(); await wait(p, 200);
+    await p.getByRole('button', { name: /^Placed/ }).click(); await wait(p, 300);
+    await p.getByRole('radio', { name: 'Not placed', exact: true }).click(); await wait(p, 300);
     if (shots) await p.screenshot({ path: `${shots}/${n}-filter.png` });
-    await p.getByRole('button', { name: /^Show \d+ lots?$/ }).click(); await wait(p, 300);
     ok(await p.getByText('Magnolia Manor').count() === 0 && await p.getByText('Velvet Room').first().isVisible(), `${n} not placed filter`);
     await p.getByRole('button', { name: 'Clear', exact: true }).click(); await wait(p, 200);
 

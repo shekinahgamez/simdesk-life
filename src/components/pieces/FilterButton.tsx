@@ -54,11 +54,12 @@ export function CheckList({ options, value, onChange, search, icon, single }: {
 }
 
 /** The row every list page puts above its list: search, filter buttons, Clear, then the view switch on the right. */
-export function FilterBar({ search, onSearch, searchLabel, active, onClear, right, children }: {
-  search?: string; onSearch?(v: string): void; searchLabel?: string; active: boolean; onClear(): void; right?: ReactNode; children?: ReactNode;
+export function FilterBar({ lead, search, onSearch, searchLabel, active, onClear, right, children }: {
+  lead?: ReactNode; search?: string; onSearch?(v: string): void; searchLabel?: string; active: boolean; onClear(): void; right?: ReactNode; children?: ReactNode;
 }) {
   return (
     <div className="p-bar">
+      {lead}
       {onSearch && (
         <div className="p-search"><MagnifyingGlass size={16} weight="bold" aria-hidden="true" />
           <input aria-label={searchLabel ?? 'Search'} placeholder={searchLabel ?? 'Search'} value={search ?? ''} onChange={(e) => onSearch(e.target.value)} />
