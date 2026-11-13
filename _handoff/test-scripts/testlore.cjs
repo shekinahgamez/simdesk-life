@@ -113,9 +113,7 @@ const seed = (st) => {
     await p.getByRole('button', { name: /Who does Kiana want\?: open/ }).click(); await p.waitForTimeout(300);
     await p.waitForTimeout(1500);
     ok(rec('s1').data.questions[0].done === true, `${n} answers a question`);
-    await p.getByLabel('Episode notes').fill('Gossip angle'); await p.waitForTimeout(900);
-    await p.waitForTimeout(1500);
-    ok(rec('s1').data.notes === 'Gossip angle', `${n} episode notes autosave`);
+    ok(await p.getByLabel('Episode notes').count() === 0, `${n} no Episode notes box (moved to Content)`);
     ok(await p.getByText('Pictures').first().isVisible(), `${n} Pictures card`);
     await shot('4-storyline');
     // add beat

@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { CaretDown, CaretLeft, CaretRight, Check, DownloadSimple, EyeSlash, Flame, HouseSimple, Kanban, MagnifyingGlass, Path, PencilSimple, Plus, PushPin, Question, Rows, SquaresFour, VideoCamera, X } from '@phosphor-icons/react';
-import { Confirm, SearchBox, Seg, toast, AutoText } from '../../components/ui';
+import { Confirm, SearchBox, Seg, toast } from '../../components/ui';
 import { ObjIcon } from '../../components/categories';
 import {
   castOf, FEEL_KINDS, feelLabel, filterActive, filterCount, filterStories, knowOf, knowsSummary, KNOWS, latestBeat, NO_FILTER, secretPeople, sortBeats, sortStories,
@@ -548,10 +548,6 @@ function StoryPage({ save, id }: { save: SaveRow; id: string }) {
           <input className="input" value={q} maxLength={120} aria-label="Add a question" placeholder="Who does Kiana want?" onChange={(e) => setQ(e.target.value)} />
           <button type="submit" className="btn sm" disabled={!q.trim()}>Add</button>
         </form>
-      </section>
-      <section className="card sl-card">
-        <div className="card-head"><h2>Episode notes</h2></div>
-        <AutoText value={s.notes} onSave={(v) => put({ notes: v })} placeholder="Voiceover angle, what to say after the clip…" label="Episode notes" rows={4} />
       </section>
       <button type="button" className="btn ghost danger" style={{ alignSelf: 'flex-start' }} onClick={() => setDel(true)}>Delete storyline</button>
     </div>
