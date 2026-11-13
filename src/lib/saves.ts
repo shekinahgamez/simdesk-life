@@ -110,7 +110,7 @@ export const MODULES: ModuleDef[] = [
   { id: 'careers', label: 'Careers', desc: 'Career, level and workplace', icon: Briefcase, tint: 'calendar', ready: false },
   { id: 'venues', label: 'Businesses', desc: 'Owners, staff, customers and a money log', icon: Storefront, tint: 'businesses', ready: true },
   { id: 'storylines', label: 'Storylines', desc: 'Threads that link Sims together', icon: Path, tint: 'storylines', ready: true },
-  { id: 'journal', label: 'Play journal', desc: 'Day-by-day notes', icon: Notebook, tint: 'clubs', ready: false },
+  { id: 'journal', label: 'Docs', desc: 'Notes and dossiers, in tabs', icon: Notebook, tint: 'docs', ready: true },
   { id: 'legacy', label: 'Legacy', desc: 'Generations, heirs, goals and rules', icon: Crown, tint: 'households', ready: true },
 ];
 /** On only when the module has launched and the save switched it on. */

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   CalendarBlank, CaretLeft, CaretRight, CaretUpDown, Check, DotsThreeCircle, GearSix, GlobeHemisphereWest, House, Plus, Sparkle as SparkleIcon, User, UserCircle,
-  ArrowsClockwise, Crown, Storefront,
+  ArrowsClockwise, Crown, Notebook, Storefront,
 } from '@phosphor-icons/react';
 import { Wordmark } from './brand';
 import { needsPack, ObjIcon, SECTIONS } from './categories';
@@ -65,6 +65,11 @@ function Sidebar({ save, route }: { save: SaveRow | null; route: Route }) {
           {d && moduleOn(d, 'venues') && (
             <a href={savePath(save.id, 'businesses')} className={`nav-link ${section === 'businesses' ? 'active' : ''}`} aria-current={section === 'businesses' ? 'page' : undefined}>
               <span className="obj businesses" aria-hidden="true"><Storefront size={16} weight="duotone" /></span> Businesses
+            </a>
+          )}
+          {d && moduleOn(d, 'journal') && (
+            <a href={savePath(save.id, 'docs')} className={`nav-link ${section === 'docs' ? 'active' : ''}`} aria-current={section === 'docs' ? 'page' : undefined}>
+              <span className="obj docs" aria-hidden="true"><Notebook size={16} weight="duotone" /></span> Docs
             </a>
           )}
           {d && moduleOn(d, 'legacy') && (

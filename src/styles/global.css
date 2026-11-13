@@ -146,6 +146,7 @@ input, select, textarea { font: inherit; color: inherit; }
 .obj.photos { background: var(--photos-tint); color: var(--photos-ink); }
 .obj.storylines { background: var(--storylines-tint); color: var(--storylines-ink); }
 .obj.businesses { background: var(--businesses-tint); color: var(--businesses-ink); }
+.obj.docs { background: var(--photos-tint); color: var(--photos-ink); }
 .obj.legacy { background: var(--accent-soft); color: var(--accent); }
 .obj.rotation { background: var(--households-tint); color: var(--households-ink); }
 .obj.berry { background: var(--accent-soft); color: var(--accent); }
