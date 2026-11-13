@@ -71,17 +71,17 @@ const seed = (st) => {
     await p.getByRole('checkbox', { name: 'Resolved' }).click(); await p.keyboard.press('Escape'); await p.waitForTimeout(300);
     ok(await p.locator('.sl-row').count() === 1, `${n} status filter`);
     await p.getByRole('button', { name: 'Clear', exact: true }).click();
-    await p.locator('.sl-search input').fill('staring'); await p.waitForTimeout(200);
+    await p.locator('.p-search input').fill('staring'); await p.waitForTimeout(200);
     ok(await p.locator('.sl-row').count() === 1, `${n} search finds a beat`);
-    await p.locator('.sl-search input').fill('');
+    await p.locator('.p-search input').fill('');
     // views
     await p.getByRole('button', { name: 'Cards' }).click(); await p.waitForTimeout(300);
     ok(await p.locator('.sl-card-tile').count() >= 2, `${n} cards view`);
     if (!phone) {
       await p.getByRole('button', { name: 'Board' }).click(); await p.waitForTimeout(300);
-      ok(await p.locator('.sl-col').count() === 3, `board has 3 columns`);
+      ok(await p.locator('.p-col').count() === 3, `board has 3 columns`);
       await shot('3-board');
-      await p.locator('.sl-kcard', { hasText: 'Who does Quentin like?' }).dragTo(p.locator('.sl-col').nth(1)); await p.waitForTimeout(400);
+      await p.locator('.p-kcard', { hasText: 'Who does Quentin like?' }).dragTo(p.locator('.p-col').nth(1)); await p.waitForTimeout(400);
       await p.waitForTimeout(1500);
       ok(rec('s2').data.status === 'hot', 'dragging a card changes its status');
     } else {
