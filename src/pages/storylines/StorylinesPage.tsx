@@ -1,9 +1,9 @@
 import { useMemo, useRef, useState, type ReactNode } from 'react';
-import { CaretLeft, CaretRight, Check, DownloadSimple, EyeSlash, Flame, HouseSimple, Kanban, Path, PencilSimple, Plus, PushPin, Question, Rows, SquaresFour, VideoCamera, X } from '@phosphor-icons/react';
-import { Confirm, toast, AutoText } from '../../components/ui';
+import { CaretLeft, CaretRight, Check, DownloadSimple, EyeSlash, Flame, HouseSimple, Kanban, Path, PencilSimple, Plus, PushPin, Question, Rows, SquaresFour, Timer, VideoCamera, X } from '@phosphor-icons/react';
+import { Confirm, toast } from '../../components/ui';
 import { ObjIcon } from '../../components/categories';
 import {
-  castOf, FEEL_KINDS, feelLabel, filterActive, filterCount, filterStories, knowOf, knowsSummary, KNOWS, latestBeat, NO_FILTER, secretPeople, sortBeats, sortStories,
+  castOf, FEEL_KINDS, feelLabel, filterActive, filterCount, filterStories, isDue, knowOf, knowsSummary, KNOWS, latestBeat, NO_FILTER, secretPeople, sortBeats, sortStories,
   statusLabel, STATUSES, storyMarkdown, tagChoices, type BeatRow, type FeelKind, type Know, type SecretRow, type Status, type StoryFilter, type StoryRow,
 } from '../../lib/storylines';
 import { go, savePath } from '../../lib/router';
@@ -73,7 +73,7 @@ function Hub({ save, tab }: { save: SaveRow; tab: Tab }) {
   const sub = tab === 'storylines' ? (ctx.stories.length ? `${plural(ctx.stories.length, 'storyline')} · ${open} open` : 'Threads that link your Sims')
     : tab === 'secrets' ? `${ctx.secrets.filter((s) => !s.sec.out).length} open · ${ctx.secrets.filter((s) => s.sec.out).length} out in the open`
     : tab === 'feelings' ? 'Who feels what about who' : 'Beats you marked as content material';
-  const primary: Record<Tab, [string, 'story' | 'beat' | 'secret' | 'feeling']> = { storylines: ['New storyline', 'story'], secrets: ['New secret', 'secret'], feelings: ['Add feeling', 'feeling'], video: ['Add beat', 'beat'] };
+  const primary: Record<Tab, [string, 'story' | 'beat' | 'secret' | 'feeling']> = { storylines: ['New storyline', 'story'], secrets: ['New secret', 'secret'], feelings: ['Add feeling', 'feeling'], video: ['Add moment', 'beat'] };
   const [pl, pk] = primary[tab];
   const btn = <button type="button" className="btn primary" onClick={() => setAdding(pk)}><Plus size={16} weight="bold" /> {pl}</button>;
   const tabs = (
@@ -400,7 +400,7 @@ function VideoTab({ save, ctx, onNew }: { save: SaveRow; ctx: StoriesCtx; onNew(
     download('SimDesk content notes.md', note);
   };
   if (vids.length === 0) {
-    return <div className="empty"><VideoCamera size={28} weight="duotone" /><h2 style={{ fontSize: 18, margin: 0 }}>Nothing in Content yet</h2><p>Tag a beat as Content material and it shows up here, in story order.</p><button type="button" className="btn primary" onClick={onNew}><Plus size={16} weight="bold" /> Add beat</button></div>;
+    return <div className="empty"><VideoCamera size={28} weight="duotone" /><h2 style={{ fontSize: 18, margin: 0 }}>Nothing in Content yet</h2><p>Tag a moment as Content material and it shows up here, in story order.</p><button type="button" className="btn primary" onClick={onNew}><Plus size={16} weight="bold" /> Add moment</button></div>;
   }
   return (
     <div className="stack" style={{ gap: 14 }}>
@@ -408,7 +408,7 @@ function VideoTab({ save, ctx, onNew }: { save: SaveRow; ctx: StoriesCtx; onNew(
       <div className="sl-vgrid">
         {groups.map((r) => (
           <section key={r.id} className="stack" style={{ gap: 8 }}>
-            <div className="sl-h" style={{ margin: 0 }}><a href={storyHref(save, r.id)}>{r.s.name}</a><span className="cnt">{plural(vids.filter((b) => b.b.storyline === r.id).length, 'beat')}</span></div>
+            <div className="sl-h" style={{ margin: 0 }}><a href={storyHref(save, r.id)}>{r.s.name}</a><span className="cnt">{plural(vids.filter((b) => b.b.storyline === r.id).length, 'moment')}</span></div>
             {sortBeats(vids.filter((b) => b.b.storyline === r.id)).reverse().map((b) => <BeatCard key={b.id} ctx={ctx} b={b} onEdit={() => setEdit(b.id)} />)}
           </section>
         ))}
@@ -423,7 +423,8 @@ function StoryPage({ save, id }: { save: SaveRow; id: string }) {
   const ctx = useStories(save);
   const store = useStore();
   const phone = useIsPhone();
-  const [modal, setModal] = useState<null | { t: 'edit' } | { t: 'beat'; id: string | null } | { t: 'secret'; id: string | null }>(null);
+  const [modal, setModal] = useState<null | { t: 'edit' } | { t: 'beat'; id: string | null; planned?: boolean } | { t: 'secret'; id: string | null }>(null);
+  const [more, setMore] = useState(false);
   const [del, setDel] = useState(false);
   const [q, setQ] = useState('');
   const row = ctx.byId.get(id);
@@ -442,7 +443,6 @@ function StoryPage({ save, id }: { save: SaveRow; id: string }) {
         <h1 style={phone ? { fontSize: 24, margin: 0 } : { margin: 0 }}>{s.name || 'Unnamed storyline'}</h1>
         <div className="sl-head-sub">
           <ViewSwitch<Status> value={s.status} options={STATUSES.map((x) => ({ v: x.id, label: x.label }))} onChange={(status) => put({ status })} label="Status" />
-          <button type="button" className={`btn sm ${s.pinned ? 'sl-pinned' : ''}`} aria-pressed={s.pinned} onClick={() => put({ pinned: !s.pinned })}><PushPin size={15} weight="duotone" /> {s.pinned ? 'Pinned' : 'Pin'}</button>
         </div>
         {s.tags.length > 0 && <div className="sl-tags" style={{ marginTop: 8 }}>{s.tags.map((t) => <span key={t} className="tag outline-soft">{t}</span>)}</div>}
         {cast.length > 0 && <div className="sl-castline"><Faces sims={cast} size={40} max={8} /><span className="muted">{plural(cast.length, 'Sim')} in the cast</span></div>}
@@ -450,14 +450,14 @@ function StoryPage({ save, id }: { save: SaveRow; id: string }) {
       <div className="row" style={{ gap: 8 }}>
         <button type="button" className="btn" onClick={exportIt}><DownloadSimple size={16} weight="duotone" /> {phone ? 'Export' : 'Export to vault'}</button>
         <button type="button" className="btn icon" aria-label="Edit storyline" onClick={() => setModal({ t: 'edit' })}><PencilSimple size={18} /></button>
-        <button type="button" className="btn primary" onClick={() => setModal({ t: 'beat', id: null })}><Plus size={16} weight="bold" /> Add beat</button>
+        <button type="button" className="btn primary" onClick={() => setModal({ t: 'beat', id: null })}><Plus size={16} weight="bold" /> Add moment</button>
       </div>
     </div>
   );
   const timeline = (
     <section className="stack" style={{ gap: 8 }}>
       <div className="sl-h" style={{ margin: 0 }}>What happened{beats.length > 0 && <span className="cnt">{beats.length}</span>}</div>
-      {beats.length === 0 && <p className="muted" style={{ margin: 0 }}>No beats yet. Add the first thing that happened.</p>}
+      {beats.length === 0 && <p className="muted" style={{ margin: 0 }}>No moments yet. Add the first thing that happened.</p>}
       <div className="sl-timeline">
         {beats.map((b, i) => {
           const partOf = (d: number | null) => (!ctx.info.track ? 0 : d == null ? 2 : dateOf(d, ctx.info.cal).year < ctx.info.cal.anchorDate.year ? 1 : 0);
@@ -471,6 +471,27 @@ function StoryPage({ save, id }: { save: SaveRow; id: string }) {
           );
         })}
       </div>
+    </section>
+  );
+  const today = ctx.info.track ? ctx.info.today : null;
+  const myPlanned = ctx.planned.filter((b) => b.b.storyline === id);
+  const shown = more ? myPlanned : myPlanned.slice(0, 3);
+  const markDone = (b: BeatRow) => { store.put('beat', { ...b.b, planned: false } as unknown as Record<string, unknown>, b.id); toast('Marked as happened'); };
+  const plannedCard = myPlanned.length === 0 ? null : (
+    <section className="card sl-card" aria-label="Planned">
+      <div className="card-head"><h2>Planned<span className="cnt">{myPlanned.length}</span></h2><button type="button" className="btn sm" onClick={() => setModal({ t: 'beat', id: null, planned: true })}><Plus size={15} weight="bold" /> Moment</button></div>
+      {shown.map((b) => {
+        const due = isDue(b.b, today);
+        const w = ctx.dayText(b.b.day, b.b.precision);
+        return (
+          <div key={b.id} className="sl-plan-row">
+            <span className="sl-plan-when">{w ? <b>{w.split(' · ')[0]}</b> : <b>—</b>}{w.includes(' · ') ? w.split(' · ')[1] : ''}</span>
+            <button type="button" className="sl-plan-text" onClick={() => setModal({ t: 'beat', id: b.id })}>{b.b.text}{due ? <StatusChip tone="due"><Timer size={12} weight="bold" /> Due</StatusChip> : null}</button>
+            <button type="button" className="sl-plan-done" aria-label="Mark as happened" title="Mark as happened" onClick={() => markDone(b)}><Check size={16} weight="bold" /></button>
+          </div>
+        );
+      })}
+      {myPlanned.length > 3 && <button type="button" className="btn ghost sm sl-plan-fold" onClick={() => setMore(!more)}>{more ? 'Show fewer' : `+ ${myPlanned.length - 3} more planned, further ahead`}</button>}
     </section>
   );
   const side = (
@@ -497,10 +518,7 @@ function StoryPage({ save, id }: { save: SaveRow; id: string }) {
           <button type="submit" className="btn sm" disabled={!q.trim()}>Add</button>
         </form>
       </section>
-      <section className="card sl-card">
-        <div className="card-head"><h2>Episode notes</h2></div>
-        <AutoText value={s.notes} onSave={(v) => put({ notes: v })} placeholder="Voiceover angle, what to say after the clip…" label="Episode notes" rows={4} />
-      </section>
+      {plannedCard}
       <button type="button" className="btn ghost danger" style={{ alignSelf: 'flex-start' }} onClick={() => setDel(true)}>Delete storyline</button>
     </div>
   );
@@ -508,9 +526,9 @@ function StoryPage({ save, id }: { save: SaveRow; id: string }) {
     <div className={phone ? 'm-stack' : 'page stack'} style={{ gap: 16 }}>
       <a className="ph-back" href={href(save)}><CaretLeft size={18} weight="bold" /> Storylines</a>
       {head}
-      {phone ? <div className="stack" style={{ gap: 14 }}>{side}{timeline}</div> : <div className="sl-two"><div>{timeline}</div>{side}</div>}
+      {phone ? <div className="stack" style={{ gap: 14 }}>{timeline}{side}</div> : <div className="sl-two"><div>{timeline}</div>{side}</div>}
       {modal?.t === 'edit' && <StoryForm ctx={ctx} id={id} onClose={() => setModal(null)} onSaved={() => setModal(null)} />}
-      {modal?.t === 'beat' && <BeatForm ctx={ctx} id={modal.id} storyline={id} onClose={() => setModal(null)} />}
+      {modal?.t === 'beat' && <BeatForm ctx={ctx} id={modal.id} storyline={id} startPlanned={modal.planned} onClose={() => setModal(null)} />}
       {modal?.t === 'secret' && <SecretForm ctx={ctx} id={modal.id} storyline={id} onClose={() => setModal(null)} onSaved={() => setModal(null)} />}
       {del && (
         <Confirm title="Delete this storyline?" text="Its beats and secrets go to Trash with it for 7 days." onCancel={() => setDel(false)}

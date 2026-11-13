@@ -199,3 +199,21 @@ button.lg-gen.fold { grid-template-columns: 44px minmax(0, 1fr) auto; }
 .lg-peek .notes-box { flex: 1; min-height: 240px; font-size: 16px; line-height: 1.6; }
 @media (max-width: 900px) { .lg-two { grid-template-columns: 1fr; } }
 @media (max-width: 700px) { .lg-gen { grid-template-columns: 30px minmax(0, 1fr) 64px; padding: 8px 12px; min-height: 56px; gap: 10px; } .lg-gen.cur { min-height: 72px; } .lg-heir { display: none; } .lg-hh-sub { display: none; } .lg-dl { grid-template-columns: 80px minmax(0, 1fr); } }
+
+.sl-chip.plan { gap: 6px; background: transparent; border: 1.5px dashed var(--toggle-off); color: var(--muted); }
+.sl-chip.plan.on { border-color: var(--accent); color: var(--accent); background: transparent; }
+.sl-plan-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.sl-plan-row:first-of-type { border-top: 0; }
+.sl-plan-when { flex: 0 0 76px; white-space: nowrap; font-size: 13px; line-height: 1.25; color: var(--muted); }
+.sl-plan-when b { display: block; color: var(--text); font-size: 15px; }
+.sl-plan-text { flex: 1; min-width: 0; text-align: left; background: none; border: 0; padding: 0; font: inherit; color: var(--text); cursor: pointer; overflow-wrap: anywhere; }
+.sl-plan-text .p-chip { margin-left: 6px; vertical-align: 1px; }
+.sl-plan-done { flex: 0 0 auto; width: 32px; height: 32px; display: inline-grid; place-items: center; border-radius: 50%; border: 1.5px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; }
+.sl-plan-done:hover, .sl-plan-done:focus-visible { border-color: var(--accent); color: var(--accent); }
+.sl-plan-fold { margin-top: 6px; }
+
+.tip-wrap { position: relative; display: inline-flex; }
+.tip-btn { width: 32px; height: 32px; display: inline-grid; place-items: center; border: 0; background: none; color: var(--muted); cursor: pointer; border-radius: 50%; }
+.tip-btn:hover, .tip-btn:focus-visible { color: var(--accent); }
+.tip-note { margin: 0; padding: 0 16px 10px; }
+@media (max-width: 700px) { .sl-head > .grow { flex: 1 1 100%; } }

@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
-import { beatRows, type Precision, feelRows, secretRows, sortBeats, storyRows, type BeatRow, type FeelRow, type SecretRow, type StoryRow } from '../../lib/storylines';
+import { beatRows, type Precision, feelRows, secretRows, sortBeats, sortPlanned, storyRows, type BeatRow, type FeelRow, type SecretRow, type StoryRow } from '../../lib/storylines';
 import { dateOf, formatDate, SEASONS, yearText } from '../../lib/time';
 import { useRecords } from '../../lib/sync/react';
 import type { SaveRow } from '../../lib/sync/types';
 import { fullName, simData, type SimData } from '../../lib/sims';
+import { useStreaming } from '../../lib/streaming';
 import { useHouseholds, useSaveInfo } from '../sims/shared';
 
 /** Everything the Storylines pages need to know about the open save. */
@@ -15,10 +16,14 @@ export function useStories(save: SaveRow) {
   const simRecs = useRecords('sim');
   const hh = useHouseholds();
   const info = useSaveInfo(save);
+  const [streaming] = useStreaming();
   return useMemo(() => {
     const stories = storyRows(storyRecs);
     const byId = new Map<string, StoryRow>(stories.map((r) => [r.id, r]));
-    const beats: BeatRow[] = sortBeats(beatRows(beatRecs)).filter((b) => byId.has(b.b.storyline));
+    const all: BeatRow[] = sortBeats(beatRows(beatRecs)).filter((b) => byId.has(b.b.storyline));
+    // `beats` is what happened. Planned moments are kept apart, and gone entirely in streaming mode.
+    const beats = all.filter((b) => !b.b.planned);
+    const planned = streaming ? [] : sortPlanned(all.filter((b) => b.b.planned), info.track ? info.today : null);
     const secrets: SecretRow[] = secretRows(secretRecs);
     const feelings: FeelRow[] = feelRows(feelRecs);
     const sims = new Map<string, SimData>(simRecs.map((r) => [r.id, simData(r)]));
@@ -36,8 +41,8 @@ export function useStories(save: SaveRow) {
       if (precision === 'season') return here ? SEASONS[d.season] : `${SEASONS[d.season]} · Year ${yearText(d.year)}`;
       return here ? formatDate(d, 'short') : `${formatDate(d, 'short')} · Year ${yearText(d.year)}`;
     };
-    return { stories, byId, beats, secrets, feelings, sims, nameOf, firstOf, householdOf, faces, dayText, hh, info };
-  }, [storyRecs, beatRecs, secretRecs, feelRecs, simRecs, hh, info]);
+    return { stories, byId, beats, planned, streaming, secrets, feelings, sims, nameOf, firstOf, householdOf, faces, dayText, hh, info };
+  }, [storyRecs, beatRecs, secretRecs, feelRecs, simRecs, hh, info, streaming]);
 }
 export type StoriesCtx = ReturnType<typeof useStories>;
 

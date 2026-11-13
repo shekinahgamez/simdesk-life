@@ -50,7 +50,7 @@ export function TodayPage({ save }: { save: SaveRow }) {
       )}
     </div>
   );
-  const coming = <ComingUp save={save} simIds={living.map((r) => r.id)} seeAll="calendar" showFaces />;
+  const coming = <ComingUp save={save} simIds={living.map((r) => r.id)} seeAll="calendar" showFaces planned />;
   const sort = <ToSort save={save} sims={living} />;
   const recent = <JumpBackIn save={save} />;
   const playing = <PlayingNow save={save} where="today" />;
