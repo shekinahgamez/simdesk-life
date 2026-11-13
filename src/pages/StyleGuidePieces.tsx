@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Kanban, Rows, SquaresFour, VideoCamera } from '@phosphor-icons/react';
 import {
-  AddButton, Board, CheckList, EmptyState, FilterBar, FilterButton, ListRow, MoreMenu, PageHeader, ProgressBar, SectionHeader, SelectBar, StatusChip, ViewSwitch, type Tone,
+  AddButton, Board, CheckList, Dropdown, EmptyState, FilterBar, FilterButton, ListRow, MoreMenu, PageHeader, ProgressBar, SectionHeader, SelectBar, StatusChip, ViewSwitch, type Tone,
 } from '../components/pieces';
-import { Picker } from '../components/ui';
 
 export function PiecesIntro() {
   return (
@@ -36,7 +35,7 @@ export function Pieces() {
   ]);
   const [pick, setPick] = useState<string[]>(['a']);
   const [picked, setPicked] = useState(false);
-  const [dd, setDd] = useState<string[]>(['barber']);
+  const [dd, setDd] = useState('barber');
   return (
     <>
       <h1 style={{ margin: '40px 0 0' }}>Shared pieces</h1>
@@ -76,7 +75,7 @@ export function Pieces() {
         <div><MoreMenu items={[{ label: 'Rename', run: () => {} }, { label: 'Duplicate', run: () => {} }, { label: 'Delete', run: () => {}, danger: true }]} /></div>
       </Piece>
       <Piece name="Dropdown picker" rule="Every dropdown is the app’s picker, with search. Never a plain browser dropdown.">
-        <Picker options={[{ id: 'barber', label: 'Barbershop' }, { id: 'bar', label: 'Bar' }, { id: 'gym', label: 'Gym' }]} value={dd} onChange={setDd} />
+        <Dropdown value={dd} onChange={setDd} none="None yet" options={[{ id: 'barber', label: 'Barbershop' }, { id: 'bar', label: 'Bar' }, { id: 'gym', label: 'Gym' }]} />
       </Piece>
       <Piece name="Section header, page header, add button" rule="A section header is a title, a count and an action. A page header is a back link, a title and actions. Add buttons are small and quiet, in the same place on every card.">
         <SectionHeader title="Open" count={4} action={<AddButton onClick={() => {}}>Add storyline</AddButton>} />
