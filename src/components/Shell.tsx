@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   CalendarBlank, CaretLeft, CaretRight, CaretUpDown, Check, DotsThreeCircle, GearSix, GlobeHemisphereWest, House, Plus, Sparkle as SparkleIcon, User, UserCircle,
-  ArrowsClockwise, Crown, Storefront,
+  ArrowsClockwise, CaretDown, Coins, Crown, Notebook, Path, Storefront, type Icon,
 } from '@phosphor-icons/react';
 import { Wordmark } from './brand';
 import { needsPack, ObjIcon, SECTIONS } from './categories';
@@ -9,7 +9,7 @@ import { SyncCloud, SyncLine } from './sync';
 import { Sheet } from './ui';
 import { useLayer } from '../lib/layers';
 import { go, savePath, type Route } from '../lib/router';
-import { moduleOn, saveData, todayOf } from '../lib/saves';
+import { moduleOn, saveData, todayOf, type SaveData } from '../lib/saves';
 import { DateSheet, NextDayButton } from './DayMove';
 import { CommandHost, QuickButton, SideSearch } from './CommandBar';
 import { useSaves } from '../lib/sync/react';
@@ -41,7 +41,8 @@ export function Shell({ save, route, children }: { save: SaveRow | null; route: 
 function Sidebar({ save, route }: { save: SaveRow | null; route: Route }) {
   const d = save ? saveData(save) : null;
   const section = route.page === 'save' ? (route.section === 'households' ? 'sims' : route.section) : route.page;
-  const cats = d ? SECTIONS.filter((c) => (!c.module || moduleOn(d, c.module)) && needsPack(c, d.packs)) : [];
+  const BASICS = ['sims', 'worlds', 'calendar', 'photos', 'clubs'];
+  const cats = d ? SECTIONS.filter((c) => BASICS.includes(c.id) && needsPack(c, d.packs)).sort((x, y) => BASICS.indexOf(x.id) - BASICS.indexOf(y.id)) : [];
   return (
     <nav className="sidebar" aria-label="Main">
       <a href="#/" style={{ display: 'flex', alignItems: 'center', padding: '4px 8px', textDecoration: 'none' }} aria-label="SimDesk home">
@@ -50,29 +51,14 @@ function Sidebar({ save, route }: { save: SaveRow | null; route: Route }) {
       {save && d && <SaveSwitcher save={save} />}
       {save && d?.trackDate && <NextDayButton save={save} className="btn sm side-nextday" />}
       {save && <SideSearch />}
-      {save && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {cats.map((c) => (
-            <a key={c.id} href={savePath(save.id, c.path)} className={`nav-link ${section === c.path ? 'active' : ''}`} aria-current={section === c.path ? 'page' : undefined}>
-              <ObjIcon cat={c.id} /> {c.label}
-            </a>
-          ))}
-          {d && moduleOn(d, 'rotation') && (
-            <a href={savePath(save.id, 'rotation')} className={`nav-link ${section === 'rotation' ? 'active' : ''}`} aria-current={section === 'rotation' ? 'page' : undefined}>
-              <span className="obj rotation" aria-hidden="true"><ArrowsClockwise size={16} weight="duotone" /></span> Rotation
-            </a>
-          )}
-          {d && moduleOn(d, 'venues') && (
-            <a href={savePath(save.id, 'businesses')} className={`nav-link ${section === 'businesses' ? 'active' : ''}`} aria-current={section === 'businesses' ? 'page' : undefined}>
-              <span className="obj businesses" aria-hidden="true"><Storefront size={16} weight="duotone" /></span> Businesses
-            </a>
-          )}
-          {d && moduleOn(d, 'legacy') && (
-            <a href={savePath(save.id, 'legacy')} className={`nav-link ${section === 'legacy' ? 'active' : ''}`} aria-current={section === 'legacy' ? 'page' : undefined}>
-              <span className="obj legacy" aria-hidden="true"><Crown size={16} weight="duotone" /></span> Legacy
-            </a>
-          )}
-        </div>
+      {save && d && (
+        <>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <SideLink href={savePath(save.id, 'today')} on={section === 'today' || section === ''} icon={<span className="obj today" aria-hidden="true"><House size={16} weight="duotone" /></span>} label="Today" />
+            {cats.map((c) => <SideLink key={c.id} href={savePath(save.id, c.path)} on={section === c.path} icon={<ObjIcon cat={c.id} />} label={c.label} />)}
+          </div>
+          <ModuleLinks save={save} d={d} section={section} />
+        </>
       )}
       <span className="grow" />
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -87,6 +73,39 @@ function Sidebar({ save, route }: { save: SaveRow | null; route: Route }) {
         <div style={{ padding: '8px 10px' }}><SyncLine /></div>
       </div>
     </nav>
+  );
+}
+
+function SideLink({ href, on, icon, label }: { href: string; on: boolean; icon: ReactNode; label: string }) {
+  return (
+    <a href={href} className={`nav-link ${on ? 'active' : ''}`} aria-current={on ? 'page' : undefined}>{icon} {label}</a>
+  );
+}
+
+const modIcon = (cls: string, I: Icon) => <span className={`obj ${cls}`} aria-hidden="true"><I size={16} weight="duotone" /></span>;
+
+/** The switched-on modules, under a "Modules" line that folds away. The choice is remembered on this device. */
+function ModuleLinks({ save, d, section }: { save: SaveRow; d: SaveData; section: string }) {
+  const [open, setOpen] = useState(() => { try { return localStorage.getItem('sd-modules-open') !== '0'; } catch { return true; } });
+  const toggle = () => setOpen((v) => { try { localStorage.setItem('sd-modules-open', v ? '0' : '1'); } catch { /* private mode */ } return !v; });
+  const items = [
+    { id: 'journal', path: 'docs', label: 'Docs', icon: modIcon('docs', Notebook) },
+    { id: 'rotation', path: 'rotation', label: 'Rotation', icon: modIcon('rotation', ArrowsClockwise) },
+    { id: 'venues', path: 'businesses', label: 'Businesses', icon: modIcon('businesses', Storefront) },
+    { id: 'funds', path: 'households', label: 'Household funds', icon: modIcon('funds', Coins), noActive: true },
+    { id: 'storylines', path: 'storylines', label: 'Storylines', icon: modIcon('storylines', Path) },
+    { id: 'legacy', path: 'legacy', label: 'Legacy', icon: modIcon('legacy', Crown) },
+  ].filter((m) => moduleOn(d, m.id));
+  if (!items.length) return null;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <button type="button" className="nav-group" aria-expanded={open} onClick={toggle}>
+        <span>Modules</span><CaretDown size={14} weight="bold" className="caret" aria-hidden="true" />
+      </button>
+      {open
+        ? items.map((m) => <SideLink key={m.id} href={savePath(save.id, m.path)} on={!m.noActive && section === m.path} icon={m.icon} label={m.label} />)
+        : <span className="nav-group-sum">{items.length} on · {items.slice(0, 3).map((m) => m.label).join(', ')}{items.length > 3 ? '…' : ''}</span>}
+    </div>
   );
 }
 

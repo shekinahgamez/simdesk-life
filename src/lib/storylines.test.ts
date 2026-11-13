@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  beatData, beatRows, castOf, cleanTags, filterStories, knowOf, knowsSummary, latestBeat, NO_FILTER, secretData, sortBeats, sortStories,
+  beatData, beatRows, isDue, sortPlanned, castOf, cleanTags, filterStories, knowOf, knowsSummary, latestBeat, NO_FILTER, secretData, sortBeats, sortStories,
   storiesOfSim, storyMarkdown, storyRows, storylineData, tagChoices, type SecretData,
 } from './storylines';
 import type { Rec } from './sync/types';
@@ -72,5 +72,25 @@ describe('storylines logic', () => {
     expect(md).toContain('# Hookah bar night');
     expect(md).toContain('Cast: [[kai]]');
     expect(md.indexOf('Unpacking')).toBeLessThan(md.indexOf('At the door'));
+  });
+});
+
+describe('planned moments', () => {
+  const rows = beatRows([
+    beat('a', { storyline: 's', text: 'far', day: 300, planned: true }),
+    beat('b', { storyline: 's', text: 'undated', planned: true }),
+    beat('c', { storyline: 's', text: 'soon', day: 120, planned: true }),
+    beat('d', { storyline: 's', text: 'due', day: 90, planned: true }),
+    beat('e', { storyline: 's', text: 'old moment', day: 10 }),
+  ]);
+  it('old moments are not planned', () => expect(rows[4].b.planned).toBe(false));
+  it('due means planned, dated and today has come', () => {
+    expect(isDue(rows[3].b, 100)).toBe(true);
+    expect(isDue(rows[2].b, 100)).toBe(false);
+    expect(isDue(rows[1].b, 100)).toBe(false);
+    expect(isDue(rows[4].b, 100)).toBe(false);
+  });
+  it('orders due, then soonest, then undated', () => {
+    expect(sortPlanned(rows.filter((r) => r.b.planned), 100).map((r) => r.b.text)).toEqual(['due', 'soon', 'far', 'undated']);
   });
 });

@@ -10,6 +10,8 @@ import { newId } from '../../lib/sync/store';
 import type { SaveRow } from '../../lib/sync/types';
 import { dateOf, formatDate, SEASONS, stageName } from '../../lib/time';
 import { SimAvatar, useSaveInfo } from '../sims/shared';
+import { StatusChip } from '../../components/pieces';
+import { usePlannedComing } from '../storylines/planned';
 
 /** Everything the calendar pages share for the open save. */
 export function useCalCtx(save: SaveRow) {
@@ -96,18 +98,36 @@ export function whenText(ctx: CalCtx, i: Pick<CalItem, 'kind' | 'day' | 'end'>):
 // ---------- Coming up (Sim profile, household page) ----------
 /** The next 3 things for these Sims, with See all. Hidden when the save doesn't track the date. */
 /** `compact`: tighter rows, birthdays show only the days left on the right (desktop household page). */
-export function ComingUp({ save, simIds, seeAll, showFaces, compact }: { save: SaveRow; simIds: string[]; seeAll: string; showFaces?: boolean; compact?: boolean }) {
+export function ComingUp({ save, simIds, seeAll, showFaces, compact, planned }: { save: SaveRow; simIds: string[]; seeAll: string; showFaces?: boolean; compact?: boolean; planned?: boolean }) {
   const ctx = useCalCtx(save);
+  const plan = usePlannedComing(save, !!planned);
   if (!ctx.info.track || !simIds.length) return null;
   const today = ctx.info.today;
   const list = comingUp(ctx.state, simIds, today);
   const mine = new Set(simIds);
+  // Planned moments sit in the same list, by date: the top 3, then a link for the rest.
+  const planTop = plan.slice(0, 3);
+  const rows: ({ k: 'cal'; day: number; i: (typeof list)[number] } | { k: 'plan'; day: number; p: (typeof plan)[number] })[] = [
+    ...list.map((i) => ({ k: 'cal' as const, day: i.day, i })), ...planTop.map((p) => ({ k: 'plan' as const, day: p.day, p })),
+  ].sort((a, b) => a.day - b.day);
   return (
     <section className={`card${compact ? ' cu-compact' : ''}`}>
       <div className="card-head"><h2>Coming up</h2><a className="btn ghost sm" style={{ color: 'var(--accent)' }} href={savePath(save.id, seeAll)}>See all</a></div>
-      {list.length === 0 ? <p className="muted small" style={{ margin: 0 }}>Nothing on the calendar yet.</p> : (
+      {rows.length === 0 ? <p className="muted small" style={{ margin: 0 }}>Nothing on the calendar yet.</p> : (
         <div className="cal-cu">
-          {list.map((i) => {
+          {rows.map((row) => {
+            if (row.k === 'plan') {
+              const p = row.p;
+              const pd = dateOf(p.day, ctx.info.cal);
+              return (
+                <a key={`p-${p.id}`} className="cal-cu-row k-planned" href={savePath(save.id, `storylines/${p.storyId}`)}>
+                  <span className="cal-when"><b>{pd.day}</b><span>{SEASONS[pd.season]}</span></span>
+                  <span className="grow"><b>{p.text}</b><span className="s">{p.story}</span></span>
+                  <StatusChip tone={p.due ? 'due' : 'planned'}>{p.due ? 'Due' : 'Planned'}</StatusChip>
+                </a>
+              );
+            }
+            const i = row.i;
             const d = dateOf(i.day, ctx.info.cal);
             // On a Sim's page the age block already counts the days, so the birthday just says what's next.
             const sub = i.kind === 'birthday' ? (!showFaces && i.toStage ? `Ages up to ${stageName(i.toStage).toLowerCase()}` : `Birthday · ${daysWord(i.day - today)}`)
@@ -124,6 +144,7 @@ export function ComingUp({ save, simIds, seeAll, showFaces, compact }: { save: S
               </a>
             );
           })}
+          {plan.length > 3 && <a className="btn ghost sm" style={{ color: 'var(--accent)', alignSelf: 'flex-start' }} href={savePath(save.id, 'storylines')}>{plan.length - 3} more planned</a>}
         </div>
       )}
     </section>

@@ -1,9 +1,9 @@
 import { useMemo, useRef, useState, type ReactNode } from 'react';
-import { CaretDown, CaretLeft, CaretRight, Check, DownloadSimple, EyeSlash, Flame, HouseSimple, Kanban, MagnifyingGlass, Path, PencilSimple, Plus, PushPin, Question, Rows, SquaresFour, VideoCamera, X } from '@phosphor-icons/react';
-import { Confirm, SearchBox, Seg, toast } from '../../components/ui';
+import { CaretLeft, CaretRight, Check, DownloadSimple, EyeSlash, Flame, HouseSimple, Kanban, Path, PencilSimple, Plus, PushPin, Question, Rows, SquaresFour, Timer, VideoCamera, X } from '@phosphor-icons/react';
+import { Confirm, toast } from '../../components/ui';
 import { ObjIcon } from '../../components/categories';
 import {
-  castOf, FEEL_KINDS, feelLabel, filterActive, filterCount, filterStories, knowOf, knowsSummary, KNOWS, latestBeat, NO_FILTER, secretPeople, sortBeats, sortStories,
+  castOf, FEEL_KINDS, feelLabel, filterActive, filterCount, filterStories, isDue, knowOf, knowsSummary, KNOWS, latestBeat, NO_FILTER, secretPeople, sortBeats, sortStories,
   statusLabel, STATUSES, storyMarkdown, tagChoices, type BeatRow, type FeelKind, type Know, type SecretRow, type Status, type StoryFilter, type StoryRow,
 } from '../../lib/storylines';
 import { go, savePath } from '../../lib/router';
@@ -16,6 +16,7 @@ import { useIsPhone } from '../../lib/useIsPhone';
 import { Faces } from '../households/shared';
 import { StoryPhotos } from '../photos/PhotosPage';
 import { RowPop } from '../sims/RowEdit';
+import { Board, CheckList, FilterBar, FilterButton, StatusChip, ViewSwitch, type Tone } from '../../components/pieces';
 import { SimAvatar } from '../sims/shared';
 import { BeatForm, FeelingForm, SecretForm, SimChecklist, StoryForm } from './forms';
 import { realDay, useStories, type StoriesCtx } from './shared';
@@ -52,42 +53,8 @@ export function StorylinesPage({ save, rest }: { save: SaveRow; rest: string[] }
 }
 
 // ---------- pieces ----------
-const StatusTag = ({ s }: { s: Status }) => <span className={`tag sl-st ${s}`}>{statusLabel(s)}</span>;
-
-function FilterBtn({ label, count, title, phone, children }: { label: string; count: number; title: string; phone: boolean; children(close: () => void): ReactNode }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLButtonElement>(null);
-  return (
-    <>
-      <button ref={ref} type="button" className={`btn sm sl-fb ${count ? 'on' : ''}`} aria-haspopup="dialog" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        {label}{count > 0 && ` · ${count}`}<CaretDown size={12} weight="bold" aria-hidden="true" />
-      </button>
-      {open && <RowPop anchor={ref.current} title={title} phone={phone} onClose={() => setOpen(false)} width={340}>{children(() => setOpen(false))}</RowPop>}
-    </>
-  );
-}
-
-/** A checklist with optional search and a count per row. */
-function CheckList({ options, value, onChange, search, icon }: { options: { id: string; label: string; n?: number }[]; value: string[]; onChange(v: string[]): void; search?: boolean; icon?: ReactNode }) {
-  const [q, setQ] = useState('');
-  const shown = options.filter((o) => !q.trim() || normalize(o.label).includes(normalize(q)));
-  return (
-    <div className="ph-pk">
-      {search && <div className="ph-pk-search"><SearchBox value={q} onChange={setQ} placeholder={`Search ${options.length}`} /></div>}
-      <div className="ph-pk-list">
-        {shown.map((o) => {
-          const on = value.includes(o.id);
-          return (
-            <button key={o.id} type="button" role="checkbox" aria-checked={on} aria-label={o.label} className="ph-pk-sim" onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])}>
-              <span className={`ph-cb ${on ? 'on' : ''}`} aria-hidden="true" />{icon}<span className="ph-pk-t">{o.label}</span>{o.n != null && <span className="sl-n">{o.n}</span>}
-            </button>
-          );
-        })}
-        {shown.length === 0 && <p className="muted ph-pk-none">{options.length ? `No match for “${q.trim()}”.` : 'Nothing to pick yet.'}</p>}
-      </div>
-    </div>
-  );
-}
+const STATUS_TONE: Record<Status, Tone> = { brewing: 'warm', hot: 'hot', resolved: 'done' };
+const StatusTag = ({ s }: { s: Status }) => <StatusChip tone={STATUS_TONE[s]}>{statusLabel(s)}</StatusChip>;
 
 const download = (name: string, text: string) => {
   const url = URL.createObjectURL(new Blob([text], { type: 'text/markdown' }));
@@ -106,7 +73,7 @@ function Hub({ save, tab }: { save: SaveRow; tab: Tab }) {
   const sub = tab === 'storylines' ? (ctx.stories.length ? `${plural(ctx.stories.length, 'storyline')} · ${open} open` : 'Threads that link your Sims')
     : tab === 'secrets' ? `${ctx.secrets.filter((s) => !s.sec.out).length} open · ${ctx.secrets.filter((s) => s.sec.out).length} out in the open`
     : tab === 'feelings' ? 'Who feels what about who' : 'Beats you marked as content material';
-  const primary: Record<Tab, [string, 'story' | 'beat' | 'secret' | 'feeling']> = { storylines: ['New storyline', 'story'], secrets: ['New secret', 'secret'], feelings: ['Add feeling', 'feeling'], video: ['Add beat', 'beat'] };
+  const primary: Record<Tab, [string, 'story' | 'beat' | 'secret' | 'feeling']> = { storylines: ['New storyline', 'story'], secrets: ['New secret', 'secret'], feelings: ['Add feeling', 'feeling'], video: ['Add moment', 'beat'] };
   const [pl, pk] = primary[tab];
   const btn = <button type="button" className="btn primary" onClick={() => setAdding(pk)}><Plus size={16} weight="bold" /> {pl}</button>;
   const tabs = (
@@ -180,34 +147,27 @@ function StoriesTab({ save, ctx, phone, onNew }: { save: SaveRow; ctx: StoriesCt
     );
   }
   const switcher = (
-    <div className="sl-views" role="group" aria-label="View">
-      {([['list', 'List', Rows], ['cards', 'Cards', SquaresFour], ['board', 'Board', Kanban]] as const).filter(([v]) => !(phone && v === 'board')).map(([v, label, I]) => (
-        <button key={v} type="button" aria-label={label} aria-pressed={eff === v} onClick={() => setView(v)}><I size={16} weight="duotone" aria-hidden="true" /><span>{label}</span></button>
-      ))}
-    </div>
+    <ViewSwitch label="View" value={eff} onChange={setView}
+      options={([['list', 'List', Rows], ['cards', 'Cards', SquaresFour], ['board', 'Board', Kanban]] as const).filter(([v]) => !(phone && v === 'board')).map(([v, label, icon]) => ({ v, label, icon }))} />
   );
   const bar = (
-    <div className="sl-bar">
-      <div className="sl-search"><MagnifyingGlass size={16} weight="bold" aria-hidden="true" /><input aria-label="Search storylines" placeholder="Search storylines" value={f.q} onChange={(e) => set({ q: e.target.value })} /></div>
-      <FilterBtn label="Sims" title="Sims" count={f.sims.length} phone={phone}>{() => <SimChecklist ctx={ctx} value={f.sims} onChange={(sims) => set({ sims })} counts={simCounts} />}</FilterBtn>
-      <FilterBtn label="Household" title="Households" count={f.households.length} phone={phone}>
+    <FilterBar search={f.q} onSearch={(q) => set({ q })} searchLabel="Search storylines" active={active} onClear={() => setF(NO_FILTER)} right={switcher}>
+      <FilterButton label="Sims" title="Sims" count={f.sims.length}>{() => <SimChecklist ctx={ctx} value={f.sims} onChange={(sims) => set({ sims })} counts={simCounts} />}</FilterButton>
+      <FilterButton label="Household" title="Households" count={f.households.length}>
         {() => <CheckList search options={ctx.hh.list.map((r) => ({ id: r.id, label: ctx.hh.nameOf(r.id), n: hhCounts.get(r.id) ?? 0 }))} value={f.households} onChange={(households) => set({ households })} icon={<span className="obj households sm" aria-hidden="true"><HouseSimple size={14} weight="duotone" /></span>} />}
-      </FilterBtn>
-      <FilterBtn label="Status" title="Status" count={f.statuses.length} phone={phone}>
+      </FilterButton>
+      <FilterButton label="Status" title="Status" count={f.statuses.length}>
         {() => <CheckList options={STATUSES.map((s) => ({ id: s.id, label: s.label, n: ctx.stories.filter((r) => r.s.status === s.id).length }))} value={f.statuses} onChange={(v) => set({ statuses: v as Status[] })} />}
-      </FilterBtn>
-      <FilterBtn label="Tag" title="Tags" count={f.tags.length} phone={phone}>
+      </FilterButton>
+      <FilterButton label="Tag" title="Tags" count={f.tags.length}>
         {() => <CheckList search={tags.length > 8} options={tags.map((t) => ({ id: t.label, label: t.label, n: t.n }))} value={f.tags} onChange={(v) => set({ tags: v })} />}
-      </FilterBtn>
-      {(active) && <button type="button" className="sl-clear" onClick={() => setF(NO_FILTER)}>Clear</button>}
-      <span className="grow" />
-      {switcher}
-    </div>
+      </FilterButton>
+    </FilterBar>
   );
 
   let body: ReactNode;
   if (rows.length === 0) body = <div className="empty"><p>No storylines match.</p><button type="button" className="btn" onClick={() => setF(NO_FILTER)}>Clear filters</button></div>;
-  else if (eff === 'board') body = <Board save={save} ctx={ctx} rows={rows} move={(id, status) => { const r = ctx.byId.get(id); if (r && r.s.status !== status) store.put('storyline', { ...r.s, status } as unknown as Record<string, unknown>, id); }} />;
+  else if (eff === 'board') body = <StoryBoard save={save} ctx={ctx} rows={rows} move={(id, status) => { const r = ctx.byId.get(id); if (r && r.s.status !== status) store.put('storyline', { ...r.s, status } as unknown as Record<string, unknown>, id); }} />;
   else {
     const pinned = rows.filter((r) => r.s.pinned && r.s.status !== 'resolved');
     const openRows = rows.filter((r) => !r.s.pinned && r.s.status !== 'resolved');
@@ -267,32 +227,21 @@ function StoryCard({ save, ctx, row }: { save: SaveRow; ctx: StoriesCtx; row: St
   );
 }
 
-function Board({ save, ctx, rows, move }: { save: SaveRow; ctx: StoriesCtx; rows: StoryRow[]; move(id: string, s: Status): void }) {
-  const [over, setOver] = useState<Status | null>(null);
+function StoryBoard({ save, ctx, rows, move }: { save: SaveRow; ctx: StoriesCtx; rows: StoryRow[]; move(id: string, s: Status): void }) {
   return (
-    <div className="sl-board">
-      {STATUSES.map((s) => {
-        const list = rows.filter((r) => r.s.status === s.id);
+    <Board items={rows} columns={STATUSES.map((s) => ({ id: s.id, chip: <StatusTag s={s.id} /> }))} columnOf={(r) => r.s.status}
+      onMove={(id, col) => move(id, col as Status)} emptyText="Drop a storyline here"
+      renderCard={(r) => {
+        const last = latestBeat(ctx.beats, r.id);
+        const cast = ctx.faces(castOf(r.s, ctx.beats, r.id));
         return (
-          <div key={s.id} className={`sl-col ${over === s.id ? 'over' : ''}`} onDragOver={(e) => { e.preventDefault(); setOver(s.id); }} onDragLeave={() => setOver((o) => (o === s.id ? null : o))}
-            onDrop={(e) => { e.preventDefault(); setOver(null); const id = e.dataTransfer.getData('text/plain'); if (id) move(id, s.id); }}>
-            <div className="row" style={{ gap: 8, padding: '2px 4px 8px' }}><StatusTag s={s.id} /><span className="muted small">{list.length}</span></div>
-            {list.map((r) => {
-              const last = latestBeat(ctx.beats, r.id);
-              const cast = ctx.faces(castOf(r.s, ctx.beats, r.id));
-              return (
-                <a key={r.id} className="sl-kcard" draggable href={storyHref(save, r.id)} onDragStart={(e) => { e.dataTransfer.setData('text/plain', r.id); e.dataTransfer.effectAllowed = 'move'; }}>
-                  <b>{r.s.name || 'Unnamed storyline'}</b>
-                  {cast.length > 0 && <Faces sims={cast} size={28} max={5} />}
-                  {last && <small>{last.b.text}</small>}
-                </a>
-              );
-            })}
-            {list.length === 0 && <div className="sl-colempty">Drop a storyline here</div>}
-          </div>
+          <a href={storyHref(save, r.id)} draggable={false}>
+            <b>{r.s.name || 'Unnamed storyline'}</b>
+            {cast.length > 0 && <Faces sims={cast} size={28} max={5} />}
+            {last && <small>{last.b.text}</small>}
+          </a>
         );
-      })}
-    </div>
+      }} />
   );
 }
 
@@ -366,11 +315,10 @@ function SecretsTab({ save, ctx, phone, onNew }: { save: SaveRow; ctx: StoriesCt
   };
   return (
     <div className="stack" style={{ gap: 14 }}>
-      <div className="sl-bar">
-        <Seg<'open' | 'all'> value={scope} options={[{ v: 'open', label: 'Open' }, { v: 'all', label: 'All' }]} onChange={setScope} label="Which secrets" />
-        <FilterBtn label="Sims" title="Sims" count={sims.length} phone={phone}>{() => <SimChecklist ctx={ctx} value={sims} onChange={setSims} counts={counts} />}</FilterBtn>
-        {sims.length > 0 && <button type="button" className="sl-clear" onClick={() => setSims([])}>Clear</button>}
-      </div>
+      <FilterBar active={sims.length > 0} onClear={() => setSims([])}>
+        <ViewSwitch<'open' | 'all'> value={scope} options={[{ v: 'open', label: 'Open' }, { v: 'all', label: 'All' }]} onChange={setScope} label="Which secrets" />
+        <FilterButton label="Sims" title="Sims" count={sims.length}>{() => <SimChecklist ctx={ctx} value={sims} onChange={setSims} counts={counts} />}</FilterButton>
+      </FilterBar>
       {rows.length === 0 ? <div className="empty"><p>No secrets match.</p></div> : (
         <div className={phone ? 'stack' : 'sl-split'} style={{ gap: 10 }}>
           <div className="stack" style={{ gap: 8 }}>{rows.map(item)}</div>
@@ -383,7 +331,7 @@ function SecretsTab({ save, ctx, phone, onNew }: { save: SaveRow; ctx: StoriesCt
 }
 
 // ---------- feelings ----------
-function FeelingsTab({ ctx, phone, onNew }: { ctx: StoriesCtx; phone: boolean; onNew(): void }) {
+function FeelingsTab({ ctx, onNew }: { ctx: StoriesCtx; phone: boolean; onNew(): void }) {
   const [sims, setSims] = useState<string[]>([]);
   const [kind, setKind] = useState<FeelKind | 'all'>('all');
   const [q, setQ] = useState('');
@@ -397,12 +345,12 @@ function FeelingsTab({ ctx, phone, onNew }: { ctx: StoriesCtx; phone: boolean; o
   }
   return (
     <div className="stack" style={{ gap: 14 }}>
-      <div className="sl-bar">
-        <div className="sl-search"><MagnifyingGlass size={16} weight="bold" aria-hidden="true" /><input aria-label="Search feelings" placeholder="Search feelings" value={q} onChange={(e) => setQ(e.target.value)} /></div>
-        <FilterBtn label="Sims" title="Sims" count={sims.length} phone={phone}>{() => <SimChecklist ctx={ctx} value={sims} onChange={setSims} counts={counts} />}</FilterBtn>
-        <Seg<FeelKind | 'all'> value={kind} options={[{ v: 'all', label: 'All' }, ...FEEL_KINDS.map((k) => ({ v: k.id as FeelKind | 'all', label: k.label }))]} onChange={setKind} label="Feeling" />
-        {(sims.length > 0 || kind !== 'all' || q) && <button type="button" className="sl-clear" onClick={() => { setSims([]); setKind('all'); setQ(''); }}>Clear</button>}
-      </div>
+      <FilterBar search={q} onSearch={setQ} searchLabel="Search feelings" active={sims.length > 0 || kind !== 'all' || !!q} onClear={() => { setSims([]); setKind('all'); setQ(''); }}>
+        <FilterButton label="Sims" title="Sims" count={sims.length}>{() => <SimChecklist ctx={ctx} value={sims} onChange={setSims} counts={counts} />}</FilterButton>
+        <FilterButton label="Feeling" title="Feeling" count={kind === 'all' ? 0 : 1}>
+          {() => <CheckList single options={FEEL_KINDS.map((k) => ({ id: k.id, label: k.label }))} value={kind === 'all' ? [] : [kind]} onChange={(v) => setKind((v[0] as FeelKind) ?? 'all')} />}
+        </FilterButton>
+      </FilterBar>
       {rows.length === 0 ? <div className="empty"><p>No feelings match.</p></div> : (
         <div className="card sl-feels">
           {rows.map((r) => (
@@ -452,7 +400,7 @@ function VideoTab({ save, ctx, onNew }: { save: SaveRow; ctx: StoriesCtx; onNew(
     download('SimDesk content notes.md', note);
   };
   if (vids.length === 0) {
-    return <div className="empty"><VideoCamera size={28} weight="duotone" /><h2 style={{ fontSize: 18, margin: 0 }}>Nothing in Content yet</h2><p>Tag a beat as Content material and it shows up here, in story order.</p><button type="button" className="btn primary" onClick={onNew}><Plus size={16} weight="bold" /> Add beat</button></div>;
+    return <div className="empty"><VideoCamera size={28} weight="duotone" /><h2 style={{ fontSize: 18, margin: 0 }}>Nothing in Content yet</h2><p>Tag a moment as Content material and it shows up here, in story order.</p><button type="button" className="btn primary" onClick={onNew}><Plus size={16} weight="bold" /> Add moment</button></div>;
   }
   return (
     <div className="stack" style={{ gap: 14 }}>
@@ -460,7 +408,7 @@ function VideoTab({ save, ctx, onNew }: { save: SaveRow; ctx: StoriesCtx; onNew(
       <div className="sl-vgrid">
         {groups.map((r) => (
           <section key={r.id} className="stack" style={{ gap: 8 }}>
-            <div className="sl-h" style={{ margin: 0 }}><a href={storyHref(save, r.id)}>{r.s.name}</a><span className="cnt">{plural(vids.filter((b) => b.b.storyline === r.id).length, 'beat')}</span></div>
+            <div className="sl-h" style={{ margin: 0 }}><a href={storyHref(save, r.id)}>{r.s.name}</a><span className="cnt">{plural(vids.filter((b) => b.b.storyline === r.id).length, 'moment')}</span></div>
             {sortBeats(vids.filter((b) => b.b.storyline === r.id)).reverse().map((b) => <BeatCard key={b.id} ctx={ctx} b={b} onEdit={() => setEdit(b.id)} />)}
           </section>
         ))}
@@ -475,7 +423,8 @@ function StoryPage({ save, id }: { save: SaveRow; id: string }) {
   const ctx = useStories(save);
   const store = useStore();
   const phone = useIsPhone();
-  const [modal, setModal] = useState<null | { t: 'edit' } | { t: 'beat'; id: string | null } | { t: 'secret'; id: string | null }>(null);
+  const [modal, setModal] = useState<null | { t: 'edit' } | { t: 'beat'; id: string | null; planned?: boolean } | { t: 'secret'; id: string | null }>(null);
+  const [more, setMore] = useState(false);
   const [del, setDel] = useState(false);
   const [q, setQ] = useState('');
   const row = ctx.byId.get(id);
@@ -493,8 +442,7 @@ function StoryPage({ save, id }: { save: SaveRow; id: string }) {
       <div className="grow">
         <h1 style={phone ? { fontSize: 24, margin: 0 } : { margin: 0 }}>{s.name || 'Unnamed storyline'}</h1>
         <div className="sl-head-sub">
-          <Seg value={s.status} options={STATUSES.map((x) => ({ v: x.id, label: x.label }))} onChange={(status) => put({ status })} label="Status" />
-          <button type="button" className={`btn sm ${s.pinned ? 'sl-pinned' : ''}`} aria-pressed={s.pinned} onClick={() => put({ pinned: !s.pinned })}><PushPin size={15} weight="duotone" /> {s.pinned ? 'Pinned' : 'Pin'}</button>
+          <ViewSwitch<Status> value={s.status} options={STATUSES.map((x) => ({ v: x.id, label: x.label }))} onChange={(status) => put({ status })} label="Status" />
         </div>
         {s.tags.length > 0 && <div className="sl-tags" style={{ marginTop: 8 }}>{s.tags.map((t) => <span key={t} className="tag outline-soft">{t}</span>)}</div>}
         {cast.length > 0 && <div className="sl-castline"><Faces sims={cast} size={40} max={8} /><span className="muted">{plural(cast.length, 'Sim')} in the cast</span></div>}
@@ -502,14 +450,14 @@ function StoryPage({ save, id }: { save: SaveRow; id: string }) {
       <div className="row" style={{ gap: 8 }}>
         <button type="button" className="btn" onClick={exportIt}><DownloadSimple size={16} weight="duotone" /> {phone ? 'Export' : 'Export to vault'}</button>
         <button type="button" className="btn icon" aria-label="Edit storyline" onClick={() => setModal({ t: 'edit' })}><PencilSimple size={18} /></button>
-        <button type="button" className="btn primary" onClick={() => setModal({ t: 'beat', id: null })}><Plus size={16} weight="bold" /> Add beat</button>
+        <button type="button" className="btn primary" onClick={() => setModal({ t: 'beat', id: null })}><Plus size={16} weight="bold" /> Add moment</button>
       </div>
     </div>
   );
   const timeline = (
     <section className="stack" style={{ gap: 8 }}>
       <div className="sl-h" style={{ margin: 0 }}>What happened{beats.length > 0 && <span className="cnt">{beats.length}</span>}</div>
-      {beats.length === 0 && <p className="muted" style={{ margin: 0 }}>No beats yet. Add the first thing that happened.</p>}
+      {beats.length === 0 && <p className="muted" style={{ margin: 0 }}>No moments yet. Add the first thing that happened.</p>}
       <div className="sl-timeline">
         {beats.map((b, i) => {
           const partOf = (d: number | null) => (!ctx.info.track ? 0 : d == null ? 2 : dateOf(d, ctx.info.cal).year < ctx.info.cal.anchorDate.year ? 1 : 0);
@@ -523,6 +471,27 @@ function StoryPage({ save, id }: { save: SaveRow; id: string }) {
           );
         })}
       </div>
+    </section>
+  );
+  const today = ctx.info.track ? ctx.info.today : null;
+  const myPlanned = ctx.planned.filter((b) => b.b.storyline === id);
+  const shown = more ? myPlanned : myPlanned.slice(0, 3);
+  const markDone = (b: BeatRow) => { store.put('beat', { ...b.b, planned: false } as unknown as Record<string, unknown>, b.id); toast('Marked as happened'); };
+  const plannedCard = myPlanned.length === 0 ? null : (
+    <section className="card sl-card" aria-label="Planned">
+      <div className="card-head"><h2>Planned<span className="cnt">{myPlanned.length}</span></h2><button type="button" className="btn sm" onClick={() => setModal({ t: 'beat', id: null, planned: true })}><Plus size={15} weight="bold" /> Moment</button></div>
+      {shown.map((b) => {
+        const due = isDue(b.b, today);
+        const w = ctx.dayText(b.b.day, b.b.precision);
+        return (
+          <div key={b.id} className="sl-plan-row">
+            <span className="sl-plan-when">{w ? <b>{w.split(' · ')[0]}</b> : <b>—</b>}{w.includes(' · ') ? w.split(' · ')[1] : ''}</span>
+            <button type="button" className="sl-plan-text" onClick={() => setModal({ t: 'beat', id: b.id })}>{b.b.text}{due ? <StatusChip tone="due"><Timer size={12} weight="bold" /> Due</StatusChip> : null}</button>
+            <button type="button" className="sl-plan-done" aria-label="Mark as happened" title="Mark as happened" onClick={() => markDone(b)}><Check size={16} weight="bold" /></button>
+          </div>
+        );
+      })}
+      {myPlanned.length > 3 && <button type="button" className="btn ghost sm sl-plan-fold" onClick={() => setMore(!more)}>{more ? 'Show fewer' : `+ ${myPlanned.length - 3} more planned, further ahead`}</button>}
     </section>
   );
   const side = (
@@ -549,6 +518,7 @@ function StoryPage({ save, id }: { save: SaveRow; id: string }) {
           <button type="submit" className="btn sm" disabled={!q.trim()}>Add</button>
         </form>
       </section>
+      {plannedCard}
       <button type="button" className="btn ghost danger" style={{ alignSelf: 'flex-start' }} onClick={() => setDel(true)}>Delete storyline</button>
     </div>
   );
@@ -556,9 +526,9 @@ function StoryPage({ save, id }: { save: SaveRow; id: string }) {
     <div className={phone ? 'm-stack' : 'page stack'} style={{ gap: 16 }}>
       <a className="ph-back" href={href(save)}><CaretLeft size={18} weight="bold" /> Storylines</a>
       {head}
-      {phone ? <div className="stack" style={{ gap: 14 }}>{side}{timeline}</div> : <div className="sl-two"><div>{timeline}</div>{side}</div>}
+      {phone ? <div className="stack" style={{ gap: 14 }}>{timeline}{side}</div> : <div className="sl-two"><div>{timeline}</div>{side}</div>}
       {modal?.t === 'edit' && <StoryForm ctx={ctx} id={id} onClose={() => setModal(null)} onSaved={() => setModal(null)} />}
-      {modal?.t === 'beat' && <BeatForm ctx={ctx} id={modal.id} storyline={id} onClose={() => setModal(null)} />}
+      {modal?.t === 'beat' && <BeatForm ctx={ctx} id={modal.id} storyline={id} startPlanned={modal.planned} onClose={() => setModal(null)} />}
       {modal?.t === 'secret' && <SecretForm ctx={ctx} id={modal.id} storyline={id} onClose={() => setModal(null)} onSaved={() => setModal(null)} />}
       {del && (
         <Confirm title="Delete this storyline?" text="Its beats and secrets go to Trash with it for 7 days." onCancel={() => setDel(false)}

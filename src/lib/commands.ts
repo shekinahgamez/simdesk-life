@@ -7,7 +7,7 @@ import { normalize } from './text';
 export type CommandId =
   | 'play' | 'add' | 'end' | 'next' | 'jump' | 'back'
   | 'sim' | 'household' | 'lot' | 'club' | 'event' | 'photo'
-  | 'move' | 'theme' | 'backup' | 'settings' | 'help';
+  | 'move' | 'theme' | 'stream' | 'backup' | 'settings' | 'help';
 
 /** What the command needs after its word. */
 export type ArgKind = 'household' | 'household-out' | 'days' | 'name' | 'move' | 'theme' | null;
@@ -44,6 +44,7 @@ export const COMMANDS: CommandDef[] = [
   { id: 'photo', word: 'photo', label: 'Add photos', group: 'Make', example: '/photo', arg: null },
   { id: 'move', word: 'move', label: 'Move a Sim', group: 'Change', hint: '/move Kai to Coriana', example: '/move Kai to Coriana', arg: 'move' },
   { id: 'theme', word: 'theme', label: 'Light or dark', group: 'App', example: '/theme dark', arg: 'theme' },
+  { id: 'stream', word: 'stream', label: 'Streaming mode', group: 'App', hint: 'Hides planned moments', example: '/stream', arg: null },
   { id: 'backup', word: 'backup', label: 'Download a backup', group: 'App', hint: 'Opens Account', example: '/backup', arg: null },
   { id: 'settings', word: 'settings', label: 'Save settings', group: 'App', example: '/settings', arg: null },
   { id: 'help', word: 'help', label: 'All commands', group: 'App', hint: 'The cheat sheet', example: '/help', arg: null },

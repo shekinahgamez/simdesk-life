@@ -21,6 +21,7 @@ import { PhotosPage } from './photos/PhotosPage';
 import { ClubsPage } from './clubs/ClubsPage';
 import { StorylinesPage } from './storylines/StorylinesPage';
 import { LegacyPage } from './legacy/LegacyPage';
+import { DocsPage } from './docs/DocsPage';
 import { BusinessesPage } from './businesses/BusinessesPage';
 import { isItemKind, ItemPage } from './calendar/ItemPage';
 import { HouseholdPage } from './households/HouseholdPage';
@@ -334,6 +335,7 @@ function AppPages({ userId, profile, onProfile, pretend }: { userId: string; pro
   else if (sec === 'clubs') page = <ClubsPage key={route.rest.join('/')} save={routeSave} rest={route.rest} />;
   else if (sec === 'storylines') page = <StorylinesPage key={route.rest.join('/')} save={routeSave} rest={route.rest} />;
   else if (sec === 'businesses') page = <BusinessesPage key={route.rest.join('/')} save={routeSave} rest={route.rest} />;
+  else if (sec === 'docs') page = <DocsPage key={route.rest[0] ?? ''} save={routeSave} rest={route.rest} />;
   else if (sec === 'legacy') page = <LegacyPage key={route.rest.join('/')} save={routeSave} rest={route.rest} />;
   else if (sec === 'households') page = route.rest[0] ? <HouseholdPage key={route.rest[0]} save={routeSave} hhId={route.rest[0]} /> : <HouseholdsList save={routeSave} />;
   else if (sec === 'sims') page = route.rest[0] ? <SimProfile key={route.rest[0]} save={routeSave} simId={route.rest[0]} /> : <SimsList save={routeSave} />;
@@ -369,7 +371,7 @@ function wirePhotos(store: SyncStore, photos: PhotoService) {
 const PRETEND_KEY = 'sd:pretend';
 export function isPretend() { try { return sessionStorage.getItem(PRETEND_KEY) === '1'; } catch { return false; } }
 export function startPretend() { try { sessionStorage.setItem(PRETEND_KEY, '1'); } catch { /* ignore */ } location.hash = '#/'; location.reload(); }
-function endPretend() { try { sessionStorage.removeItem(PRETEND_KEY); } catch { /* ignore */ } location.hash = '#style-check'; location.reload(); }
+function endPretend() { try { sessionStorage.removeItem(PRETEND_KEY); } catch { /* ignore */ } location.hash = '#style-guide'; location.reload(); }
 
 export function PretendApp() {
   const [store] = useState(() => {

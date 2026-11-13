@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import {
   ArrowCounterClockwise, ArrowsClockwise, ArrowsLeftRight, CalendarPlus, CloudArrowDown, Command, FastForward, FlagCheckered,
   GearSix, HouseSimple, ImageSquare, MagnifyingGlass, MapPin, Moon, Play, Plus, SunHorizon, UserCircle, UserPlus,
-  UsersThree, type Icon,
+  UsersThree, VideoCamera, type Icon,
 } from '@phosphor-icons/react';
 import {
   available, COMMANDS, GROUPS, matchWord, opensBar, parseDays, parseMove, plainCommand, rank, splitName, splitSlash,
@@ -20,6 +20,7 @@ import { fullName, householdLabel, simData } from '../lib/sims';
 import { useRecords, useStore } from '../lib/sync/react';
 import type { Rec, SaveRow } from '../lib/sync/types';
 import { plural } from '../lib/text';
+import { useStreaming } from '../lib/streaming';
 import { setTheme } from '../lib/theme';
 import { dateOf, formatDate } from '../lib/time';
 import { useIsPhone } from '../lib/useIsPhone';
@@ -55,12 +56,12 @@ export const hotkeyLabel = () => (isMac() ? '⌘K' : 'Ctrl K');
 const ICONS: Record<CommandId, Icon> = {
   play: Play, add: Plus, end: FlagCheckered, next: SunHorizon, jump: FastForward, back: ArrowCounterClockwise,
   sim: UserPlus, household: HouseSimple, lot: MapPin, club: UsersThree, event: CalendarPlus, photo: ImageSquare,
-  move: ArrowsLeftRight, theme: Moon, backup: CloudArrowDown, settings: GearSix, help: Command,
+  move: ArrowsLeftRight, theme: Moon, stream: VideoCamera, backup: CloudArrowDown, settings: GearSix, help: Command,
 };
 const TINT: Record<CommandId, string> = {
   play: 'worlds', add: 'worlds', end: 'worlds', next: 'calendar', jump: 'calendar', back: 'calendar',
   sim: 'sims', household: 'households', lot: 'worlds', club: 'clubs', event: 'calendar', photo: 'photos',
-  move: 'households', theme: 'berry', backup: 'berry', settings: 'berry', help: 'berry',
+  move: 'households', theme: 'berry', stream: 'berry', backup: 'berry', settings: 'berry', help: 'berry',
 };
 const CmdIcon = ({ id }: { id: CommandId }) => {
   const I = ICONS[id];
@@ -91,6 +92,7 @@ function useEnv(save: SaveRow) {
     clubs: d.packs.includes('get-together'),
   };
   const cmds = available(ctx);
+  const [streaming, setStreaming] = useStreaming();
   const living = useMemo(() => sims.filter((r) => !simData(r).deceased), [sims]);
   const members = (hhId: string) => living.filter((r) => simData(r).householdId === hhId).length;
   const hhName = (id: string | null) => (id ? householdLabel(hh.nameOf(id)) : '');
@@ -110,7 +112,7 @@ function useEnv(save: SaveRow) {
     put(hhId);
     toast(`Moved ${simData(rec).first || 'them'} to ${hhName(hhId)}`, { label: 'Undo', run: () => put(before) });
   };
-  return { save, d, rot, move, sims, living, lots, clubs, hh, ctx, cmds, members, hhName, when, play, add, moveSim };
+  return { save, d, rot, move, sims, living, lots, clubs, hh, ctx, cmds, streaming, setStreaming, members, hhName, when, play, add, moveSim };
 }
 type Env = ReturnType<typeof useEnv>;
 
@@ -151,6 +153,7 @@ function runBare(c: CommandDef, x: Runner) {
     case 'back': x.close(); x.dialog({ t: 'jump', mode: 'back' }); return;
     case 'sim': case 'household': case 'lot': case 'club': case 'event': x.close(); x.dialog({ t: c.id, name: '' }); return;
     case 'photo': x.close(); x.photo(); return;
+    case 'stream': x.close(); env.setStreaming(!env.streaming); toast(env.streaming ? 'Streaming mode off' : 'Streaming mode on'); return;
     case 'backup': x.close(); go('#/account'); return;
     case 'settings': x.close(); go(savePath(env.save.id, 'settings')); return;
   }

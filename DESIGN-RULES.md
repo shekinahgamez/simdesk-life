@@ -32,6 +32,24 @@ The owner said SimDesk was "beautiful but everything takes a million clicks". Ev
 - Buttons say what happens ("End turn", "Restore as a new save"), not "OK" or "Done" when a verb fits.
 - Icons beat text labels where the icon is clear (the owner has autism and ADHD). Keep the label as `aria-label` or a short word next to it.
 
+## Shared pieces (Nov 13 2026)
+Every page is built from the shared pieces in `src/components/pieces`. A page never writes its own version of one. If a page needs something a piece can't do, change the piece, so every page gets it. The Style guide page (`#style-guide`, owner only) shows each piece live with when to use it.
+
+| Piece | Use it for |
+|---|---|
+| FilterButton, CheckList, FilterBar | Every filter. One button per thing, plain when off, tinted with a count when on, a Clear link, a popover (bottom sheet on phone) with checkboxes, a count per row, search when the list can grow. Small fixed sets use the same checkbox list, not pills. |
+| Group by | A separate button next to Filter (CheckList, single). List and Cards only. A Board always groups by status. |
+| ViewSwitch | Layout views, sort and any 2 to 5 fixed choices. Icons only on phone. Also page tabs. |
+| StatusChip | Every status. One word, one of eight tones (neutral, info, warm, hot, done, accent, planned, due). Pages pick a tone, never colors. |
+| Board | Every Kanban. Phone shows the list instead. |
+| ListRow | Every list row. Only the left slot changes: face for Sims, section icon for content, small picture for lots, nothing for plain items. |
+| SelectBar | Bulk actions on any long list. Delete last, red, asks first with the count ("Delete 6 Sims?") and Undo. Offer every bulk action that fits the page. |
+| MoreMenu | The ⋯ menu for rare and risky actions. Delete last and red. |
+| Picker | Every dropdown. Never a plain browser select. |
+| SectionHeader, PageHeader, AddButton, EmptyState, ProgressBar | Section titles with count and action; back link, title and actions; small quiet add buttons; one-line empty states with one button; the one progress bar. |
+
+Before drawing or building a screen, check this list and the Style guide. Mockups are drawn from the same pieces. New pieces get added here and to the Style guide in the same change.
+
 ## Lists and filters
 - **Never use pills or chips for names of Sims, worlds, lots or anything that can grow.** A save can have hundreds of Sims. Use a dropdown with a search box, checkboxes, and a count per row.
 - Pills are fine only for a small fixed set (3 to 6 options that never grow), like "All / Living / Passed".

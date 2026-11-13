@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles/global.css';
 import './styles/mobile.css';
-import './styles/stylecheck.css';
+import './styles/styleguide.css';
 import './styles/auth.css';
 import './styles/setup.css';
 import './styles/intro.css';
@@ -14,12 +14,15 @@ import './styles/calendar.css';
 import './styles/photos.css';
 import './styles/clubs.css';
 import './styles/storylines.css';
+import './styles/pieces.css';
 import './styles/money.css';
 import './styles/commandbar.css';
 import './styles/gameimport.css';
 import './styles/businesses.css';
+import './styles/docs.css';
 import './styles/landing.css';
-import { StyleCheck } from './pages/StyleCheck';
+import { StyleGuide } from './pages/StyleGuide';
+import { STYLE_GUIDE_OWNERS } from './config/owners';
 import { AppSettings } from './pages/AppSettings';
 import { Auth } from './pages/Auth';
 import { LandingPage, BetaApplyPage } from './pages/landing/Landing';
@@ -47,14 +50,25 @@ function useHash() {
   return hash;
 }
 
-/** Picks what to show: the app when signed in, log in when not. #style-check is the design check page; #app-settings also works signed out (theme only). */
+/** The Style guide opens only for the owner's account (listed in config/owners.ts). In development it opens for anyone. */
+function StyleGuideGate({ auth }: { auth: ReturnType<typeof useAuth> }) {
+  if (import.meta.env.DEV) return <StyleGuide />;
+  if (auth.status === 'loading') return <div className="loading" role="status">Loading…</div>;
+  const id = auth.status === 'signed-in' ? auth.session.user.id : '';
+  if (id && STYLE_GUIDE_OWNERS.includes(id)) return <StyleGuide />;
+  return (
+    <main className="sc"><p className="muted">This page is only for the owner. {id ? <>Your account id: <code>{id}</code></> : 'Log in first.'}</p></main>
+  );
+}
+
+/** Picks what to show: the app when signed in, log in when not. #style-guide is the Style guide (owner only); #app-settings also works signed out (theme only). */
 function App() {
   const hash = useHash();
   const auth = useAuth();
   const [recoveryDone, setRecoveryDone] = React.useState(false);
   // Signed in, App settings opens inside the app (it has account settings too).
   if (hash === '#app-settings' && auth.status === 'signed-out' && !isPretend()) return <AppSettings />;
-  if (hash === '#style-check') return <StyleCheck />;
+  if (hash === '#style-guide') return <StyleGuideGate auth={auth} />;
   if (isPretend()) return <PretendApp />;
   if (auth.status === 'loading') return <div className="loading" role="status">Loading…</div>;
   if (auth.status === 'recovery' && !recoveryDone) return <SetPassword onDone={() => setRecoveryDone(true)} />;
