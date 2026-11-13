@@ -2,19 +2,19 @@ import { useEffect, useState } from 'react';
 
 /**
  * Hash addresses (#/s/<save>/sims) so refreshing or sharing a link on GitHub Pages never 404s.
- * #style-check and #app-settings are the older single-word pages and still work.
+ * #style-guide and #app-settings are the older single-word pages and still work.
  */
 export type Route =
   | { page: 'home' }
   | { page: 'setup' }
   | { page: 'account' }
   | { page: 'app-settings' }
-  | { page: 'style-check' }
+  | { page: 'style-guide' }
   | { page: 'save'; saveId: string; section: string; rest: string[] };
 
 export function parse(hash: string): Route {
   const h = hash.replace(/^#/, '');
-  if (h === 'style-check') return { page: 'style-check' };
+  if (h === 'style-guide') return { page: 'style-guide' };
   if (h === 'app-settings' || h === '/app-settings') return { page: 'app-settings' };
   const parts = h.replace(/^\//, '').split('/').filter(Boolean).map(decodeURIComponent);
   if (parts[0] === 'setup') return { page: 'setup' };
