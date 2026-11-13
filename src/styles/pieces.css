@@ -55,3 +55,5 @@
 .p-bar-track i { display: block; height: 100%; border-radius: 99px; background: var(--accent); }
 .p-face { width: 36px; height: 36px; border-radius: 50%; background: var(--sidebar); color: var(--muted); display: grid; place-items: center; font-weight: 700; font-size: 13px; }
 .p-board, .p-bar, .p-sh, .p-ph, .empty { width: 100%; }
+.p-scroll { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
+.p-scroll > * { flex: none; }

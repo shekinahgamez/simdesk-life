@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowDown, ArrowUp, Cake, CaretDown, CaretRight, Check, CheckSquare, FunnelSimple, Hourglass, HouseSimple, ListPlus, PencilSimple, Plus, Rows, Sparkle, SquaresFour, Trash, X } from '@phosphor-icons/react';
+import { ArrowDown, ArrowUp, Cake, CaretDown, CaretRight, Check, CheckSquare, Hourglass, HouseSimple, ListPlus, PencilSimple, Plus, Rows, Sparkle, SquaresFour, Trash, X } from '@phosphor-icons/react';
 import { AzHeader, AzRail, azKey, letterOf, PhoneBar } from '../../components/AzList';
 import { QuickButton } from '../../components/CommandBar';
 import { cleanRotation } from '../../lib/rotation';
@@ -7,7 +7,7 @@ import { moduleOn, saveData } from '../../lib/saves';
 import { Faces } from '../households/shared';
 import { ObjIcon } from '../../components/categories';
 import { PhotoBox } from '../../components/photo';
-import { Confirm, Field, Modal, Picker, SearchBox, Seg, Sheet, TextInput, Toggle, toast } from '../../components/ui';
+import { Confirm, Field, Modal, SearchBox, Seg, Sheet, TextInput, Toggle, toast } from '../../components/ui';
 import { go, savePath } from '../../lib/router';
 import {
   applyFilters, birthdayCell, filterCount, matchesSearch, NO_FILTERS, NO_HOUSEHOLD, sortRows, splitName, stageLabel, BLANK_SIM,
@@ -21,6 +21,7 @@ import type { SaveRow } from '../../lib/sync/types';
 import { SimForm } from './SimForm';
 import { SimsSwitch } from '../households/HouseholdsList';
 import { HouseholdPick } from './HouseholdPick';
+import { CheckList, FilterBar, FilterButton, ViewSwitch } from '../../components/pieces';
 import { SimAvatar, useBirthdayView, useCustomTraits, useHouseholds, useSaveInfo, useSimRows, type SaveInfo } from './shared';
 
 const FILTER_KEY = (saveId: string) => `sd:simFilters:${saveId}`;
@@ -58,7 +59,6 @@ export function SimsList({ save }: { save: SaveRow }) {
   const [q, setQ] = useState('');
   const [filters, setFilters] = useState<Filters>(() => loadFilters(save.id));
   const [sort, setSort] = useState<Sort>({ key: 'name', dir: 1 });
-  const [showFilter, setShowFilter] = useState(false);
   const [layout, setLayoutState] = useState<'table' | 'gallery'>(loadLayout);
   const setLayout = (l: 'table' | 'gallery') => { setLayoutState(l); try { localStorage.setItem(LAYOUT_KEY, l); } catch { /* ignore */ } };
   const [group, setGroupState] = useState<GroupKey>(loadGroup);
@@ -84,15 +84,10 @@ export function SimsList({ save }: { save: SaveRow }) {
   const nf = filterCount(filters);
 
   const tags = (
-    <ActiveFilters filters={filters} onChange={setFilters} nameOf={(id) => (id === NO_HOUSEHOLD ? 'No household' : hh.nameOf(id))} />
-  );
-  const filterUi = showFilter && (
-    <FilterPanel filters={filters} onChange={setFilters} onClose={() => setShowFilter(false)} count={shown.length} phone={phone}
-      view={view} onView={setView} />
+    <div className="p-bar p-scroll"><SimFilterButtons filters={filters} onChange={setFilters} birthdays={{ view, onView: setView }} />{nf > 0 && <button type="button" className="p-clear" onClick={() => setFilters(NO_FILTERS)}>Clear</button>}</div>
   );
   const dialogs = (
     <>
-      {filterUi}
       {form && <SimForm info={info} simId={null} onClose={() => setForm(false)} onSaved={(id, another) => { if (!another) { setForm(false); open(id); } }} />}
       {quick && <QuickAdd info={info} onClose={() => setQuick(false)} />}
       {traits && <CustomTraitsManager onClose={() => setTraits(false)} />}
@@ -153,9 +148,6 @@ export function SimsList({ save }: { save: SaveRow }) {
               <div className="m-search grow"><SearchBox value={q} onChange={setQ} placeholder="Search" /></div>
               <button type="button" className="tb-btn" aria-label={`Group and view: ${GROUPS.find((g) => g.id === group)!.label}`} onClick={() => setShowGroup(true)}>
                 <Rows size={18} /> {GROUPS.find((g) => g.id === group)!.label} <CaretDown size={12} weight="bold" />
-              </button>
-              <button type="button" className="btn icon filter-btn" aria-label={nf ? `Filter, ${nf} on` : 'Filter'} onClick={() => setShowFilter(true)}>
-                <FunnelSimple size={20} weight="bold" />{nf > 0 && <span className="count">{nf}</span>}
               </button>
             </div>
             {noHh > 0 && !filters.households.includes(NO_HOUSEHOLD) && !q.trim() && (
@@ -240,20 +232,10 @@ export function SimsList({ save }: { save: SaveRow }) {
       </div>
       {all.length === 0 ? <EmptySims onAdd={() => setForm(true)} onQuick={() => setQuick(true)} /> : (
         <>
-          <div className="row" style={{ gap: 10 }}>
-            <SimsSwitch saveId={save.id} on="sims" />
-            <div style={{ flex: '0 1 380px' }}><SearchBox value={q} onChange={setQ} placeholder={`Search ${plural(searchCount, 'Sim')}`} /></div>
-            <button type="button" className="btn filter-btn" onClick={() => setShowFilter(true)}>
-              <FunnelSimple size={18} weight="bold" /> Filter{nf > 0 && <span className="count">{nf}</span>}
-            </button>
-            <span className="grow" />
-            {selectBtn}
-            <span className="view-switch" role="group" aria-label="View">
-              <button type="button" aria-pressed={layout === 'table'} aria-label="List" title="List" onClick={() => setLayout('table')}><Rows size={20} weight={layout === 'table' ? 'fill' : 'regular'} /></button>
-              <button type="button" aria-pressed={layout === 'gallery'} aria-label="Gallery" title="Gallery" onClick={() => setLayout('gallery')}><SquaresFour size={20} weight={layout === 'gallery' ? 'fill' : 'regular'} /></button>
-            </span>
-          </div>
-          {tags}
+          <FilterBar lead={<SimsSwitch saveId={save.id} on="sims" />} search={q} onSearch={setQ} searchLabel={`Search ${plural(searchCount, 'Sim')}`} active={nf > 0} onClear={() => setFilters(NO_FILTERS)}
+            right={<>{selectBtn}<ViewSwitch<'table' | 'gallery'> label="View" value={layout} onChange={setLayout} options={[{ v: 'table', label: 'List', icon: Rows }, { v: 'gallery', label: 'Gallery', icon: SquaresFour }]} /></>}>
+            <SimFilterButtons filters={filters} onChange={setFilters} />
+          </FilterBar>
           {shown.length === 0 ? <p className="muted">No Sims match that.</p> : layout === 'gallery' ? (
             <div className="sim-grid gallery">
               {shown.map((r) => <SimCard key={r.id} r={r} info={info} view={view} onOpen={() => (selecting ? togglePick(r.id) : open(r.id))} household picked={selecting ? picked.includes(r.id) : undefined} />)}
@@ -380,91 +362,34 @@ function SimCard({ r, info, view, onOpen, household, picked }: { r: SimRow; info
   );
 }
 
-function ActiveFilters({ filters: f, onChange, nameOf }: { filters: Filters; onChange(f: Filters): void; nameOf(id: string): string }) {
-  const items: { key: string; label: string; off(): Filters }[] = [
-    ...f.stages.map((s) => ({ key: `s${s}`, label: stageName(s), off: () => ({ ...f, stages: f.stages.filter((x) => x !== s) }) })),
-    ...f.households.map((h) => ({ key: `h${h}`, label: nameOf(h), off: () => ({ ...f, households: f.households.filter((x) => x !== h) }) })),
-    ...f.genders.map((g) => ({ key: `g${g}`, label: g === 'male' ? 'Male' : 'Female', off: () => ({ ...f, genders: f.genders.filter((x) => x !== g) }) })),
-    ...(f.birthdayThisWeek ? [{ key: 'bw', label: 'Birthday this week', off: () => ({ ...f, birthdayThisWeek: false }) }] : []),
-    ...(f.status !== 'any' ? [{ key: 'st', label: f.status === 'planned' ? 'Planned' : 'Created', off: () => ({ ...f, status: 'any' as const }) }] : []),
-    ...(f.deceased ? [{ key: 'dc', label: 'Deceased', off: () => ({ ...f, deceased: false }) }] : []),
-  ];
-  if (!items.length) return null;
-  return (
-    <div className="row filter-tags" style={{ gap: 6 }}>
-      {items.map((i) => (
-        <span key={i.key} className="ftag">{i.label}
-          <button type="button" aria-label={`Remove ${i.label}`} onClick={() => onChange(i.off())}><X size={11} weight="bold" /></button>
-        </span>
-      ))}
-      <button type="button" className="btn ghost sm" onClick={() => onChange(NO_FILTERS)}>Clear</button>
-    </div>
-  );
-}
-
-function FilterPanel({ filters: f, onChange, onClose, count, phone, view, onView }: {
-  filters: Filters; onChange(f: Filters): void; onClose(): void; count: number; phone: boolean; view: BirthdayView; onView(v: BirthdayView): void;
-}) {
+function SimFilterButtons({ filters: f, onChange, birthdays }: { filters: Filters; onChange(f: Filters): void; birthdays?: { view: BirthdayView; onView(v: BirthdayView): void } }) {
   const hh = useHouseholds();
-  const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
-  const body = (
-    <div className="stack filter-panel" style={{ gap: 18 }}>
-      <div className="field">
-        <span className="label">Life stage</span>
-        <div className="chip-row">
-          {STAGE_IDS.map((s) => (
-            <button key={s} type="button" className="fchip" aria-pressed={f.stages.includes(s)} onClick={() => onChange({ ...f, stages: toggle<StageId>(f.stages, s) })}>{stageName(s)}</button>
-          ))}
-        </div>
-      </div>
-      <Field label="Household">
-        {(id) => <Picker id={id} multiple placeholder="Type a household" value={f.households} onChange={(households) => onChange({ ...f, households })}
-          options={[...hh.list.map((h) => ({ id: h.id, label: hh.nameOf(h.id) })), { id: NO_HOUSEHOLD, label: 'No household' }]} />}
-      </Field>
-      <div className="field">
-        <span className="label">Gender</span>
-        <div className="chip-row">
-          {(['male', 'female'] as Gender[]).map((g) => (
-            <button key={g} type="button" className="fchip" aria-pressed={f.genders.includes(g)} onClick={() => onChange({ ...f, genders: toggle<Gender>(f.genders, g) })}>{g === 'male' ? 'Male' : 'Female'}</button>
-          ))}
-        </div>
-      </div>
-      <div className="field">
-        <span className="label">In the game</span>
-        <div className="chip-row">
-          {([['created', 'Created'], ['planned', 'Planned']] as const).map(([v, l]) => (
-            <button key={v} type="button" className="fchip" aria-pressed={f.status === v} onClick={() => onChange({ ...f, status: f.status === v ? 'any' : v })}>{l}</button>
-          ))}
-        </div>
-      </div>
-      <div className="switch-list">
-        <label className="switch-line"><span>Birthday this week</span><Toggle label="Birthday this week" on={f.birthdayThisWeek} onChange={(v) => onChange({ ...f, birthdayThisWeek: v })} /></label>
-        <label className="switch-line"><span>Show deceased Sims</span><Toggle label="Show deceased Sims" on={f.deceased} onChange={(v) => onChange({ ...f, deceased: v })} /></label>
-      </div>
-      {phone && (
-        <div className="field">
-          <span className="label">Show birthdays as</span>
-          <Seg label="Show birthdays as" value={view} onChange={onView} options={[{ v: 'countdown', label: 'In 3 days' }, { v: 'date', label: 'Spring 11' }]} />
-        </div>
-      )}
-    </div>
-  );
-  if (phone) {
-    return (
-      <Sheet title="Filter" onClose={onClose}>
-        {body}
-        <div className="stack" style={{ gap: 8, marginTop: 18 }}>
-          <button type="button" className="m-pillbtn" onClick={onClose}>Show {plural(count, 'Sim')}</button>
-          <button type="button" className="btn ghost" onClick={() => onChange(NO_FILTERS)}>Clear all</button>
-        </div>
-      </Sheet>
-    );
-  }
+  const showOn = [...(f.birthdayThisWeek ? ['bw'] : []), ...(f.deceased ? ['dc'] : [])];
   return (
-    <Modal title="Filter" onClose={onClose} autoFocus={false}
-      footer={<><button type="button" className="btn ghost" onClick={() => onChange(NO_FILTERS)}>Clear all</button><span className="grow" /><button type="button" className="btn primary" onClick={onClose}>Show {plural(count, 'Sim')}</button></>}>
-      {body}
-    </Modal>
+    <>
+      <FilterButton label="Life stage" count={f.stages.length}>
+        {() => <CheckList options={STAGE_IDS.map((s) => ({ id: s, label: stageName(s) }))} value={f.stages} onChange={(v) => onChange({ ...f, stages: v as StageId[] })} />}
+      </FilterButton>
+      <FilterButton label="Household" title="Households" count={f.households.length}>
+        {() => <CheckList search options={[...hh.list.map((h) => ({ id: h.id, label: hh.nameOf(h.id) })), { id: NO_HOUSEHOLD, label: 'No household' }]} value={f.households} onChange={(households) => onChange({ ...f, households })} />}
+      </FilterButton>
+      <FilterButton label="Gender" count={f.genders.length}>
+        {() => <CheckList options={[{ id: 'male', label: 'Male' }, { id: 'female', label: 'Female' }]} value={f.genders} onChange={(v) => onChange({ ...f, genders: v as Gender[] })} />}
+      </FilterButton>
+      <FilterButton label="In the game" count={f.status === 'any' ? 0 : 1}>
+        {(close) => <CheckList single options={[{ id: 'created', label: 'Created' }, { id: 'planned', label: 'Planned' }]} value={f.status === 'any' ? [] : [f.status]}
+          onChange={(v) => { onChange({ ...f, status: f.status === v[0] ? 'any' : (v[0] as 'created' | 'planned') }); close(); }} />}
+      </FilterButton>
+      <FilterButton label="Show" count={showOn.length}>
+        {() => <CheckList options={[{ id: 'bw', label: 'Birthday this week' }, { id: 'dc', label: 'Deceased Sims' }]} value={showOn}
+          onChange={(v) => onChange({ ...f, birthdayThisWeek: v.includes('bw'), deceased: v.includes('dc') })} />}
+      </FilterButton>
+      {birthdays && (
+        <FilterButton label={`Birthdays: ${birthdays.view === 'date' ? 'date' : 'countdown'}`} count={0}>
+          {(close) => <CheckList single options={[{ id: 'countdown', label: 'In 3 days' }, { id: 'date', label: 'Spring 11' }]} value={[birthdays.view]} onChange={(v) => { birthdays.onView(v[0] as BirthdayView); close(); }} />}
+        </FilterButton>
+      )}
+    </>
   );
 }
 
