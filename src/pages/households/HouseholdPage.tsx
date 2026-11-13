@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { DotsThree, HouseSimple, MapPin, PencilSimple, Plus, Trash, X } from '@phosphor-icons/react';
+import { CaretLeft, DotsThree, HouseSimple, MapPin, PencilSimple, Plus, Trash, Users, X } from '@phosphor-icons/react';
 import { PhotoBox } from '../../components/photo';
-import { BackLink } from '../../components/Shell';
+import { PhoneBar } from '../../components/AzList';
 import { AutoText, Confirm, Modal, Picker, toast } from '../../components/ui';
 import { homeLot, type HH } from '../../lib/households';
 import { APARTMENT, lotTypeName } from '../../lib/lots';
@@ -28,6 +28,7 @@ export function HouseholdPage({ save, hhId }: { save: SaveRow; hhId: string }) {
   const [view] = useBirthdayView();
   const [dialog, setDialog] = useState<null | 'home' | 'rename' | 'sim' | 'movein' | 'own' | 'delete'>(null);
   const net = useSimNet(save, hhId);
+  const [noteOpen, setNoteOpen] = useState(false);
   const hh = ctx.byId.get(hhId);
   const back = savePath(save.id, 'households');
   if (!hh) return <div className="page"><p>That household isn’t here anymore.</p><a className="btn" href={back}>Back to Households</a></div>;
@@ -74,25 +75,6 @@ export function HouseholdPage({ save, hhId }: { save: SaveRow; hhId: string }) {
     </a>
   ) : (
     <div className="hh-lot"><span className="obj worlds"><HouseSimple size={18} weight="duotone" /></span><span className="grow muted">No home yet</span></div>
-  );
-  const lotsCard = (
-    <div className="card">
-      <div className="card-head"><h2>Lots</h2><button type="button" className="btn ghost sm" style={{ color: 'var(--accent)' }} onClick={() => setDialog('own')}><Plus size={14} weight="bold" /> Add</button></div>
-      <div className="hh-lots">
-        {homeRow}
-        {ownedOthers.map((r) => (
-          <div key={r.id} className="hh-lot">
-            <a className="row grow" style={{ gap: 12, flexWrap: 'nowrap', color: 'inherit', textDecoration: 'none', minWidth: 0 }} href={lotHref(r.id)}>
-              <span className="obj worlds"><MapPin size={18} weight="duotone" /></span>
-              <span className="grow"><b>{r.lot.name}</b><span className="s">{lotTypeLine(ctx, r.id)}</span></span>
-              <span className="tag outline-soft">Own</span>
-            </a>
-            <button type="button" className="btn ghost icon sm" aria-label={`${label} doesn’t own ${r.lot.name}`} onClick={() => unown(r.id, r.lot.name)}><X size={15} /></button>
-          </div>
-        ))}
-      </div>
-      <button type="button" className="btn sm" style={{ alignSelf: 'flex-start', marginTop: 12 }} onClick={() => setDialog('home')}>{home ? 'Move to a new home' : 'Pick a home'}</button>
-    </div>
   );
   // Desktop: Sims as rows with each Sim's net worth, and a lots card with one dashed row when there is no home.
   const simRows = (
@@ -152,25 +134,23 @@ export function HouseholdPage({ save, hhId }: { save: SaveRow; hhId: string }) {
       )}
     </>
   );
-  const moveInBtn = <button type="button" className="btn ghost sm" style={{ color: 'var(--accent)' }} onClick={() => setDialog('movein')}>Move Sims in</button>;
 
   if (phone) {
     return (
-      <div className="m-stack">
-        <BackLink href={back} label="Households" />
-        <h1 className="m-h1">{label}</h1>
-        <div className="row" style={{ gap: 8 }}>
-          <button type="button" className="btn sm" onClick={() => setDialog('sim')}><Plus size={14} weight="bold" /> New Sim</button>
-          {moveInBtn}
-          <button type="button" className="btn ghost icon sm" aria-label="Edit household" onClick={() => setDialog('rename')}><PencilSimple size={16} /></button>
-          <HhMore onDelete={() => setDialog('delete')} />
-        </div>
+      <div className="m-stack hh-phone">
+        <PhoneBar title={label} left={<a className="pp-round" href={back} aria-label="Back to Households" style={{ marginLeft: -10 }}><CaretLeft size={20} weight="bold" /></a>} right={<>
+          <button type="button" className="btn ghost icon" aria-label="New Sim" onClick={() => setDialog('sim')}><Plus size={22} /></button>
+          <button type="button" className="btn ghost icon" aria-label="Edit household" onClick={() => setDialog('rename')}><PencilSimple size={22} /></button>
+          <HhMore onDelete={() => setDialog('delete')} onMoveIn={() => setDialog('movein')} />
+        </>} />
         <HouseholdRotation save={save} hhId={hh.id} />
         <MoneyStrip save={save} hhId={hh.id} />
         {tiles}
         <ComingUp save={save} simIds={members.map((m) => m.id)} seeAll={`calendar/household/${hh.id}`} showFaces />
-        {lotsCard}
-        <div className="card"><div className="card-head"><h2>Notes</h2></div>{notes}</div>
+        {lotsCardDesktop}
+        {hh.data.notes || noteOpen
+          ? <div className="card"><div className="card-head"><h2>Notes</h2></div>{notes}</div>
+          : <button type="button" className="pp-addrow" onClick={() => setNoteOpen(true)}><span className="obj berry"><PencilSimple size={16} weight="duotone" /></span><span className="muted">Add a note</span></button>}
         {dialogs}
       </div>
     );
@@ -273,7 +253,7 @@ function OwnLot({ ctx, hh, onClose }: { ctx: HhCtx; hh: HH; onClose(): void }) {
 }
 
 /** The ⋯ menu on a household (Delete lives here, like on a Sim). */
-function HhMore({ onDelete, onEdit }: { onDelete(): void; onEdit?(): void }) {
+function HhMore({ onDelete, onEdit, onMoveIn }: { onDelete(): void; onEdit?(): void; onMoveIn?(): void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
@@ -289,6 +269,7 @@ function HhMore({ onDelete, onEdit }: { onDelete(): void; onEdit?(): void }) {
       <button type="button" className="btn icon hh-more-btn" aria-label="More" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((x) => !x)}><DotsThree size={20} weight="bold" /></button>
       {open && (
         <div className="combo-list more-menu" role="menu" style={{ right: 0, left: 'auto' }}>
+          {onMoveIn && <button type="button" role="menuitem" onClick={() => { setOpen(false); onMoveIn(); }}><Users size={16} weight="duotone" /> Move Sims in</button>}
           {onEdit && <button type="button" role="menuitem" onClick={() => { setOpen(false); onEdit(); }}><PencilSimple size={16} weight="duotone" /> Edit household</button>}
           <button type="button" role="menuitem" className="danger" onClick={() => { setOpen(false); onDelete(); }}><Trash size={16} weight="duotone" /> Delete household</button>
         </div>

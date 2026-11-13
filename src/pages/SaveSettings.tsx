@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
-import { CalendarBlank, GearSix, LockKey, MapPin, Package, PuzzlePiece, Trash } from '@phosphor-icons/react';
-import { BackLink, MRow } from '../components/Shell';
+import { CalendarBlank, CaretLeft, GearSix, LockKey, MapPin, Package, PuzzlePiece, Trash } from '@phosphor-icons/react';
+import { PhoneBar } from '../components/AzList';
+import { MRow } from '../components/Shell';
 import { ObjIcon, type CategoryId } from '../components/categories';
 import { FundsSettings } from './money/Money';
 import { DateFields, LifespanEditor, MODULES, NewFromPacks, PackPicker, SeasonLengthPicker, Swatches } from '../components/savebits';
 import { DeleteSaveDialog, TrashList } from '../components/sync';
-import { Field, Modal, toast, Toggle } from '../components/ui';
+import { Field, Modal, Sheet, toast, Toggle } from '../components/ui';
 import { PhotoField } from '../components/photo';
 import { usePhotos, type PhotoRef } from '../lib/photos';
 import { available, BY_ID, GAME } from '../data/game';
@@ -45,7 +46,8 @@ export function SaveSettings({ save }: { save: SaveRow }) {
   const [packsBefore, setPacksBefore] = useState<string[] | null>(null);
   const [newPacks, setNewPacks] = useState<string[]>([]);
   const [deleting, setDeleting] = useState(false);
-  const [sheet, setSheet] = useState<null | 'season' | 'life' | 'name' | 'trash'>(null);
+  const [sheet, setSheet] = useState<null | 'season' | 'life' | 'name' | 'trash' | 'secret'>(null);
+  const [soonOpen, setSoonOpen] = useState(false);
 
   const lots = useLotsCtx(save);
   const [choosingWorlds, setChoosingWorlds] = useState(false);
@@ -137,8 +139,7 @@ export function SaveSettings({ save }: { save: SaveRow }) {
     const t = todayOf(d);
     return (
       <div className="m-stack">
-        <BackLink href={savePath(save.id, 'more')} label="More" />
-        <h1 className="m-h1">Save settings</h1>
+        <PhoneBar title="Save settings" left={<a className="pp-round" href={savePath(save.id, 'more')} aria-label="Back to More"><CaretLeft size={20} weight="bold" /></a>} />
         <div className="m-label">Time</div>
         <div className="m-group">
           <MRow title="Track today’s date" chevron={false} right={<Toggle on={d.trackDate} onChange={(trackDate) => update({ trackDate })} label="Track today’s date" />} />
@@ -150,30 +151,38 @@ export function SaveSettings({ save }: { save: SaveRow }) {
         <div className="m-help">{d.trackDate ? 'Powers ages, countdowns, birthdays, holidays, rotation and Jump ahead.' : 'Countdowns and Jump ahead are hidden. Age Sims up by hand from their profile. Real-life ages need today’s date tracked.'}</div>
         <div className="m-label">Modules</div>
         <div className="m-group">
-          {MODULES.map((m) => (
-            <MRow key={m.id} title={m.label} sub={m.ready ? undefined : m.desc} chevron={false}
-              right={m.ready ? <Toggle on={!!d.modules[m.id]} onChange={(on) => update({ modules: { ...d.modules, [m.id]: on } })} label={m.label} /> : <span className="tag outline" style={{ whiteSpace: 'nowrap' }}>Coming soon</span>} />
-          )).flatMap((row, i) => (MODULES[i].id === 'funds' ? [row, <FundsSettings key="funds-sub" save={save} phone update={update} />] : [row]))}
+          {MODULES.filter((m) => m.ready).map((m) => (
+            <MRow key={m.id} title={m.label} chevron={false}
+              right={<Toggle on={!!d.modules[m.id]} onChange={(on) => update({ modules: { ...d.modules, [m.id]: on } })} label={m.label} />} />
+          )).flatMap((row) => (row.key === 'funds' ? [row, <FundsSettings key="funds-sub" save={save} phone update={update} />] : [row]))}
+          {MODULES.some((m) => !m.ready) && (
+            <MRow title={`${MODULES.filter((m) => !m.ready).length} more coming soon`} sub={soonOpen ? undefined : MODULES.filter((m) => !m.ready).slice(0, 3).map((m) => m.label).join(', ') + '…'}
+              icon={<span className="obj" style={{ background: 'var(--sidebar)', color: 'var(--muted)' }}><LockKey size={16} weight="duotone" /></span>}
+              onClick={() => setSoonOpen((o) => !o)} />
+          )}
+          {soonOpen && MODULES.filter((m) => !m.ready).map((m) => <MRow key={m.id} title={m.label} sub={m.desc} chevron={false} right={<span className="tag outline" style={{ whiteSpace: 'nowrap' }}>Soon</span>} />)}
         </div>
-        <div className="m-help">Turning one off hides it without deleting anything. The rest are on the way.</div>
-        {secretLots.length > 0 && (
-          <>
-            <div className="m-label">Secret lots</div>
-            <div className="m-group">
-              <MRow title="All secret lots" chevron={false} right={<Toggle on={allSecretOn} onChange={setAllSecret} label="All secret lots" />} />
-              {secretLots.map((l) => <MRow key={l.id} title={l.name} sub={l.worldName} chevron={false} right={<Toggle on={secretOn.has(l.id)} onChange={(on) => setSecret(l.id, on)} label={l.name} />} />)}
-            </div>
-            <div className="m-help">{secretHelp}</div>
-          </>
-        )}
+        <div className="m-label">Worlds</div>
+        <div className="m-group">
+          <MRow title="Worlds you play" icon={<span className="obj worlds"><MapPin size={16} weight="duotone" /></span>} value={`${lots.shownWorlds.length} of ${lots.worlds.length}`} onClick={() => setChoosingWorlds(true)} />
+          {secretLots.length > 0 && <MRow title="Secret lots" icon={<span className="obj worlds"><LockKey size={16} weight="duotone" /></span>} value={`${secretLots.filter((l) => secretOn.has(l.id)).length} of ${secretLots.length} on`} onClick={() => setSheet('secret')} />}
+        </div>
         <div className="m-label">Save</div>
         <div className="m-group">
           <MRow title="Name, color and cover" value={d.name} onClick={() => setSheet('name')} />
           <MRow title="Packs" value={d.packs.length} onClick={openPacks} />
-          <MRow title="Worlds you play" value={`${lots.shownWorlds.length} of ${lots.worlds.length}`} onClick={() => setChoosingWorlds(true)} />
           <MRow title="Trash" value={trash.length || undefined} onClick={() => setSheet('trash')} />
           <MRow title="Delete this save" danger chevron={false} onClick={() => setDeleting(true)} />
         </div>
+        {sheet === 'secret' && (
+          <Sheet title="Secret lots" onClose={() => setSheet(null)}>
+            <div className="m-group">
+              <MRow title="All secret lots" chevron={false} right={<Toggle on={allSecretOn} onChange={setAllSecret} label="All secret lots" />} />
+              {secretLots.map((l) => <MRow key={l.id} title={l.name} sub={l.worldName} chevron={false} right={<Toggle on={secretOn.has(l.id)} onChange={(on) => setSecret(l.id, on)} label={l.name} />} />)}
+            </div>
+            <div className="m-help" style={{ marginTop: 8 }}>{secretHelp}</div>
+          </Sheet>
+        )}
         {sheet === 'season' && (
           <Modal title="Season length" onClose={() => setSheet(null)} footer={<button type="button" className="btn primary" onClick={() => setSheet(null)}>Done</button>}>
             <SeasonLengthPicker value={d.calendar.seasonLength} onChange={setLength} />

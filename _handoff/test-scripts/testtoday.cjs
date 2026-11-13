@@ -46,7 +46,7 @@ const seed = (st) => {
     await p.getByRole('button', { name: 'Go back 5 days' }).click(); await p.waitForTimeout(300);
     ok((await h1()).includes('Spring 9'), `${n} went back 5 days`);
     await p.locator('.today-row', { hasText: 'with no household' }).click(); await p.waitForURL(/\/sims$/); await p.waitForTimeout(600);
-    ok(await p.locator(phone ? '.sim-card' : 'tbody tr').count() === 2, `${n} To sort opens the Sims list filtered`);
+    ok(await p.locator(phone ? '.sim-mrow' : 'tbody tr').count() === 2, `${n} To sort opens the Sims list filtered`);
     if (phone) {
       await p.goto(`http://localhost:4173/#/s/${SID}/today`); await p.waitForTimeout(800);
       await p.locator('.m-datepill').click(); await p.waitForTimeout(400);

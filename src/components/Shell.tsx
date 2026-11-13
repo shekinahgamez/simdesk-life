@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
-  CalendarBlank, CaretLeft, CaretRight, CaretUpDown, Check, DotsThreeCircle, GearSix, House, MapPin, Plus, Sparkle as SparkleIcon, User, UserCircle,
-  ArrowsClockwise,
+  CalendarBlank, CaretLeft, CaretRight, CaretUpDown, Check, DotsThreeCircle, GearSix, GlobeHemisphereWest, House, Plus, Sparkle as SparkleIcon, User, UserCircle,
+  ArrowsClockwise, Crown, Storefront,
 } from '@phosphor-icons/react';
 import { Wordmark } from './brand';
 import { needsPack, ObjIcon, SECTIONS } from './categories';
@@ -59,7 +59,17 @@ function Sidebar({ save, route }: { save: SaveRow | null; route: Route }) {
           ))}
           {d && moduleOn(d, 'rotation') && (
             <a href={savePath(save.id, 'rotation')} className={`nav-link ${section === 'rotation' ? 'active' : ''}`} aria-current={section === 'rotation' ? 'page' : undefined}>
-              <span className="obj worlds" aria-hidden="true"><ArrowsClockwise size={16} weight="duotone" /></span> Rotation
+              <span className="obj rotation" aria-hidden="true"><ArrowsClockwise size={16} weight="duotone" /></span> Rotation
+            </a>
+          )}
+          {d && moduleOn(d, 'venues') && (
+            <a href={savePath(save.id, 'businesses')} className={`nav-link ${section === 'businesses' ? 'active' : ''}`} aria-current={section === 'businesses' ? 'page' : undefined}>
+              <span className="obj businesses" aria-hidden="true"><Storefront size={16} weight="duotone" /></span> Businesses
+            </a>
+          )}
+          {d && moduleOn(d, 'legacy') && (
+            <a href={savePath(save.id, 'legacy')} className={`nav-link ${section === 'legacy' ? 'active' : ''}`} aria-current={section === 'legacy' ? 'page' : undefined}>
+              <span className="obj legacy" aria-hidden="true"><Crown size={16} weight="duotone" /></span> Legacy
             </a>
           )}
         </div>
@@ -131,7 +141,7 @@ const TABS = [
   { id: 'today', label: 'Today', icon: House, ink: 'var(--accent)', tint: 'var(--accent-soft)' },
   { id: 'sims', label: 'Sims', icon: User, ink: 'var(--sims-ink)', tint: 'var(--sims-tint)' },
   { id: 'calendar', label: 'Calendar', icon: CalendarBlank, ink: 'var(--calendar-ink)', tint: 'var(--calendar-tint)' },
-  { id: 'worlds', label: 'Worlds', icon: MapPin, ink: 'var(--worlds-ink)', tint: 'var(--worlds-tint)' },
+  { id: 'worlds', label: 'Worlds', icon: GlobeHemisphereWest, ink: 'var(--worlds-ink)', tint: 'var(--worlds-tint)' },
   { id: 'more', label: 'More', icon: DotsThreeCircle, ink: 'var(--muted)', tint: 'color-mix(in srgb, var(--text) 8%, transparent)' },
 ] as const;
 

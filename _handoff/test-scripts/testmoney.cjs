@@ -1,7 +1,8 @@
 // Household funds: real-app checks + proof shots (desktop 1440x900, phone 390x844).
 const { chromium } = require('playwright');
 const { mock, newState, logIn } = require('./mockdb.cjs');
-const { seed, SID } = require('./seed.cjs');
+const { seed: seed0, SID } = require('./commands/seed.cjs');
+const seed = (st, { mods = {} } = {}) => { seed0(st); const d = st.saves[SID].data; d.modules = { ...(d.modules || {}), ...mods }; };
 const out = process.argv[2];
 const P='5056d802-6c5e-a304-9c79-671c6a49385d', A='2ba8ae06-801b-34f8-1c6c-2bd8d57f92dd', C='4782e179-bd45-4205-a681-5306199d4c7d', F='f9b9b9c1-35c2-a19a-b78c-8253484322a9';
 const J='852aa94c-ca2c-ce85-0ab1-1995fa7d69e7', K='538f4ec2-615e-1317-7437-204043514362', BR='9b473440-f7af-5fc4-b96e-cf7b227aef66', BL='e529183f-9423-d09d-41fe-6ce56deba361';
@@ -33,7 +34,8 @@ function money(today){
   ok((await entry.textContent()).includes('§1,148,300'), 'net worth = §1,148,300');
   ok((await entry.textContent()).includes('Ultra Wealthy'), 'class Ultra Wealthy');
   ok((await entry.textContent()).includes('§26,900'), 'change §26,900');
-  if(!phone) for(const nm of ['Jamar','Kendra','Bryson','Blair']) ok((await entry.textContent()).includes(nm), 'card names '+nm);
+  // Desktop household page is compact now: the Money card keeps only funds; each Sim's net worth is on the Sim rows.
+  if(!phone) for(const nm of ['Jamar','Kendra','Bryson','Blair']) ok(!(await entry.textContent()).includes(nm), 'card no longer lists '+nm);
   await noOverflow('household'); await shot('1-household');
   await entry.click(); await p.waitForTimeout(500);
   const dlg = p.locator(phone?'.m-sheet':'.mny-modal');

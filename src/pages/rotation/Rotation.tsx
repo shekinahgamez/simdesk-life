@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ArrowRight, ArrowsClockwise, ArrowsLeftRight, MagnifyingGlass, Pause, CalendarPlus, Check, Clock, DotsSixVertical, DotsThree, Play, Plus, SkipForward, Trash } from '@phosphor-icons/react';
-import { BackLink, PhoneTop } from '../../components/Shell';
+import { ArrowRight, ArrowsClockwise, CaretLeft, ArrowsLeftRight, MagnifyingGlass, Pause, CalendarPlus, Check, Clock, DotsSixVertical, DotsThree, Play, Plus, SkipForward, Trash } from '@phosphor-icons/react';
+import { PhoneBar } from '../../components/AzList';
+import { QuickButton } from '../../components/CommandBar';
 import { Modal, Sheet, toast } from '../../components/ui';
 import { householdLabel, householdName, simData, type SimData } from '../../lib/sims';
 import { savePath } from '../../lib/router';
@@ -357,7 +358,7 @@ export function RotationPage({ save }: { save: SaveRow }) {
   const add = <button type="button" className={`btn${phone ? ' sm' : ''}`} onClick={() => setAdding(true)}><Plus size={phone ? 14 : 16} weight="bold" /> {phone ? 'Add' : 'Add households'}</button>;
   const empty = !r.order.length && (
     <section className="card rot-empty">
-      <span className="obj worlds lg" aria-hidden="true"><ArrowsClockwise size={24} weight="duotone" /></span>
+      <span className="obj rotation lg" aria-hidden="true"><ArrowsClockwise size={24} weight="duotone" /></span>
       <h2>No one’s in the rotation yet</h2>
       <p className="muted">Add the households you take turns playing. SimDesk keeps track of whose turn it is and for how long.</p>
       <button type="button" className="btn primary" onClick={() => setAdding(true)}><Plus size={16} weight="bold" /> Add households</button>
@@ -373,12 +374,9 @@ export function RotationPage({ save }: { save: SaveRow }) {
   if (phone) {
     return (
       <div className="m-stack">
-        <PhoneTop save={save} />
-        <BackLink href={savePath(save.id, 'more')} label="More" />
-        <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-end' }}>
-          <div><h1 className="m-h1">Rotation</h1><div className="muted">{sub}</div></div>
-          {r.order.length > 0 && add}
-        </div>
+        <PhoneBar title="Rotation" left={<a className="pp-round" href={savePath(save.id, 'more')} aria-label="Back to More" style={{ marginLeft: -10 }}><CaretLeft size={20} weight="bold" /></a>}
+          right={<>{r.order.length > 0 && add}<QuickButton /></>} />
+        <div className="muted small" style={{ marginTop: -4 }}>{sub}</div>
         {body}
         {adding && <AddDialog rot={rot} phone onClose={() => setAdding(false)} />}
       </div>
@@ -419,7 +417,7 @@ export function HouseholdRotation({ save, hhId }: { save: SaveRow; hhId: string 
   }
   return (
     <div className="rot-hh">
-      <a className="obj worlds" href={page} aria-label="Open Rotation"><ArrowsClockwise size={16} weight="duotone" /></a>
+      <a className="obj rotation" href={page} aria-label="Open Rotation"><ArrowsClockwise size={16} weight="duotone" /></a>
       <span className="grow">{text}</span>
       {action}
       {ending && <EndTurnDialog rot={rot} phone={phone} onClose={() => setEnding(false)} />}

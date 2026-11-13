@@ -4,6 +4,7 @@ import { APP } from '../config/app';
 import { Sparkle, Wordmark } from '../components/brand';
 import { ObjIcon, DECK } from '../components/categories';
 import { PasswordInput } from '../components/PasswordInput';
+import { useIsPhone } from '../lib/useIsPhone';
 import {
   AuthError, logIn, MIN_PASSWORD, sendReset, signUp, usernameAvailable, USERNAME_RE, USERNAME_RULES,
 } from '../lib/auth';
@@ -13,10 +14,11 @@ const HEADINGS: Record<Mode, string> = { signup: 'Make your account', login: 'We
 
 /** The brand side plus a card. Used by every account screen. */
 export function AuthShell({ title, children }: { title: string; children: ReactNode }) {
+  const phone = useIsPhone();
   return (
     <main className="auth">
       <div className="auth-brand">
-        <Wordmark size={64} />
+        <Wordmark size={phone ? 40 : 64} />
         <p className="auth-tag">{APP.tagline}</p>
         <div className="auth-pills">
           {DECK.map((c) => (
@@ -152,12 +154,6 @@ export function Auth({ confirmed, startLogin }: { confirmed?: boolean; startLogi
   return (
     <AuthShell title={HEADINGS[mode]}>
       {confirmed && mode === 'login' && <div className="form-ok" role="status"><CheckCircle size={18} weight="fill" /> Your email is confirmed. Log in to start.</div>}
-      {mode !== 'reset' && (
-        <div className="seg auth-switch" role="group" aria-label="Account">
-          <button type="button" aria-pressed={mode === 'signup'} onClick={() => switchTo('signup')}>Sign up</button>
-          <button type="button" aria-pressed={mode === 'login'} onClick={() => switchTo('login')}>Log in</button>
-        </div>
-      )}
       <form className="auth-form" onSubmit={submit} noValidate>
         {mode === 'signup' && (
           <div className="field">
@@ -216,6 +212,8 @@ export function Auth({ confirmed, startLogin }: { confirmed?: boolean; startLogi
         </button>
         {mode === 'login' && <button type="button" className="btn ghost auth-link" onClick={() => switchTo('reset')}>Forgot password?</button>}
         {mode === 'reset' && <button type="button" className="btn ghost auth-link" onClick={() => switchTo('login')}>Back to log in</button>}
+        {mode === 'signup' && <p className="auth-swap">Already have an account? <button type="button" className="auth-swap-btn" onClick={() => switchTo('login')}>Log in</button></p>}
+        {mode === 'login' && <p className="auth-swap">New to SimDesk? <button type="button" className="auth-swap-btn" onClick={() => switchTo('signup')}>Sign up</button></p>}
       </form>
     </AuthShell>
   );

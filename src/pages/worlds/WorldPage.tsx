@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { PencilSimple, Plus } from '@phosphor-icons/react';
+import { CaretDown, CaretRight, PencilSimple, Plus } from '@phosphor-icons/react';
 import { BY_ID, type GameLot } from '../../data/game';
 import { BackLink } from '../../components/Shell';
 import { Confirm, Field, Modal, TextInput, toast } from '../../components/ui';
@@ -21,6 +21,8 @@ export function WorldPage({ save, worldId }: { save: SaveRow; worldId: string })
   const [editing, setEditing] = useState(false);
   const [spotMenu, setSpotMenu] = useState<GameLot | null>(null);
   const [renaming, setRenaming] = useState<string | null>(null);
+  // Phone: neighborhoods with nothing filled start folded.
+  const [hoodOpen, setHoodOpen] = useState<Record<string, boolean>>({});
   const game = BY_ID.worlds.get(worldId);
   const spots = useMemo(() => spotsOf(ctx.info.avail, worldId), [ctx.info.avail, worldId]);
   const apts = ctx.apartments.filter((a) => a.world === worldId);
@@ -55,12 +57,14 @@ export function WorldPage({ save, worldId }: { save: SaveRow; worldId: string })
     <div className="hood-cols">
       {hoods.map((h) => {
         const placed = h.list.filter((s) => ctx.bySpot.has(s.id)).length;
+        const open = !phone || (hoodOpen[h.name] ?? placed > 0);
         return (
-          <section key={h.name} className="card hood-card">
+          <section key={h.name} className={`card hood-card${phone ? ' hood-fold' : ''}${open ? '' : ' folded'}`}>
             <HoodHead game={h.name} name={ctx.hoodName(worldId, h.name)} editing={renaming === h.name} canRename={h.name !== 'Other'}
-              count={`${placed} of ${h.list.length} filled`} onEdit={() => setRenaming(h.name)} onCancel={() => setRenaming(null)}
+              count={`${placed} of ${h.list.length} filled`}
+              fold={phone ? { open, toggle: () => setHoodOpen((m) => ({ ...m, [h.name]: !open })) } : undefined} onEdit={() => setRenaming(h.name)} onCancel={() => setRenaming(null)}
               onSave={(v) => { putWorld({ hoodNames: { ...w.hoodNames, [h.name]: v === h.name ? '' : v } }); setRenaming(null); toast('Saved'); }} />
-            <div className="hood-rows">
+            {open && <div className="hood-rows">
               {h.list.map((s) => {
                 const r = ctx.bySpot.get(s.id);
                 return r ? (
@@ -75,7 +79,7 @@ export function WorldPage({ save, worldId }: { save: SaveRow; worldId: string })
                   </button>
                 );
               })}
-            </div>
+            </div>}
           </section>
         );
       })}
@@ -159,8 +163,8 @@ function AptGroup({ ctx, save, apts: every, phone }: { ctx: LotsCtx; save: SaveR
 }
 
 /** A neighborhood card's heading. The pencil renames it (your name; the game's name stays as a hint). */
-function HoodHead({ game, name, count, editing, canRename, onEdit, onCancel, onSave }: {
-  game: string; name: string; count: string; editing: boolean; canRename: boolean; onEdit(): void; onCancel(): void; onSave(v: string): void;
+function HoodHead({ game, name, count, fold, editing, canRename, onEdit, onCancel, onSave }: {
+  game: string; name: string; count: string; fold?: { open: boolean; toggle(): void }; editing: boolean; canRename: boolean; onEdit(): void; onCancel(): void; onSave(v: string): void;
 }) {
   const [v, setV] = useState(name);
   if (editing) {
@@ -178,6 +182,9 @@ function HoodHead({ game, name, count, editing, canRename, onEdit, onCancel, onS
   }
   return (
     <header>
+      {fold && <button type="button" className="hood-caret" aria-expanded={fold.open} aria-label={`${fold.open ? 'Fold' : 'Open'} ${name}`} onClick={fold.toggle}>
+        {fold.open ? <CaretDown size={20} weight="bold" /> : <CaretRight size={20} weight="bold" />}
+      </button>}
       <h2>{name}{canRename && <button type="button" className="hood-pencil" aria-label={`Rename ${name}`} title="Rename" onClick={() => { setV(name); onEdit(); }}><PencilSimple size={18} /></button>}</h2>
       <span className="hood-count">{count}</span>
     </header>

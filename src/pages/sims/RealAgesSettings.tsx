@@ -23,10 +23,10 @@ export function RealAgesSettings({ phone }: { phone: boolean }) {
     return { id, i, control };
   });
   const body = (
-    <div className="ra-list">
+    <div className={`ra-list${phone ? ' ra-phone' : ''}`}>
       {rows.map((r) => (
         <div key={r.id} className="ra-row">
-          <div className="grow"><b>{stageName(r.id)}</b><span className="muted small"> · {rangeText(r.id, ranges)}</span></div>
+          <div className="grow"><b>{stageName(r.id)}</b><span className="muted small"><span className="ra-dot"> · </span>{rangeText(r.id, ranges)}</span></div>
           {r.control}
         </div>
       ))}

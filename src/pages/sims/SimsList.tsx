@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowDown, ArrowUp, Cake, CaretDown, Check, CheckSquare, FunnelSimple, Hourglass, HouseSimple, ListPlus, PencilSimple, Plus, Rows, Sparkle, SquaresFour, Trash, X } from '@phosphor-icons/react';
+import { ArrowDown, ArrowUp, Cake, CaretDown, CaretRight, Check, CheckSquare, FunnelSimple, Hourglass, HouseSimple, ListPlus, PencilSimple, Plus, Rows, Sparkle, SquaresFour, Trash, X } from '@phosphor-icons/react';
+import { AzHeader, AzRail, azKey, letterOf, PhoneBar } from '../../components/AzList';
+import { QuickButton } from '../../components/CommandBar';
+import { cleanRotation } from '../../lib/rotation';
+import { moduleOn, saveData } from '../../lib/saves';
+import { Faces } from '../households/shared';
 import { ObjIcon } from '../../components/categories';
 import { PhotoBox } from '../../components/photo';
 import { Confirm, Field, Modal, Picker, SearchBox, Seg, Sheet, TextInput, Toggle, toast } from '../../components/ui';
@@ -20,6 +25,17 @@ import { SimAvatar, useBirthdayView, useCustomTraits, useHouseholds, useSaveInfo
 
 const FILTER_KEY = (saveId: string) => `sd:simFilters:${saveId}`;
 const LAYOUT_KEY = 'sd:simsLayout';
+type GroupKey = 'az' | 'household' | 'stage' | 'recent';
+const GROUP_KEY = 'sd:simsGroup';
+const GROUPS: { id: GroupKey; label: string; sub: string }[] = [
+  { id: 'az', label: 'A–Z', sub: 'By last name, with a jump strip' },
+  { id: 'household', label: 'Household', sub: 'Playing now on top, each household folds' },
+  { id: 'stage', label: 'Life stage', sub: 'Babies to elders' },
+  { id: 'recent', label: 'Recently added', sub: 'Newest first' },
+];
+function loadGroup(): GroupKey {
+  try { const g = localStorage.getItem(GROUP_KEY); return GROUPS.some((x) => x.id === g) ? (g as GroupKey) : 'az'; } catch { return 'az'; }
+}
 function loadLayout(): 'table' | 'gallery' {
   try { return localStorage.getItem(LAYOUT_KEY) === 'gallery' ? 'gallery' : 'table'; } catch { return 'table'; }
 }
@@ -45,6 +61,10 @@ export function SimsList({ save }: { save: SaveRow }) {
   const [showFilter, setShowFilter] = useState(false);
   const [layout, setLayoutState] = useState<'table' | 'gallery'>(loadLayout);
   const setLayout = (l: 'table' | 'gallery') => { setLayoutState(l); try { localStorage.setItem(LAYOUT_KEY, l); } catch { /* ignore */ } };
+  const [group, setGroupState] = useState<GroupKey>(loadGroup);
+  const setGroup = (g: GroupKey) => { setGroupState(g); try { localStorage.setItem(GROUP_KEY, g); } catch { /* ignore */ } };
+  const [showGroup, setShowGroup] = useState(false);
+  const [open1, setOpen1] = useState<Record<string, boolean>>({});
   const [form, setForm] = useState(false);
   const [quick, setQuick] = useState(false);
   const [traits, setTraits] = useState(false);
@@ -95,35 +115,101 @@ export function SimsList({ save }: { save: SaveRow }) {
   );
 
   if (phone) {
+    const d = saveData(save);
+    const playing = moduleOn(d, 'rotation') ? cleanRotation(d.rotation).current : null;
+    const noHh = all.filter((r) => !r.sim.deceased && !r.sim.householdId).length;
+    const searching = q.trim() !== '' || nf > 0 || selecting;
+    const sections = groupSims(shown, group, hh.nameOf, playing, sort);
+    const tick = (r: SimRow) => (selecting ? <span className={`pick-tick${picked.includes(r.id) ? ' on' : ''}`} aria-hidden="true">{picked.includes(r.id) && <Check size={14} weight="bold" />}</span> : null);
+    const rowEl = (r: SimRow) => {
+      const b = birthdayCell(r.age, info.cal, view, !!r.sim.deceased);
+      return (
+      <button key={r.id} type="button" className={`m-row sim-mrow${selecting && picked.includes(r.id) ? ' picked' : ''}`} aria-pressed={selecting ? picked.includes(r.id) : undefined}
+        onClick={() => (selecting ? togglePick(r.id) : open(r.id))}>
+        {tick(r)}
+        <SimAvatar sim={r.sim} size={36} />
+        <span className="grow" style={{ minWidth: 0 }}>
+          <span className="t">{r.name}</span>
+          <span className="s">{[r.realAgeShort, r.sim.deceased ? 'Deceased' : stageLabel(r.stage), r.sim.planned ? 'Planned' : '', r.sim.townie ? 'Townie' : ''].filter(Boolean).join(' · ')}{b?.soon && <> · <span className="sim-card-bday"><Cake size={13} weight="duotone" /> Birthday {view === 'date' ? `on ${b.text}` : b.text}</span></>}</span>
+        </span>
+        {group !== 'household' && (r.household ? <span className="hh">{r.household}</span> : !r.sim.deceased && <span className="hh none">No household</span>)}
+      </button>
+      );
+    };
+    const letters = group === 'az' && !searching && shown.length >= 12 ? [...new Set(sections.map((x) => x.key))] : [];
     return (
       <div className="m-stack sims-phone">
-        <div className="row" style={{ justifyContent: 'space-between', paddingTop: 6 }}>
-          <h1 className="m-h1">Sims</h1>
-          <span className="row" style={{ gap: 2, flexWrap: 'nowrap' }}>
-            {all.length > 0 && selectBtn}
-            {!selecting && <button type="button" className="btn ghost sm" style={{ color: 'var(--accent)' }} onClick={() => setQuick(true)}><ListPlus size={18} /> Quick add</button>}
-          </span>
-        </div>
+        <PhoneBar title="Sims" right={<>
+          {all.length > 0 && <button type="button" className="btn ghost icon" aria-label={selecting ? 'Done selecting' : 'Select Sims'} aria-pressed={selecting} onClick={() => (selecting ? stopSelecting() : setSelecting(true))}><CheckSquare size={22} weight={selecting ? 'fill' : 'regular'} /></button>}
+          {!selecting && <button type="button" className="btn ghost icon" aria-label="Quick add" onClick={() => setQuick(true)}><ListPlus size={22} /></button>}
+          <QuickButton />
+        </>} />
         <SimsSwitch saveId={save.id} on="sims" />
         {all.length === 0 ? (
           <EmptySims onAdd={() => setForm(true)} onQuick={() => setQuick(true)} phone />
         ) : (
           <>
-            <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
-              <div className="m-search grow"><SearchBox value={q} onChange={setQ} placeholder={`Search ${plural(searchCount, 'Sim')}`} /></div>
+            <div className="tb-row">
+              <div className="m-search grow"><SearchBox value={q} onChange={setQ} placeholder="Search" /></div>
+              <button type="button" className="tb-btn" aria-label={`Group and view: ${GROUPS.find((g) => g.id === group)!.label}`} onClick={() => setShowGroup(true)}>
+                <Rows size={18} /> {GROUPS.find((g) => g.id === group)!.label} <CaretDown size={12} weight="bold" />
+              </button>
               <button type="button" className="btn icon filter-btn" aria-label={nf ? `Filter, ${nf} on` : 'Filter'} onClick={() => setShowFilter(true)}>
                 <FunnelSimple size={20} weight="bold" />{nf > 0 && <span className="count">{nf}</span>}
               </button>
             </div>
+            {noHh > 0 && !filters.households.includes(NO_HOUSEHOLD) && !q.trim() && (
+              <button type="button" className="attn-row" onClick={() => setFilters({ ...NO_FILTERS, households: [NO_HOUSEHOLD] })}>
+                <span className="ico"><HouseSimple size={18} weight="duotone" /></span><span><b>{plural(noHh, 'Sim')}</b> with no household</span>
+                <span className="go">Sort them <CaretRight size={14} weight="bold" /></span>
+              </button>
+            )}
             {tags}
-            {shown.length === 0 ? <p className="muted">No Sims match that.</p> : (
+            {shown.length === 0 ? <p className="muted">No Sims match that.</p> : layout === 'gallery' ? (
               <div className="sim-grid">
                 {shown.map((r) => <SimCard key={r.id} r={r} info={info} view={view} onOpen={() => (selecting ? togglePick(r.id) : open(r.id))} picked={selecting ? picked.includes(r.id) : undefined} />)}
               </div>
+            ) : (
+              <div className="az-list">
+                {sections.map((sec) => {
+                  const folded = group === 'household' && !searching && !(open1[sec.key] ?? sec.key === playing);
+                  return (
+                    <div key={sec.key} className="az-sec">
+                      {sec.band && <div className={`az-band ${sec.band.tone}`}>{sec.band.label}</div>}
+                      {group === 'az' ? <AzHeader letter={sec.key} /> : group === 'stage' ? <div className="az-band">{sec.label} · {sec.rows.length}</div> : null}
+                      {group === 'household' && (
+                        <button type="button" className="az-hhead" aria-expanded={!folded} onClick={() => setOpen1({ ...open1, [sec.key]: folded })}>
+                          <span className="caret"><CaretDown size={16} weight="bold" /></span>
+                          {sec.rows.length > 0 && <Faces sims={sec.rows} size={28} max={2} />}
+                          <span className="t">{sec.label}</span><span className="n">{plural(sec.rows.length, 'Sim')}</span>
+                        </button>
+                      )}
+                      {!folded && <div className={group === 'az' ? 'az-card' : undefined}>{sec.rows.map(rowEl)}</div>}
+                    </div>
+                  );
+                })}
+              </div>
             )}
+            <AzRail letters={letters} />
           </>
         )}
         {!selecting && <button type="button" className="m-fab" aria-label="New Sim" onClick={() => setForm(true)}><Plus size={26} weight="bold" /></button>}
+        {showGroup && (
+          <Sheet title="Show Sims" onClose={() => setShowGroup(false)}>
+            <div className="m-label" style={{ padding: '0 4px 6px' }}>Group by</div>
+            <div className="m-group" role="radiogroup" aria-label="Group by">
+              {GROUPS.map((g) => (
+                <button key={g.id} type="button" role="radio" aria-checked={group === g.id} className="opt" onClick={() => { setGroup(g.id); setShowGroup(false); }}>
+                  <span><span className="t">{g.label}</span><span className="s">{g.sub}</span></span>
+                  {group === g.id && <span className="ck"><Check size={20} weight="bold" /></span>}
+                </button>
+              ))}
+            </div>
+            <div className="m-label" style={{ padding: '14px 4px 6px' }}>Look</div>
+            <Seg label="Look" value={layout} onChange={(l) => { setLayout(l); setShowGroup(false); }} options={[{ v: 'table', label: 'Rows' }, { v: 'gallery', label: 'Photos' }]} />
+            <p className="muted small" style={{ margin: '12px 4px 0' }}>SimDesk remembers this on this device.</p>
+          </Sheet>
+        )}
         {dialogs}
       </div>
     );
@@ -202,7 +288,7 @@ export function SimsList({ save }: { save: SaveRow }) {
                         onClick={() => (selecting ? togglePick(r.id) : open(r.id))} onKeyDown={(e) => e.key === 'Enter' && (selecting ? togglePick(r.id) : open(r.id))}>
                         {selecting && <td className="pick-col"><input type="checkbox" aria-label={`Pick ${r.name}`} checked={picked.includes(r.id)} onChange={() => togglePick(r.id)} onClick={(e) => e.stopPropagation()} /></td>}
                         <td><span className="sim-cell"><SimAvatar sim={r.sim} />{r.name}</span></td>
-                        <td>{r.sim.deceased ? <span className="tag outline">Deceased</span> : <span className="tag sims ink">{stageLabel(r.stage)}</span>}</td>
+                        <td>{r.sim.deceased ? <span className="tag outline">Deceased</span> : <span className="tag sims ink">{stageLabel(r.stage)}</span>}{r.sim.planned && <span className="tag outline" style={{ marginLeft: 6 }}>Planned</span>}{r.sim.townie && <span className="tag outline" style={{ marginLeft: 6 }}>Townie</span>}</td>
                         {realAges && <td>{r.realAge ? r.realAge.replace(/ old$/, '') : <span className="muted">–</span>}</td>}
                         <td>
                           <button type="button" className={`hh-cell${r.household ? '' : ' none'}`} aria-label={`Household for ${r.name}: ${r.household || 'none'}. Change`}
@@ -228,6 +314,41 @@ export function SimsList({ save }: { save: SaveRow }) {
   );
 }
 
+type Section = { key: string; label: string; rows: SimRow[]; band?: { label: string; tone: string } };
+/** Splits the shown Sims into the phone list's sections. */
+function groupSims(rows: SimRow[], group: GroupKey, hhName: (id: string) => string, playing: string | null | undefined, sort: Sort): Section[] {
+  const byName = sortRows(rows, sort);
+  if (group === 'az') {
+    const m = new Map<string, SimRow[]>();
+    for (const r of sortRows(rows, { key: 'name', dir: 1 })) {
+      const l = letterOf(r.sim.last || r.sim.first);
+      (m.get(l) ?? m.set(l, []).get(l)!).push(r);
+    }
+    return [...m.entries()].sort((a, b) => azKey(a[0]).localeCompare(azKey(b[0]))).map(([k, v]) => ({ key: k, label: k, rows: v }));
+  }
+  if (group === 'stage') {
+    const m = new Map<string, SimRow[]>();
+    for (const r of byName) { const k = r.sim.deceased ? 'deceased' : r.stage ?? 'none'; (m.get(k) ?? m.set(k, []).get(k)!).push(r); }
+    const order = [...STAGE_IDS, 'none', 'deceased'] as string[];
+    return [...m.entries()].sort((a, b) => order.indexOf(a[0]) - order.indexOf(b[0]))
+      .map(([k, v]) => ({ key: k, label: k === 'deceased' ? 'Deceased' : k === 'none' ? 'Age not set' : stageName(k as StageId), rows: v }));
+  }
+  if (group === 'recent') {
+    const rec = [...rows].sort((a, b) => ((b.sim.addedDay ?? -1e9) - (a.sim.addedDay ?? -1e9)) || a.name.localeCompare(b.name));
+    return [{ key: 'recent', label: 'Newest first', rows: rec }];
+  }
+  const m = new Map<string, SimRow[]>();
+  for (const r of byName) { const k = r.sim.householdId || NO_HOUSEHOLD; (m.get(k) ?? m.set(k, []).get(k)!).push(r); }
+  const secs: Section[] = [...m.entries()].map(([k, v]) => ({ key: k, label: k === NO_HOUSEHOLD ? 'No household' : hhName(k), rows: v }));
+  const rank = (x: Section) => (x.key === playing ? 0 : x.key === NO_HOUSEHOLD ? 1 : 2);
+  secs.sort((a, b) => rank(a) - rank(b) || azKey(a.label).localeCompare(azKey(b.label)));
+  const first = secs.find((x) => rank(x) === 0), none = secs.find((x) => rank(x) === 1), firstRest = secs.find((x) => rank(x) === 2);
+  if (first) first.band = { label: 'Playing now', tone: 'now' };
+  if (none) none.band = { label: 'Needs a household', tone: 'none' };
+  if (firstRest) firstRest.band = { label: 'All households', tone: '' };
+  return secs;
+}
+
 function EmptySims({ onAdd, onQuick, phone }: { onAdd(): void; onQuick(): void; phone?: boolean }) {
   return (
     <div className="empty">
@@ -251,7 +372,7 @@ function SimCard({ r, info, view, onOpen, household, picked }: { r: SimRow; info
         : <span className="sim-card-img initials">{(r.sim.first[0] ?? '') + (r.sim.last[0] ?? '')}</span>}
       <span className="sim-card-body">
         <span className="sim-card-name"><b>{r.name}</b>{r.realAgeShort && <span className="sim-card-age">, {r.realAgeShort}</span>}</span>
-        <span>{r.sim.deceased ? 'Deceased' : stageLabel(r.stage)}</span>
+        <span>{r.sim.deceased ? 'Deceased' : stageLabel(r.stage)}{r.sim.planned ? ' · Planned' : ''}{r.sim.townie ? ' · Townie' : ''}</span>
         {household && (r.household ? <span className="sim-card-hh">{r.household}</span> : <span>No household</span>)}
         {b?.soon && <span className="sim-card-bday"><Cake size={13} weight="duotone" /> Birthday {view === 'date' ? `on ${b.text}` : b.text}</span>}
       </span>
@@ -265,6 +386,7 @@ function ActiveFilters({ filters: f, onChange, nameOf }: { filters: Filters; onC
     ...f.households.map((h) => ({ key: `h${h}`, label: nameOf(h), off: () => ({ ...f, households: f.households.filter((x) => x !== h) }) })),
     ...f.genders.map((g) => ({ key: `g${g}`, label: g === 'male' ? 'Male' : 'Female', off: () => ({ ...f, genders: f.genders.filter((x) => x !== g) }) })),
     ...(f.birthdayThisWeek ? [{ key: 'bw', label: 'Birthday this week', off: () => ({ ...f, birthdayThisWeek: false }) }] : []),
+    ...(f.status !== 'any' ? [{ key: 'st', label: f.status === 'planned' ? 'Planned' : 'Created', off: () => ({ ...f, status: 'any' as const }) }] : []),
     ...(f.deceased ? [{ key: 'dc', label: 'Deceased', off: () => ({ ...f, deceased: false }) }] : []),
   ];
   if (!items.length) return null;
@@ -307,6 +429,14 @@ function FilterPanel({ filters: f, onChange, onClose, count, phone, view, onView
           ))}
         </div>
       </div>
+      <div className="field">
+        <span className="label">In the game</span>
+        <div className="chip-row">
+          {([['created', 'Created'], ['planned', 'Planned']] as const).map(([v, l]) => (
+            <button key={v} type="button" className="fchip" aria-pressed={f.status === v} onClick={() => onChange({ ...f, status: f.status === v ? 'any' : v })}>{l}</button>
+          ))}
+        </div>
+      </div>
       <div className="switch-list">
         <label className="switch-line"><span>Birthday this week</span><Toggle label="Birthday this week" on={f.birthdayThisWeek} onChange={(v) => onChange({ ...f, birthdayThisWeek: v })} /></label>
         <label className="switch-line"><span>Show deceased Sims</span><Toggle label="Show deceased Sims" on={f.deceased} onChange={(v) => onChange({ ...f, deceased: v })} /></label>
@@ -345,12 +475,13 @@ function QuickAdd({ info, onClose }: { info: SaveInfo; onClose(): void }) {
   const [text, setText] = useState('');
   const [household, setHousehold] = useState('');
   const [stage, setStage] = useState<StageId>('youngAdult');
+  const [planned, setPlanned] = useState(false);
   const names = text.split('\n').map((l) => l.trim()).filter(Boolean);
   const add = () => {
     for (const line of names) {
       const { first, last } = splitName(line);
       store.put('sim', {
-        ...BLANK_SIM, first, last, householdId: household || null,
+        ...BLANK_SIM, first, last, householdId: household || null, ...(planned ? { planned: true } : {}),
         bornDay: info.track ? bornDayFor({ stage, fresh: true }, info.today, info.table) : null,
         addedDay: info.track ? info.today : null,
         stage: info.track ? null : stage,
@@ -382,6 +513,7 @@ function QuickAdd({ info, onClose }: { info: SaveInfo; onClose(): void }) {
             )}
           </Field>
         </div>
+        <label className="switch-line"><span>Planned <span className="muted small">(not created in the game yet)</span></span><Toggle label="Planned" on={planned} onChange={setPlanned} /></label>
       </div>
     </Modal>
   );

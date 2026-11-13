@@ -2,7 +2,9 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Camera, DotsThree, HouseSimple, MapPin, PencilSimple, Plus, X } from '@phosphor-icons/react';
 import { BY_ID } from '../../data/game';
 import { PhotoBox, usePhotoPicker } from '../../components/photo';
+import { PhoneBar } from '../../components/AzList';
 import { BackLink } from '../../components/Shell';
+import { CaretLeft } from '@phosphor-icons/react';
 import { AutoText, Confirm, TextInput, toast } from '../../components/ui';
 import { APARTMENT, lotData, RESIDENTIAL_RENTAL, type LotData } from '../../lib/lots';
 import { newId } from '../../lib/sync/store';
@@ -88,7 +90,7 @@ export function LotPage({ save, lotId }: { save: SaveRow; lotId: string }) {
     <>
       {rental && <Units lot={lot} onChange={(units) => update({ units })} onMoveIn={setMovingIn}
         who={(unit) => { const h = hh.livesIn.get(homeKey({ kind: 'lot', id: lotId, unit })); return h ? <HhPill name={hh.nameOf(h.id)} href={savePath(save.id, `households/${h.id}`)} /> : null; }} />}
-      <TheBuild lot={lot} onSave={update} />
+      <TheBuild lot={lot} onSave={update} compact={phone} />
       {/* History is no longer added to (nothing fills it in). Older entries still show so nothing is lost. */}
       {lot.history.length > 0 && <History rows={lot.history} onChange={(history) => update({ history })} />}
       <div className="card lot-notes"><div className="card-head"><h2>Notes</h2></div>
@@ -111,10 +113,19 @@ export function LotPage({ save, lotId }: { save: SaveRow; lotId: string }) {
   if (phone) {
     return (
       <div className="m-stack">
-        <BackLink href={back} label="Lots" />
-        {pic}
-        <h1 className="m-h1">{lot.name}</h1>
-        {tags}
+        <PhoneBar title="Lot" left={<a className="pp-round" href={back} aria-label="Back to Lots" style={{ marginLeft: -10 }}><CaretLeft size={20} weight="bold" /></a>} />
+        {lot.photo ? (
+          <>
+            {pic}
+            <h1 className="m-h1">{lot.name}</h1>
+            {tags}
+          </>
+        ) : (
+          <div className="lot-m-head">
+            <button type="button" className="lot-photo-sm" onClick={newPhoto}><Camera size={22} weight="duotone" /><span>Add photo</span></button>
+            <div className="lot-m-title"><h1 className="m-h1">{lot.name}</h1>{tags}</div>
+          </div>
+        )}
         {placeBox}
         {(row?.spot || lot.price != null) && <div className="m-group lot-m-facts">{facts}</div>}
         {actions}
@@ -218,7 +229,7 @@ function Menu({ label, items, small }: { label: string; small?: boolean; items: 
 }
 
 /** Creator, the Gallery ID and name, and lot traits. Tap anywhere on it to edit right there. */
-function TheBuild({ lot, onSave }: { lot: LotData; onSave(p: Partial<LotData>): void }) {
+function TheBuild({ lot, onSave, compact }: { lot: LotData; onSave(p: Partial<LotData>): void; compact?: boolean }) {
   const [on, setOn] = useState(false);
   const [f, setF] = useState({ credits: '', galleryId: '', galleryName: '', traits: [] as string[] });
   const [trait, setTrait] = useState('');
@@ -245,7 +256,20 @@ function TheBuild({ lot, onSave }: { lot: LotData; onSave(p: Partial<LotData>): 
       <div className="card-head"><h2>The build</h2>
         {!on && <button type="button" className="btn ghost icon sm edit-pen" aria-label="Edit the build" onClick={start}><PencilSimple size={16} /></button>}
       </div>
-      {!on ? (
+      {!on && compact ? (
+        <div>
+          <dl className="build-kv">
+            {creator && <><dt>Creator</dt><dd>{creator}</dd></>}
+            {lot.galleryId && <><dt>Gallery ID</dt><dd>{lot.galleryId}</dd></>}
+            {lot.galleryName && <><dt>Name on Gallery</dt><dd>{lot.galleryName}</dd></>}
+            {lot.traits.length > 0 && <><dt>Lot traits</dt><dd><span className="tags">{lot.traits.map((t) => <span key={t} className="tag outline">{t}</span>)}</span></dd></>}
+          </dl>
+          {(() => {
+            const empty = [!creator && 'Creator', !lot.galleryId && 'Gallery ID', !lot.galleryName && 'Gallery name', !lot.traits.length && 'Lot traits'].filter(Boolean);
+            return empty.length > 0 ? <button type="button" className="link-btn m-add" onClick={start}><Plus size={14} weight="bold" /> {empty.join(', ')}</button> : null;
+          })()}
+        </div>
+      ) : !on ? (
         <dl className="build-kv">
           <dt>Creator</dt><dd>{dash(creator)}</dd>
           <dt>Gallery ID</dt><dd>{dash(lot.galleryId)}</dd>

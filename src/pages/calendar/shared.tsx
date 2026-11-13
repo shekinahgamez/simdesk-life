@@ -26,7 +26,7 @@ export function useCalCtx(save: SaveRow) {
       holidays: hol.map((r) => ({ id: r.id, data: holidayData(r) })),
       events: evt.map((r) => ({ id: r.id, data: eventData(r) })),
       vacations: vac.map((r) => ({ id: r.id, data: vacationData(r) })),
-      sims: info.track ? sims.filter((s) => s.sim.bornDay !== null && !s.sim.deceased).map((s) => ({ id: s.id, name: s.sim.first || fullName(s.sim), bornDay: s.sim.bornDay!, addedDay: s.sim.addedDay ?? undefined })) : [],
+      sims: info.track ? sims.filter((s) => s.sim.bornDay !== null && !s.sim.deceased && !s.sim.townie).map((s) => ({ id: s.id, name: s.sim.first || fullName(s.sim), bornDay: s.sim.bornDay!, addedDay: s.sim.addedDay ?? undefined })) : [],
       table: info.table,
       cal: info.cal,
     };

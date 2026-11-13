@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowCounterClockwise, ArrowRight, CalendarBlank } from '@phosphor-icons/react';
+import { ArrowCounterClockwise, ArrowRight, CalendarBlank, FastForward } from '@phosphor-icons/react';
 import { saveData, todayOf } from '../lib/saves';
 import { useStore } from '../lib/sync/react';
 import type { SaveRow } from '../lib/sync/types';
@@ -68,9 +68,11 @@ export function DayButtons({ save, phone }: { save: SaveRow; phone?: boolean }) 
   return (
     <>
       <div className={`day-btns${phone ? ' phone' : ''}`}>
+        {phone && <button type="button" className="btn icon" aria-label="Go back" title="Go back" onClick={() => setJump('back')}><ArrowCounterClockwise size={20} /></button>}
+        {phone && <button type="button" className="btn icon" aria-label="Jump ahead" title="Jump ahead" onClick={() => setJump('ahead')}><FastForward size={20} weight="duotone" /></button>}
         <NextDayButton save={save} className={`btn primary${phone ? '' : ' sm'}`} />
-        <button type="button" className={`btn${phone ? '' : ' sm'}`} onClick={() => setJump('ahead')}><CalendarBlank size={16} weight="duotone" /> Jump ahead</button>
-        <button type="button" className={`btn ghost${phone ? '' : ' sm'} day-back`} onClick={() => setJump('back')}><ArrowCounterClockwise size={16} /> Go back</button>
+        {!phone && <button type="button" className="btn sm" onClick={() => setJump('ahead')}><CalendarBlank size={16} weight="duotone" /> Jump ahead</button>}
+        {!phone && <button type="button" className="btn ghost sm day-back" onClick={() => setJump('back')}><ArrowCounterClockwise size={16} /> Go back</button>}
       </div>
       {jump && <JumpDialog save={save} mode={jump} onClose={() => setJump(null)} />}
     </>

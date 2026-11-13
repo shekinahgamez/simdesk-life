@@ -45,7 +45,7 @@ async function submit(form: HTMLFormElement, kind: Kind) {
   const email = form.querySelector<HTMLInputElement>('input[type=email]');
   if (!email || !email.value.trim() || !email.checkValidity()) { say(form, 'Add your email so I can reach you.', 'err'); email?.focus(); return; }
   if (kind === 'beta') {
-    const missing = form.querySelector<HTMLElement>('[name=first_name]:invalid, [name="fields[sims_tracked]"]:invalid, [name="fields[save_description]"]:invalid');
+    const missing = form.querySelector<HTMLElement>('[name=first_name]:invalid, [name="fields[sims_tracked]"]:invalid, [name="fields[quit_last_tracker]"]:invalid, [name="fields[save_description]"]:invalid');
     if (missing) { say(form, 'Fill in the highlighted questions first.', 'err'); (missing as HTMLInputElement).focus(); return; }
   }
   const url = KIT[kind];

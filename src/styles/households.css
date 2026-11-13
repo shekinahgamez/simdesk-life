@@ -74,7 +74,9 @@
 .hh-pick:hover { color: var(--households-ink); border-color: var(--households-ink); }
 .hh-mrow { gap: 12px; min-height: 60px; width: 100%; text-align: left; font: inherit; color: inherit; background: none; border-left: 0; border-right: 0; border-top: 0; }
 .hh-mrow .t, .hh-mrow .s { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hh-mrow-faces { width: 60px; flex-shrink: 0; display: inline-flex; }
+.hh-mrow-faces { width: 64px; flex-shrink: 0; display: inline-flex; }
+.hh-mrow { min-height: 52px; }
+.hh-playing { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; }
 .hh-mrow .hh-face { border-width: 2px; }
 .hh-face-empty { width: 30px; height: 30px; border-radius: 50%; border: 1.5px dashed var(--line); }
 

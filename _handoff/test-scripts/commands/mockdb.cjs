@@ -87,8 +87,8 @@ async function mock(page, st) {
   });
 }
 async function logIn(page) {
-  await page.goto('http://localhost:'+(process.env.PORT||4173)+'/');
-  await page.getByRole('button', { name: 'Log in', exact: true }).first().click();
+  await page.goto('http://localhost:'+(process.env.PORT||4173)+'/#/login');
+  await page.getByLabel('Username or email').waitFor();
   await page.getByLabel('Username or email').fill('NiaPlays');
   await page.getByLabel('Password', { exact: true }).fill('correct-horse-1');
   await page.getByRole('button', { name: 'Log in', exact: true }).last().click();

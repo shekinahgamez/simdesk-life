@@ -13,7 +13,7 @@ import { APARTMENT, RESIDENTIAL_RENTAL, type LotRow } from './lots';
 import type { Rec } from './sync/types';
 
 export type Home = { kind: 'lot'; id: string; unit: string | null } | { kind: 'apt'; id: string };
-export type HouseholdData = { name: string; home: Home | null; notes: string };
+export type HouseholdData = { name: string; home: Home | null; notes: string; /** Its id in the game, saved by Import from game. */ gameId?: string };
 
 export const BLANK_HOUSEHOLD: HouseholdData = { name: '', home: null, notes: '' };
 
@@ -27,7 +27,7 @@ function cleanHome(h: unknown): Home | null {
 
 export function householdData(r: Rec | undefined): HouseholdData {
   const d = (r?.data ?? {}) as Partial<HouseholdData>;
-  return { name: typeof d.name === 'string' ? d.name : '', home: cleanHome(d.home), notes: typeof d.notes === 'string' ? d.notes : '' };
+  return { name: typeof d.name === 'string' ? d.name : '', home: cleanHome(d.home), notes: typeof d.notes === 'string' ? d.notes : '', ...(typeof d.gameId === 'string' ? { gameId: d.gameId } : {}) };
 }
 
 export const homeKey = (h: Home) => (h.kind === 'apt' ? `apt:${h.id}` : `lot:${h.id}${h.unit ? `:${h.unit}` : ''}`);
