@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CaretRight, FunnelSimple, HouseSimple, Play, Plus, Rows, SquaresFour, X } from '@phosphor-icons/react';
+import { CaretRight, HouseSimple, Play, Plus, Rows, SquaresFour } from '@phosphor-icons/react';
 import { AzHeader, AzRail, azKey, letterOf, PhoneBar } from '../../components/AzList';
 import { QuickButton } from '../../components/CommandBar';
 import { cleanRotation } from '../../lib/rotation';
 import { moduleOn, saveData } from '../../lib/saves';
 import { ObjIcon } from '../../components/categories';
-import { Field, Modal, Picker, SearchBox, Sheet, TextInput, Toggle } from '../../components/ui';
+import { Field, Modal, SearchBox, TextInput } from '../../components/ui';
 import { householdTags, type HH } from '../../lib/households';
 import { householdLabel, simAge, stageOf } from '../../lib/sims';
 import { go, savePath } from '../../lib/router';
@@ -13,6 +13,7 @@ import { matches, plural } from '../../lib/text';
 import { useStore } from '../../lib/sync/react';
 import { useIsPhone } from '../../lib/useIsPhone';
 import type { SaveRow } from '../../lib/sync/types';
+import { CheckList, FilterBar, FilterButton, ViewSwitch } from '../../components/pieces';
 import { HomePicker } from './HomePicker';
 import { Faces, useHhCtx, type HhCtx } from './shared';
 
@@ -34,7 +35,6 @@ export function HouseholdsList({ save }: { save: SaveRow }) {
   const [adding, setAdding] = useState(false);
   const [picking, setPicking] = useState<HH | null>(null);
   const [filters, setFilters] = useState<HhFilters>(() => loadHhFilters(save.id));
-  const [showFilter, setShowFilter] = useState(false);
   const [layout, setLayoutState] = useState<Layout>(loadLayout);
   const setLayout = (l: Layout) => { setLayoutState(l); try { localStorage.setItem(HH_LAYOUT_KEY, l); } catch { /* ignore */ } };
   useEffect(() => { try { sessionStorage.setItem(HH_FILTER_KEY(save.id), JSON.stringify(filters)); } catch { /* ignore */ } }, [filters, save.id]);
@@ -90,20 +90,15 @@ export function HouseholdsList({ save }: { save: SaveRow }) {
     )
   );
   const viewSwitch = ctx.households.length > 0 && (
-    <span className="view-switch" role="group" aria-label="View">
-      <button type="button" aria-pressed={layout === 'list'} aria-label="List" title="List" onClick={() => setLayout('list')}><Rows size={20} weight={layout === 'list' ? 'fill' : 'regular'} /></button>
-      <button type="button" aria-pressed={layout === 'gallery'} aria-label="Gallery" title="Gallery" onClick={() => setLayout('gallery')}><SquaresFour size={20} weight={layout === 'gallery' ? 'fill' : 'regular'} /></button>
-    </span>
+    <ViewSwitch<'list' | 'gallery'> label="View" value={layout} onChange={setLayout} options={[{ v: 'list', label: 'List', icon: Rows }, { v: 'gallery', label: 'Gallery', icon: SquaresFour }]} />
   );
   const dialogs = (
     <>
       {adding && <NewHousehold onClose={() => setAdding(false)} onSaved={(id) => { setAdding(false); open(id); }} />}
       {picking && <HomePicker ctx={ctx} hh={picking} onClose={() => setPicking(null)} />}
-      {showFilter && <HhFilterPanel filters={filters} onChange={setFilters} onClose={() => setShowFilter(false)} count={shown.length} phone={phone} worlds={worldOpts} />}
     </>
   );
-  const tags = <HhActiveFilters filters={filters} onChange={setFilters} worldName={(id) => worldOpts.find((w) => w.id === id)?.label ?? id} />;
-  const search = ctx.households.length > 0 && <SearchBox value={q} onChange={setQ} placeholder={phone ? 'Search' : `Search ${plural(ctx.households.length, 'household')}`} />;
+  const filterButtons = <HhFilterButtons filters={filters} onChange={setFilters} worlds={worldOpts} />;
 
   if (phone) {
     const searching = q.trim() !== '' || nf > 0;
@@ -111,22 +106,19 @@ export function HouseholdsList({ save }: { save: SaveRow }) {
       <div className="m-stack">
         <PhoneBar title="Households" right={<QuickButton />} />
         <SimsSwitch saveId={save.id} on="households" />
-        {search && (
+        {ctx.households.length > 0 && (
           <div className="tb-row">
-            <div className="m-search grow">{search}</div>
-            <button type="button" className="btn icon filter-btn" aria-label={nf ? `Filter, ${nf} on` : 'Filter'} onClick={() => setShowFilter(true)}>
-              <FunnelSimple size={20} weight="bold" />{nf > 0 && <span className="count">{nf}</span>}
-            </button>
+            <div className="m-search grow"><SearchBox value={q} onChange={setQ} placeholder="Search" /></div>
             {viewSwitch}
           </div>
         )}
+        {ctx.households.length > 0 && <div className="p-bar p-scroll">{filterButtons}{nf > 0 && <button type="button" className="p-clear" onClick={() => setFilters(NO_HH_FILTERS)}>Clear</button>}</div>}
         {noHome > 0 && !filters.homes.includes('none') && !q.trim() && layout === 'list' && (
           <button type="button" className="attn-row" onClick={() => setFilters({ ...NO_HH_FILTERS, homes: ['none'] })}>
             <span className="ico"><HouseSimple size={18} weight="duotone" /></span><span><b>{plural(noHome, 'household')}</b> with no home</span>
             <span className="go">Pick homes <CaretRight size={14} weight="bold" /></span>
           </button>
         )}
-        {tags}
         {cards}
         {layout === 'list' && !searching && shown.length >= 12 && <AzRail letters={phoneGroups.map(([l]) => l)} />}
         <button type="button" className="m-fab" aria-label="New household" onClick={() => setAdding(true)}><Plus size={26} weight="bold" /></button>
@@ -143,18 +135,10 @@ export function HouseholdsList({ save }: { save: SaveRow }) {
         </div>
         <button type="button" className="btn primary" onClick={() => setAdding(true)}><Plus size={18} weight="bold" /> New household</button>
       </div>
-      <div className="row" style={{ gap: 10 }}>
-        <SimsSwitch saveId={save.id} on="households" />
-        {search && <div style={{ flex: '0 1 380px' }}>{search}</div>}
-        {search && (
-          <button type="button" className="btn filter-btn" onClick={() => setShowFilter(true)}>
-            <FunnelSimple size={18} weight="bold" /> Filter{nf > 0 && <span className="count">{nf}</span>}
-          </button>
-        )}
-        <span className="grow" />
-        {viewSwitch}
-      </div>
-      {tags}
+      <FilterBar lead={<SimsSwitch saveId={save.id} on="households" />} search={ctx.households.length > 0 ? q : undefined} onSearch={ctx.households.length > 0 ? setQ : undefined}
+        searchLabel={`Search ${plural(ctx.households.length, 'household')}`} active={nf > 0} onClear={() => setFilters(NO_HH_FILTERS)} right={viewSwitch}>
+        {ctx.households.length > 0 && filterButtons}
+      </FilterBar>
       {cards}
       {dialogs}
     </div>
@@ -286,74 +270,22 @@ function passes(x: Facts, f: HhFilters) {
   return true;
 }
 
-function HhActiveFilters({ filters: f, onChange, worldName }: { filters: HhFilters; onChange(f: HhFilters): void; worldName(id: string): string }) {
-  const items: { key: string; label: string; off(): HhFilters }[] = [
-    ...f.worlds.map((w) => ({ key: `w${w}`, label: worldName(w), off: () => ({ ...f, worlds: f.worlds.filter((x) => x !== w) }) })),
-    ...f.homes.map((h) => ({ key: `h${h}`, label: HOME_LABEL[h], off: () => ({ ...f, homes: f.homes.filter((x) => x !== h) }) })),
-    ...f.sizes.map((s) => ({ key: `s${s}`, label: SIZE_LABEL[s], off: () => ({ ...f, sizes: f.sizes.filter((x) => x !== s) }) })),
-    ...(f.kids ? [{ key: 'k', label: 'Kids at home', off: () => ({ ...f, kids: false }) }] : []),
-    ...(f.landlord ? [{ key: 'l', label: 'Landlords', off: () => ({ ...f, landlord: false }) }] : []),
-  ];
-  if (!items.length) return null;
+function HhFilterButtons({ filters: f, onChange, worlds }: { filters: HhFilters; onChange(f: HhFilters): void; worlds: { id: string; label: string }[] }) {
+  const showOn = [...(f.kids ? ['kids'] : []), ...(f.landlord ? ['landlord'] : [])];
   return (
-    <div className="row filter-tags" style={{ gap: 6 }}>
-      {items.map((i) => (
-        <span key={i.key} className="ftag">{i.label}
-          <button type="button" aria-label={`Remove ${i.label}`} onClick={() => onChange(i.off())}><X size={11} weight="bold" /></button>
-        </span>
-      ))}
-      <button type="button" className="btn ghost sm" onClick={() => onChange(NO_HH_FILTERS)}>Clear</button>
-    </div>
-  );
-}
-
-function HhFilterPanel({ filters: f, onChange, onClose, count, phone, worlds }: {
-  filters: HhFilters; onChange(f: HhFilters): void; onClose(): void; count: number; phone: boolean; worlds: { id: string; label: string }[];
-}) {
-  const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
-  const body = (
-    <div className="stack filter-panel" style={{ gap: 18 }}>
-      <Field label="World">
-        {(id) => <Picker id={id} multiple placeholder="Type a world" value={f.worlds} onChange={(w) => onChange({ ...f, worlds: w })} options={worlds} />}
-      </Field>
-      <div className="field">
-        <span className="label">Home</span>
-        <div className="chip-row">
-          {(Object.keys(HOME_LABEL) as HomeKind[]).map((h) => (
-            <button key={h} type="button" className="fchip" aria-pressed={f.homes.includes(h)} onClick={() => onChange({ ...f, homes: toggle(f.homes, h) })}>{HOME_LABEL[h]}</button>
-          ))}
-        </div>
-      </div>
-      <div className="field">
-        <span className="label">Size</span>
-        <div className="chip-row">
-          {(Object.keys(SIZE_LABEL) as SizeKind[]).map((s) => (
-            <button key={s} type="button" className="fchip" aria-pressed={f.sizes.includes(s)} onClick={() => onChange({ ...f, sizes: toggle(f.sizes, s) })}>{SIZE_LABEL[s]}</button>
-          ))}
-        </div>
-      </div>
-      <div className="switch-list">
-        <label className="switch-line"><span>Kids at home</span><Toggle label="Kids at home" on={f.kids} onChange={(v) => onChange({ ...f, kids: v })} /></label>
-        <label className="switch-line"><span>Landlords</span><Toggle label="Landlords" on={f.landlord} onChange={(v) => onChange({ ...f, landlord: v })} /></label>
-      </div>
-    </div>
-  );
-  const show = `Show ${plural(count, 'household')}`;
-  if (phone) {
-    return (
-      <Sheet title="Filter" onClose={onClose}>
-        {body}
-        <div className="stack" style={{ gap: 8, marginTop: 18 }}>
-          <button type="button" className="m-pillbtn" onClick={onClose}>{show}</button>
-          <button type="button" className="btn ghost" onClick={() => onChange(NO_HH_FILTERS)}>Clear all</button>
-        </div>
-      </Sheet>
-    );
-  }
-  return (
-    <Modal title="Filter" onClose={onClose} autoFocus={false}
-      footer={<><button type="button" className="btn ghost" onClick={() => onChange(NO_HH_FILTERS)}>Clear all</button><span className="grow" /><button type="button" className="btn primary" onClick={onClose}>{show}</button></>}>
-      {body}
-    </Modal>
+    <>
+      <FilterButton label="World" title="Worlds" count={f.worlds.length}>
+        {() => <CheckList search={worlds.length > 8} options={worlds} value={f.worlds} onChange={(w) => onChange({ ...f, worlds: w })} />}
+      </FilterButton>
+      <FilterButton label="Home" count={f.homes.length}>
+        {() => <CheckList options={(Object.keys(HOME_LABEL) as HomeKind[]).map((h) => ({ id: h, label: HOME_LABEL[h] }))} value={f.homes} onChange={(v) => onChange({ ...f, homes: v as HomeKind[] })} />}
+      </FilterButton>
+      <FilterButton label="Size" count={f.sizes.length}>
+        {() => <CheckList options={(Object.keys(SIZE_LABEL) as SizeKind[]).map((x) => ({ id: x, label: SIZE_LABEL[x] }))} value={f.sizes} onChange={(v) => onChange({ ...f, sizes: v as SizeKind[] })} />}
+      </FilterButton>
+      <FilterButton label="Show" count={showOn.length}>
+        {() => <CheckList options={[{ id: 'kids', label: 'Kids at home' }, { id: 'landlord', label: 'Landlords' }]} value={showOn} onChange={(v) => onChange({ ...f, kids: v.includes('kids'), landlord: v.includes('landlord') })} />}
+      </FilterButton>
+    </>
   );
 }

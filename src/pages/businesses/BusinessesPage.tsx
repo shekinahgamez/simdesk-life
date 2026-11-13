@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { CaretLeft, CaretRight, Plus, Star, Storefront, Trash, X } from '@phosphor-icons/react';
-import { AutoText, Confirm, Field, Modal, SearchBox, TextInput, toast } from '../../components/ui';
+import { CheckList, Dropdown, FilterBar, FilterButton } from '../../components/pieces';
+import { AutoText, Confirm, Field, Modal, TextInput, toast } from '../../components/ui';
 import {
   addActivity, addReading, BLANK_BUSINESS, businessRows, CRITERIA, criterionOf, EXTRAS, FEES, fmt, guessSystem, kindList, lastChange, lifetimeOf, MAX_ACTIVITIES,
   PRICES, priceText, removeRule, setRule, setStaff, setStart, showStartNote, signed, staffIds, SYSTEMS, systemLabel, type BusinessData, type BusinessRow, type CriterionId, type Fee,
@@ -72,10 +73,9 @@ function BusinessList({ save }: { save: SaveRow }) {
   const btn = <button type="button" className="btn primary" onClick={() => setAdding(true)}><Plus size={16} weight="bold" /> New business</button>;
   const usedKinds = [...new Set(B.rows.map((r) => r.b.kind).filter(Boolean))];
   const filters = B.rows.length > 1 && (
-    <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
-      <div style={{ flex: '1 1 200px', maxWidth: 320 }}><SearchBox value={q} onChange={setQ} placeholder="Search businesses" /></div>
-      {usedKinds.length > 1 && <select className="select" aria-label="Kind" value={kind} onChange={(e) => setKind(e.target.value)} style={{ width: 'auto' }}><option value="">All kinds</option>{usedKinds.map((k) => <option key={k}>{k}</option>)}</select>}
-    </div>
+    <FilterBar search={q} onSearch={setQ} searchLabel="Search businesses" active={!!kind || !!q} onClear={() => { setKind(''); setQ(''); }}>
+      {usedKinds.length > 1 && <FilterButton label="Kind" count={kind ? 1 : 0}>{(close) => <CheckList single options={usedKinds.map((k) => ({ id: k, label: k }))} value={kind ? [kind] : []} onChange={(v) => { setKind(v[0] === kind ? '' : (v[0] ?? '')); close(); }} />}</FilterButton>}
+    </FilterBar>
   );
   const row = (r: BusinessRow) => {
     const b = r.b;
@@ -132,11 +132,11 @@ function NewBusiness({ save, B, onClose, onMade }: { save: SaveRow; B: B; onClos
       <form className="stack" style={{ gap: 16 }} onSubmit={(e) => { e.preventDefault(); make(); }}>
         <Field label="Name">{(id) => <TextInput id={id} value={name} maxLength={80} placeholder="Black Tea" onChange={(e) => setName(e.target.value)} />}</Field>
         <Field label="Kind" hint={<button type="button" className="link-btn" onClick={() => setEditKinds(true)}>Edit kinds</button>}>{(id) => (
-          <select id={id} className="select" value={kind} onChange={(e) => { setKind(e.target.value); setSystem(guessSystem(e.target.value)); }}>{B.kinds.map((k) => <option key={k}>{k}</option>)}</select>
+          <Dropdown id={id} value={kind} onChange={(v) => { setKind(v); setSystem(guessSystem(v)); }} options={B.kinds.map((k) => ({ id: k, label: k }))} />
         )}</Field>
-        <Field label="How the game runs it">{(id) => <select id={id} className="select" value={system} onChange={(e) => setSystem(e.target.value as System)}>{SYSTEMS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}</select>}</Field>
+        <Field label="How the game runs it">{(id) => <Dropdown id={id} value={system} onChange={(v) => setSystem(v as System)} options={SYSTEMS.map((s) => ({ id: s.id, label: s.label }))} />}</Field>
         <Field label="Owner household">{(id) => (
-          <select id={id} className="select" value={owner} onChange={(e) => setOwner(e.target.value)}><option value="">None yet</option>{B.ctx.hh.list.map((h) => <option key={h.id} value={h.id}>{B.ctx.hh.nameOf(h.id)}</option>)}</select>
+          <Dropdown id={id} value={owner} none="None yet" onChange={setOwner} options={B.ctx.hh.list.map((h) => ({ id: h.id, label: B.ctx.hh.nameOf(h.id) }))} />
         )}</Field>
       </form>
     </Modal>
@@ -235,9 +235,7 @@ function BusinessOne({ save, id }: { save: SaveRow; id: string }) {
                   <a className="lg-gt grow" href={savePath(save.id, `sims/${s.sim}`)}><b>{B.ctx.nameOf(s.sim)}</b>{sim.townie && <small className="muted">Townie</small>}</a>
                   <input className="input bz-role" aria-label={`Role for ${sim.first}`} defaultValue={s.role} placeholder="Role" maxLength={40}
                     onBlur={(e) => { if (e.target.value !== s.role) patch({ staff: b.staff.map((x) => (x.sim === s.sim ? { ...x, role: e.target.value.trim() } : x)) }); }} />
-                  <select className="select bz-pay" aria-label={`Pay for ${sim.first}`} value={s.pay} onChange={(e) => patch({ staff: b.staff.map((x) => (x.sim === s.sim ? { ...x, pay: e.target.value as 'Low' | 'Medium' | 'High' } : x)) })}>
-                    <option>Low</option><option>Medium</option><option>High</option>
-                  </select>
+                  <div className="bz-pay"><Dropdown ariaLabel={`Pay for ${sim.first}`} value={s.pay} onChange={(v) => patch({ staff: b.staff.map((x) => (x.sim === s.sim ? { ...x, pay: v as 'Low' | 'Medium' | 'High' } : x)) })} options={['Low', 'Medium', 'High'].map((x) => ({ id: x, label: x }))} /></div>
                 </div>
               );
             })}
@@ -264,11 +262,11 @@ function BusinessOne({ save, id }: { save: SaveRow; id: string }) {
             <div className="card-head"><h2>Details</h2></div>
             <div className="stack" style={{ gap: 14 }}>
               <Field label="Name">{(fid) => <TextInput id={fid} defaultValue={b.name} maxLength={80} onBlur={(e) => { const n = e.target.value.trim(); if (n && n !== b.name) patch({ name: n }); else e.target.value = b.name; }} />}</Field>
-              <Field label="Kind" hint={<button type="button" className="link-btn" onClick={() => setModal('kinds')}>Edit kinds</button>}>{(fid) => <select id={fid} className="select" value={b.kind} onChange={(e) => patch({ kind: e.target.value })}>{kindOptions.map((k) => <option key={k}>{k}</option>)}</select>}</Field>
-              <Field label="How the game runs it">{(fid) => <select id={fid} className="select" value={b.system} onChange={(e) => patch({ system: e.target.value as System })}>{SYSTEMS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}</select>}</Field>
-              <Field label="Owner household">{(fid) => <select id={fid} className="select" value={b.owner} onChange={(e) => patch({ owner: e.target.value })}><option value="">None yet</option>{B.ctx.hh.list.map((h) => <option key={h.id} value={h.id}>{B.ctx.hh.nameOf(h.id)}</option>)}</select>}</Field>
+              <Field label="Kind" hint={<button type="button" className="link-btn" onClick={() => setModal('kinds')}>Edit kinds</button>}>{(fid) => <Dropdown id={fid} value={b.kind} onChange={(v) => patch({ kind: v })} options={kindOptions.map((k) => ({ id: k, label: k }))} />}</Field>
+              <Field label="How the game runs it">{(fid) => <Dropdown id={fid} value={b.system} onChange={(v) => patch({ system: v as System })} options={SYSTEMS.map((s) => ({ id: s.id, label: s.label }))} />}</Field>
+              <Field label="Owner household">{(fid) => <Dropdown id={fid} value={b.owner} none="None yet" onChange={(v) => patch({ owner: v })} options={B.ctx.hh.list.map((h) => ({ id: h.id, label: B.ctx.hh.nameOf(h.id) }))} />}</Field>
               <div className="field"><span className="label">Rating</span><Stars n={b.rating} onChange={(v) => patch({ rating: v })} size={24} /></div>
-              <Field label="Price level">{(fid) => <select id={fid} className="select" value={b.price} onChange={(e) => patch({ price: Number(e.target.value) })}>{PRICES.map((p) => <option key={p} value={p}>{priceText(p)}</option>)}</select>}</Field>
+              <Field label="Price level">{(fid) => <Dropdown id={fid} value={String(b.price)} onChange={(v) => patch({ price: Number(v) })} options={PRICES.map((p) => ({ id: String(p), label: priceText(p) }))} />}</Field>
             </div>
           </section>
 
@@ -279,7 +277,7 @@ function BusinessOne({ save, id }: { save: SaveRow; id: string }) {
                 <div key={a} className="bz-kind"><span className="grow">{a}</span><button type="button" className="btn ghost icon sm" aria-label={`Remove ${a}`} onClick={() => patch({ activities: b.activities.filter((x) => x !== a) })}><X size={16} weight="bold" /></button></div>
               ))}
               {b.activities.length === 0 && <p className="muted small" style={{ margin: 0 }}>Up to five.</p>}
-              <Field label="Entry fee">{(fid) => <select id={fid} className="select" value={b.fee} onChange={(e) => patch({ fee: e.target.value as Fee })}>{FEES.map((f) => <option key={f}>{f}</option>)}</select>}</Field>
+              <Field label="Entry fee">{(fid) => <Dropdown id={fid} value={b.fee} onChange={(v) => patch({ fee: v as Fee })} options={FEES.map((f) => ({ id: f, label: f }))} />}</Field>
             </section>
           )}
 

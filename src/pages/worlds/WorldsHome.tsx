@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CaretRight, FunnelSimple, Plus, X } from '@phosphor-icons/react';
+import { CaretRight, Plus } from '@phosphor-icons/react';
 import { BY_ID } from '../../data/game';
+import { CheckList, FilterBar, FilterButton } from '../../components/pieces';
 import { ObjIcon } from '../../components/categories';
-import { Field, Modal, Picker, SearchBox, Seg, Sheet, TextInput, toast } from '../../components/ui';
+import { Field, Modal, Picker, SearchBox, TextInput, toast } from '../../components/ui';
 import {
   APARTMENT, applyLotFilters, BLANK_LOT, LOT_SIZES, lotData, lotFilterCount, lotTypeName, lotTypeOptions, NO_LOT_FILTERS, shownSize,
   type LotData, type LotFilters, type LotRow,
@@ -120,7 +121,6 @@ function LotsList({ ctx, save, phone, onAdd, onPlace }: { ctx: LotsCtx; save: Sa
   const [moreApts, setMoreApts] = useState(false);
   const [q, setQ] = useState('');
   const [f, setF] = useState<LotFilters>(() => load(FILTER_KEY(save.id), NO_LOT_FILTERS));
-  const [showFilter, setShowFilter] = useState(false);
   useEffect(() => { try { sessionStorage.setItem(FILTER_KEY(save.id), JSON.stringify(f)); } catch { /* ignore */ } }, [f, save.id]);
   const apartments: LotRow[] = useMemo(() => ctx.apartments.map((a) => ({
     id: `apt:${a.id}`, lot: { ...BLANK_LOT, name: a.name, type: APARTMENT, size: '', spot: a.id }, spot: a, world: a.world,
@@ -149,14 +149,9 @@ function LotsList({ ctx, save, phone, onAdd, onPlace }: { ctx: LotsCtx; save: Sa
       </div>
     );
   }
-  const filterBtn = (
-    <button type="button" className={`btn filter-btn ${phone ? 'icon' : ''}`} aria-label={phone ? (nf ? `Filter, ${nf} on` : 'Filter') : undefined} onClick={() => setShowFilter(true)}>
-      <FunnelSimple size={phone ? 20 : 18} weight="bold" />{!phone && ' Filter'}{nf > 0 && <span className="count">{nf}</span>}
-    </button>
-  );
   const search = <SearchBox value={q} onChange={setQ} placeholder={`Search ${plural(all.length, 'lot')}`} />;
-  const tags = <LotFilterTags f={f} onChange={setF} ctx={ctx} />;
-  const panel = showFilter && <LotFilterPanel ctx={ctx} f={f} onChange={setF} onClose={() => setShowFilter(false)} count={shown.length} phone={phone} />;
+  const filterButtons = <LotFilterButtons ctx={ctx} f={f} onChange={setF} />;
+  const clear = nf > 0 && <button type="button" className="p-clear" onClick={() => setF(NO_LOT_FILTERS)}>Clear</button>;
 
   if (phone) {
     const notPlaced = shown.filter((r) => !r.spot);
@@ -166,8 +161,8 @@ function LotsList({ ctx, save, phone, onAdd, onPlace }: { ctx: LotsCtx; save: Sa
     if (gameApts.length) byWorld.set('__apts', gameApts);
     return (
       <>
-        <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}><div className="m-search grow">{search}</div>{filterBtn}</div>
-        {tags}
+        <div className="m-search">{search}</div>
+        <div className="p-bar p-scroll">{filterButtons}{clear}</div>
         {shown.length === 0 && !(unusedMatching && !unfold) && <p className="muted">No lots match that.</p>}
         {notPlaced.length > 0 && (
           <>
@@ -202,14 +197,12 @@ function LotsList({ ctx, save, phone, onAdd, onPlace }: { ctx: LotsCtx; save: Sa
           </div>
         ))}
         {more}
-        {panel}
       </>
     );
   }
   return (
     <>
-      <div className="row" style={{ gap: 10 }}><div style={{ flex: '0 1 380px' }}>{search}</div>{filterBtn}</div>
-      {tags}
+      <FilterBar search={q} onSearch={setQ} searchLabel={`Search ${plural(all.length, 'lot')}`} active={nf > 0} onClear={() => setF(NO_LOT_FILTERS)}>{filterButtons}</FilterBar>
       {shown.length === 0 ? <p className="muted">No lots match that.</p> : (
         <div className="table-wrap">
           <table className="table lots-table">
@@ -237,7 +230,6 @@ function LotsList({ ctx, save, phone, onAdd, onPlace }: { ctx: LotsCtx; save: Sa
         </div>
       )}
       {more}
-      {panel}
     </>
   );
 }
@@ -246,56 +238,23 @@ export function LotTypeTag({ id }: { id: string }) {
   return <span className="tag lot-type">{lotTypeName(id)}</span>;
 }
 
-function LotFilterTags({ f, onChange, ctx }: { f: LotFilters; onChange(f: LotFilters): void; ctx: LotsCtx }) {
-  const items = [
-    ...f.types.map((t) => ({ k: `t${t}`, label: lotTypeName(t), off: () => ({ ...f, types: f.types.filter((x) => x !== t) }) })),
-    ...f.worlds.map((w) => ({ k: `w${w}`, label: ctx.worldName(w), off: () => ({ ...f, worlds: f.worlds.filter((x) => x !== w) }) })),
-    ...(f.placed !== 'any' ? [{ k: 'p', label: f.placed === 'placed' ? 'Placed' : 'Not placed', off: () => ({ ...f, placed: 'any' as const }) }] : []),
-    ...f.sizes.map((s) => ({ k: `s${s}`, label: s, off: () => ({ ...f, sizes: f.sizes.filter((x) => x !== s) }) })),
-  ];
-  if (!items.length) return null;
+function LotFilterButtons({ ctx, f, onChange }: { ctx: LotsCtx; f: LotFilters; onChange(f: LotFilters): void }) {
   return (
-    <div className="row filter-tags" style={{ gap: 6 }}>
-      {items.map((i) => <span key={i.k} className="ftag">{i.label}<button type="button" aria-label={`Remove ${i.label}`} onClick={() => onChange(i.off())}><X size={11} weight="bold" /></button></span>)}
-      <button type="button" className="btn ghost sm" onClick={() => onChange(NO_LOT_FILTERS)}>Clear</button>
-    </div>
-  );
-}
-
-function LotFilterPanel({ ctx, f, onChange, onClose, count, phone }: { ctx: LotsCtx; f: LotFilters; onChange(f: LotFilters): void; onClose(): void; count: number; phone: boolean }) {
-  const toggle = (list: string[], v: string) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
-  const body = (
-    <div className="stack filter-panel" style={{ gap: 18 }}>
-      <Field label="Lot type">{(id) => <Picker id={id} multiple placeholder="Type a lot type" value={f.types} onChange={(types) => onChange({ ...f, types })} options={lotTypeOptions(ctx.info.avail)} />}</Field>
-      <Field label="World">{(id) => <Picker id={id} multiple placeholder="Type a world" value={f.worlds} onChange={(worlds) => onChange({ ...f, worlds })} options={ctx.worlds.map((w) => ({ id: w.id, label: w.name }))} />}</Field>
-      <div className="field">
-        <span className="label">Placed</span>
-        <Seg label="Placed" value={f.placed} onChange={(placed) => onChange({ ...f, placed })} options={[{ v: 'any', label: 'Any' }, { v: 'placed', label: 'Placed' }, { v: 'not', label: 'Not placed' }]} />
-      </div>
-      <div className="field">
-        <span className="label">Size</span>
-        <div className="chip-row">
-          {LOT_SIZES.map((s) => <button key={s} type="button" className="fchip" aria-pressed={f.sizes.includes(s)} onClick={() => onChange({ ...f, sizes: toggle(f.sizes, s) })}>{s}</button>)}
-        </div>
-      </div>
-    </div>
-  );
-  if (phone) {
-    return (
-      <Sheet title="Filter" onClose={onClose}>
-        {body}
-        <div className="stack" style={{ gap: 8, marginTop: 18 }}>
-          <button type="button" className="m-pillbtn" onClick={onClose}>Show {plural(count, 'lot')}</button>
-          <button type="button" className="btn ghost" onClick={() => onChange(NO_LOT_FILTERS)}>Clear all</button>
-        </div>
-      </Sheet>
-    );
-  }
-  return (
-    <Modal title="Filter" onClose={onClose} autoFocus={false}
-      footer={<><button type="button" className="btn ghost" onClick={() => onChange(NO_LOT_FILTERS)}>Clear all</button><span className="grow" /><button type="button" className="btn primary" onClick={onClose}>Show {plural(count, 'lot')}</button></>}>
-      {body}
-    </Modal>
+    <>
+      <FilterButton label="Lot type" count={f.types.length}>
+        {() => <CheckList search options={lotTypeOptions(ctx.info.avail).map((o) => ({ id: o.id, label: o.label }))} value={f.types} onChange={(types) => onChange({ ...f, types })} />}
+      </FilterButton>
+      <FilterButton label="World" title="Worlds" count={f.worlds.length}>
+        {() => <CheckList options={ctx.worlds.map((w) => ({ id: w.id, label: ctx.worldName(w.id) }))} value={f.worlds} onChange={(worlds) => onChange({ ...f, worlds })} />}
+      </FilterButton>
+      <FilterButton label="Placed" count={f.placed === 'any' ? 0 : 1}>
+        {(close) => <CheckList single options={[{ id: 'placed', label: 'Placed' }, { id: 'not', label: 'Not placed' }]} value={f.placed === 'any' ? [] : [f.placed]}
+          onChange={(v) => { onChange({ ...f, placed: f.placed === v[0] ? 'any' : (v[0] as 'placed' | 'not') }); close(); }} />}
+      </FilterButton>
+      <FilterButton label="Size" count={f.sizes.length}>
+        {() => <CheckList options={LOT_SIZES.map((x) => ({ id: x, label: x }))} value={f.sizes} onChange={(sizes) => onChange({ ...f, sizes })} />}
+      </FilterButton>
+    </>
   );
 }
 

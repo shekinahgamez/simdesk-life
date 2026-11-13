@@ -67,9 +67,9 @@ const shots = process.env.SHOTS;
     } else {
       ok(await p.locator('.sim-card-bday', { hasText: 'Birthday in 3 days' }).isVisible(), `${n} phone card birthday this week`);
     }
-    await p.getByRole('button', { name: /^Filter/ }).click(); await wait(p, 400);
-    await p.getByRole('button', { name: 'Male', exact: true }).click(); await wait(p, 200);
-    await p.getByRole('button', { name: /^Show 1 Sim$/ }).click(); await wait(p, 400);
+    await p.getByRole('button', { name: /^Gender/ }).click(); await wait(p, 400);
+    await p.getByRole('checkbox', { name: 'Male', exact: true }).click(); await wait(p, 200);
+    await p.keyboard.press('Escape'); await wait(p, 400);
     ok(await p.locator(phone ? '.sim-mrow' : 'tbody tr').count() === 1, `${n} gender filter`);
     await p.getByRole('button', { name: 'Clear', exact: true }).click(); await wait(p, 200);
     await p.getByRole('button', { name: 'Quick add' }).first().click(); await wait(p, 300);
