@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowDown, ArrowUp, Cake, CaretDown, CaretRight, Check, CheckSquare, Hourglass, HouseSimple, ListPlus, PencilSimple, Plus, Rows, Sparkle, SquaresFour, Trash, X } from '@phosphor-icons/react';
+import { ArrowDown, ArrowUp, Cake, CaretDown, CaretRight, Check, CheckSquare, Hourglass, HouseSimple, ListPlus, PencilSimple, Plus, Rows, Sparkle, SquaresFour, Trash } from '@phosphor-icons/react';
 import { AzHeader, AzRail, azKey, letterOf, PhoneBar } from '../../components/AzList';
 import { QuickButton } from '../../components/CommandBar';
 import { cleanRotation } from '../../lib/rotation';
@@ -12,6 +12,7 @@ import { go, savePath } from '../../lib/router';
 import {
   applyFilters, birthdayCell, filterCount, matchesSearch, NO_FILTERS, NO_HOUSEHOLD, sortRows, splitName, stageLabel, BLANK_SIM,
   type BirthdayView, type Filters, type Gender, type Sort, type SortKey, type SimRow,
+  relData,
 } from '../../lib/sims';
 import { plural } from '../../lib/text';
 import { useRecords, useStore } from '../../lib/sync/react';
@@ -21,7 +22,7 @@ import type { SaveRow } from '../../lib/sync/types';
 import { SimForm } from './SimForm';
 import { SimsSwitch } from '../households/HouseholdsList';
 import { HouseholdPick } from './HouseholdPick';
-import { CheckList, FilterBar, FilterButton, ViewSwitch } from '../../components/pieces';
+import { CheckList, FilterBar, FilterButton, SelectBar, ViewSwitch } from '../../components/pieces';
 import { SimAvatar, useBirthdayView, useCustomTraits, useHouseholds, useSaveInfo, useSimRows, type SaveInfo } from './shared';
 
 const FILTER_KEY = (saveId: string) => `sd:simFilters:${saveId}`;
@@ -70,6 +71,9 @@ export function SimsList({ save }: { save: SaveRow }) {
   const [traits, setTraits] = useState(false);
   // Pick a household right in the list (one Sim), or tick several and move them together.
   const [hhPick, setHhPick] = useState<{ ids: string[]; current: string | null | undefined; el: HTMLElement | null } | null>(null);
+  const store = useStore();
+  const rels = useRecords('rel');
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [selecting, setSelecting] = useState(false);
   const [picked, setPicked] = useState<string[]>([]);
   const togglePick = (id: string) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
@@ -94,12 +98,25 @@ export function SimsList({ save }: { save: SaveRow }) {
       {hhPick && <HouseholdPick simIds={hhPick.ids} current={hhPick.current} anchor={hhPick.el} phone={phone}
         onClose={() => setHhPick(null)} onDone={hhPick.ids.length > 1 ? stopSelecting : undefined} />}
       {selecting && !hhPick && (
-        <div className={`select-bar${phone ? ' phone' : ''}`} role="toolbar" aria-label="Picked Sims">
-          <span className="grow"><b>{picked.length}</b> picked</span>
-          <button type="button" className="btn ghost sm" onClick={stopSelecting}><X size={14} weight="bold" /> Cancel</button>
+        <SelectBar count={picked.length} noun="Sims" phone={phone} onCancel={stopSelecting} actions={<>
           <button type="button" className="btn primary sm" disabled={!picked.length}
             onClick={(e) => setHhPick({ ids: picked, current: undefined, el: e.currentTarget })}><HouseSimple size={15} weight="duotone" /> Move to household</button>
-        </div>
+          <button type="button" className="btn sm danger" disabled={!picked.length} onClick={() => setConfirmDelete(true)}><Trash size={15} weight="duotone" /> Delete</button>
+        </>} />
+      )}
+      {confirmDelete && (
+        <Confirm title={`Delete ${plural(picked.length, 'Sim')}?`}
+          text="They, their photos and relationships go to Trash for 7 days, and you can undo right after. If they died in your game, “Mark as deceased” keeps their story instead."
+          onCancel={() => setConfirmDelete(false)}
+          actions={[
+            { label: 'Keep them', run: () => setConfirmDelete(false) },
+            { label: 'Delete', kind: 'danger', run: () => {
+              const gone = new Set(picked);
+              const relIds = rels.filter((r) => { const d = relData(r); return gone.has(d.a) || gone.has(d.b); }).map((r) => r.id);
+              store.moveManyToTrash([...picked, ...relIds], plural(picked.length, 'Sim'));
+              setConfirmDelete(false); stopSelecting();
+            } },
+          ]} />
       )}
     </>
   );
