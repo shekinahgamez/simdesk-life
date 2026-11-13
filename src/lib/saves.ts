@@ -1,4 +1,4 @@
-import { ArrowsClockwise, Briefcase, Coins, Crown, Notebook, Path, Storefront, type Icon } from '@phosphor-icons/react';
+import { ArrowsClockwise, Coins, Crown, Notebook, Path, Storefront, type Icon } from '@phosphor-icons/react';
 import { BY_ID, GAME, ownedFrom } from '../data/game';
 import type { SaveRow } from './sync/types';
 import type { PhotoRef } from './photos';
@@ -106,12 +106,11 @@ export type ModuleDef = { id: string; label: string; desc: string; icon: Icon; t
 /** Optional features. Only ready ones can be turned on; the rest say "Coming soon". */
 export const MODULES: ModuleDef[] = [
   { id: 'rotation', label: 'Rotation', desc: 'Who’s up next and for how long', icon: ArrowsClockwise, tint: 'rotation', ready: true },
-  { id: 'funds', label: 'Household funds', desc: 'Net worth for every household and Sim', icon: Coins, tint: 'households', ready: true },
-  { id: 'careers', label: 'Careers', desc: 'Career, level and workplace', icon: Briefcase, tint: 'calendar', ready: false },
+  { id: 'funds', label: 'Household funds', desc: 'Net worth for every household and Sim', icon: Coins, tint: 'funds', ready: true },
   { id: 'venues', label: 'Businesses', desc: 'Owners, staff, customers and a money log', icon: Storefront, tint: 'businesses', ready: true },
   { id: 'storylines', label: 'Storylines', desc: 'Threads that link Sims together', icon: Path, tint: 'storylines', ready: true },
   { id: 'journal', label: 'Docs', desc: 'Notes and dossiers, in tabs', icon: Notebook, tint: 'docs', ready: true },
-  { id: 'legacy', label: 'Legacy', desc: 'Generations, heirs, goals and rules', icon: Crown, tint: 'households', ready: true },
+  { id: 'legacy', label: 'Legacy', desc: 'Generations, heirs, goals and rules', icon: Crown, tint: 'legacy', ready: true },
 ];
 /** On only when the module has launched and the save switched it on. */
 export const moduleOn = (d: SaveData, id: string) => !!d.modules[id] && !!MODULES.find((m) => m.id === id)?.ready;
