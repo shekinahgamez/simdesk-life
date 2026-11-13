@@ -5,3 +5,4 @@ export { StatusChip, type Tone } from './StatusChip';
 export { Board, type BoardColumn } from './Board';
 export { MoreMenu, type MenuItem } from './MoreMenu';
 export { ListRow, SectionHeader, EmptyState, PageHeader, AddButton, ProgressBar, SelectBar } from './Layout';
+export { Dropdown } from './Dropdown';

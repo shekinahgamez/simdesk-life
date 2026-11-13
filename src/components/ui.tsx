@@ -300,7 +300,7 @@ export function NoMatches({ query }: { query: string }) {
 export type Option = { id: string; label: string; group?: string };
 
 export function Picker({
-  id, options, value, onChange, multiple = false, placeholder, onAdd, addLabel, max,
+  id, options, value, onChange, multiple = false, placeholder, onAdd, addLabel, max, clearable = true, ariaLabel,
 }: {
   id?: string;
   options: Option[];
@@ -314,6 +314,10 @@ export function Picker({
   /** The words on the add row. Default: Add “what you typed”. */
   addLabel?: (typed: string) => string;
   max?: number;
+  /** One pick only: show the ✕ that clears it. Off for a required choice. */
+  clearable?: boolean;
+  /** For a picker with no visible label (a cell in a row). */
+  ariaLabel?: string;
 }) {
   const autoId = useId();
   const inputId = id ?? autoId;
@@ -364,14 +368,16 @@ export function Picker({
   if (!multiple && single && !editing) {
     return (
       <div className="picker-chosen input">
-        <button type="button" id={inputId} className="picker-chosen-label" onClick={() => {
+        <button type="button" id={inputId} aria-label={ariaLabel} className="picker-chosen-label" onClick={() => {
           setEditing(true); setOpen(true); setTimeout(() => inputRef.current?.focus(), 0);
         }}>
           <span className={byId.has(single) ? '' : 'muted'}>{labelOf(single)}</span>
         </button>
-        <button type="button" className="picker-clear" aria-label={`Clear ${labelOf(single)}`} onClick={() => onChange([])}>
-          <X size={14} weight="bold" />
-        </button>
+        {clearable && (
+          <button type="button" className="picker-clear" aria-label={`Clear ${labelOf(single)}`} onClick={() => onChange([])}>
+            <X size={14} weight="bold" />
+          </button>
+        )}
       </div>
     );
   }
@@ -382,6 +388,7 @@ export function Picker({
         <input
           ref={inputRef}
           id={inputId}
+          aria-label={ariaLabel}
           className="input"
           role="combobox"
           aria-expanded={open}

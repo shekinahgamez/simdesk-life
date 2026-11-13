@@ -49,8 +49,8 @@ const tmp = path.join(os.tmpdir(), 'biz-import.json'); fs.writeFileSync(tmp, imp
     await p.getByRole('button', { name: /New business/ }).first().click();
     const dlg = p.getByRole('dialog', { name: 'New business' });
     await dlg.getByLabel('Name').fill('Black Tea');
-    await dlg.getByLabel('Kind').selectOption('Cafe');
-    await dlg.getByLabel('Owner household').selectOption('h1');
+    await dlg.getByLabel('Kind').click(); await dlg.getByRole('option', { name: 'Cafe', exact: true }).click();
+    await dlg.getByLabel('Owner household').click(); await dlg.getByRole('option').first().click();
     await shot('2-new');
     await dlg.getByRole('button', { name: 'Add business' }).click(); await p.waitForTimeout(800);
     ok(await until(p, () => recs('business').length === 1), `${n} business saved`);
@@ -62,7 +62,7 @@ const tmp = path.join(os.tmpdir(), 'biz-import.json'); fs.writeFileSync(tmp, imp
     await p.getByRole('button', { name: '4 stars' }).click();
     ok(await until(p, () => biz().rating === 0), `${n} tapping the same star clears it`);
     await p.getByRole('button', { name: '3 stars' }).click();
-    await p.getByLabel('Price level').selectOption('50');
+    await p.getByLabel('Price level').click(); await p.getByRole('option', { name: '+50%', exact: true }).click();
     ok(await until(p, () => biz().price === 50), `${n} price level`);
     // staff (townie included)
     await p.getByRole('button', { name: /Add staff/ }).click();
@@ -73,7 +73,7 @@ const tmp = path.join(os.tmpdir(), 'biz-import.json'); fs.writeFileSync(tmp, imp
     ok(await until(p, () => biz().staff.length === 2), `${n} two staff saved`);
     await p.getByLabel('Role for Nolan').fill('Owner'); await p.getByLabel('Role for Nolan').blur();
     ok(await until(p, () => biz().staff.find((s) => s.sim === 'nolan').role === 'Owner'), `${n} role saves`);
-    await p.getByLabel('Pay for Marcel').selectOption('High');
+    await p.getByLabel('Pay for Marcel').click(); await p.getByRole('option', { name: 'High', exact: true }).click();
     ok(await until(p, () => biz().staff.find((s) => s.sim === 'marcel').pay === 'High'), `${n} pay saves`);
     // customers
     ok(await p.getByText('Anyone can come in.').isVisible(), `${n} no rules yet`);
@@ -125,7 +125,7 @@ const tmp = path.join(os.tmpdir(), 'biz-import.json'); fs.writeFileSync(tmp, imp
     await p.goto(url('businesses')); await p.waitForTimeout(700);
     await p.getByRole('button', { name: /New business/ }).first().click();
     const d2 = p.getByRole('dialog', { name: 'New business' });
-    await d2.getByLabel('Name').fill('Ransom Rack'); await d2.getByLabel('Kind').selectOption('Retail');
+    await d2.getByLabel('Name').fill('Ransom Rack'); await d2.getByLabel('Kind').click(); await d2.getByRole('option', { name: 'Retail', exact: true }).click();
     await d2.getByRole('button', { name: 'Add business' }).click(); await p.waitForTimeout(800);
     ok(await p.getByText(/SimLogger only counts profit/).isVisible(), `${n} retail shows the starting-totals note`);
     await p.getByRole('button', { name: 'Set starting total' }).click();
