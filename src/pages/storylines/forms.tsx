@@ -5,6 +5,7 @@ import { WhenField } from '../../components/WhenField';
 import { BLANK_FEELING, BLANK_SECRET, BLANK_STORYLINE, cleanTags, FEEL_KINDS, STATUSES, tagChoices, type BeatData, type FeelingData, type SecretData, type StorylineData } from '../../lib/storylines';
 import { normalize } from '../../lib/text';
 import { useStore } from '../../lib/sync/react';
+import { useIsPhone } from '../../lib/useIsPhone';
 import { SimAvatar } from '../sims/shared';
 import type { StoriesCtx } from './shared';
 
@@ -134,6 +135,7 @@ export function StoryForm({ ctx, id, name, onClose, onSaved }: { ctx: StoriesCtx
 // ---------- beat ----------
 export function BeatForm({ ctx, id, storyline, startPlanned, onClose, onSaved }: { ctx: StoriesCtx; id: string | null; storyline?: string | null; startPlanned?: boolean; onClose(): void; onSaved?(): void }) {
   const store = useStore();
+  const phone = useIsPhone();
   const { info } = ctx;
   const rec = id ? [...ctx.beats, ...ctx.planned].find((b) => b.id === id)?.b : undefined;
   const [start] = useState<BeatData>(() => rec ?? { storyline: storyline ?? '', text: '', sims: [], day: info.track && !startPlanned ? info.today : null, precision: 'day', video: false, secret: false, planned: !!startPlanned, addedAt: '' });
@@ -169,19 +171,20 @@ export function BeatForm({ ctx, id, storyline, startPlanned, onClose, onSaved }:
         <StoryChecklist ctx={ctx} value={f.storyline} onPick={(sid) => { set({ storyline: sid }); setView('form'); }} onNew={newStory} />
       ) : (
         <form className="stack" style={{ gap: 14 }} onSubmit={(e) => { e.preventDefault(); submit(); }}>
-          <Field label={f.planned ? 'What will happen' : 'What happened'}>{(fid) => <textarea id={fid} className="textarea" rows={3} value={f.text} maxLength={600} autoFocus={!id} aria-invalid={tried && !f.text.trim()} placeholder="Corey and Kiana showed up at the door…" onChange={(e) => set({ text: e.target.value })} />}</Field>
+          <Field label={f.planned ? 'What will happen' : 'What happened'}>{(fid) => <textarea id={fid} className="textarea" rows={phone ? 2 : 3} value={f.text} maxLength={600} autoFocus={!id} aria-invalid={tried && !f.text.trim()} placeholder={f.planned ? 'Kendra finds out about Shanae…' : 'Corey and Kiana showed up at the door…'} onChange={(e) => set({ text: e.target.value })} />}</Field>
           {tried && !f.text.trim() && <p className="hint err" role="alert">Say what happened.</p>}
           <PickRow label="Sims" text={f.sims.length ? namesText(ctx, f.sims) : 'No one picked'} empty={!f.sims.length} action={f.sims.length ? 'Change' : 'Choose'} onClick={() => setView('sims')} />
+          {/* On phone, opened from a storyline: the storyline is already known, so no row for it and the date gets the full width. */}
           <div className="row" style={{ gap: 8, flexWrap: 'nowrap', alignItems: 'flex-start' }}>
             {info.track && (
               <div className="grow"><WhenField cal={info.cal} today={info.today} value={{ day: f.day, precision: f.precision }} onChange={(w) => set(w)} /></div>
             )}
-            <div className="grow"><PickRow label="Storyline" text={story?.s.name || 'Choose one'} empty={!story} action={story ? 'Change' : 'Choose'} onClick={() => setView('story')} /></div>
+            {!(phone && storyline) && <div className="grow"><PickRow label="Storyline" text={story?.s.name || 'Choose one'} empty={!story} action={story ? 'Change' : 'Choose'} onClick={() => setView('story')} /></div>}
           </div>
           {tried && !f.storyline && <p className="hint err" role="alert">Pick a storyline.</p>}
-          <div className="row" style={{ gap: 8 }}>
+          <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
             {(!ctx.streaming || f.planned) && <button type="button" className={`sl-chip plan ${f.planned ? 'on' : ''}`} aria-pressed={f.planned} onClick={() => set(!id && f.day === (f.planned ? null : info.today) ? { planned: !f.planned, day: f.planned ? (info.track ? info.today : null) : null } : { planned: !f.planned })}><Bell size={14} weight="duotone" /> Planned</button>}
-            <button type="button" className={`sl-chip ${f.video ? 'on' : ''}`} aria-pressed={f.video} onClick={() => set({ video: !f.video })}>Content material</button>
+            <button type="button" className={`sl-chip ${f.video ? 'on' : ''}`} aria-pressed={f.video} onClick={() => set({ video: !f.video })}>{phone ? 'Content' : 'Content material'}</button>
             <button type="button" className={`sl-chip ${f.secret ? 'on' : ''}`} aria-pressed={f.secret} onClick={() => set({ secret: !f.secret })}>Secret</button>
           </div>
         </form>
