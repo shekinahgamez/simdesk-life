@@ -49,7 +49,7 @@ const tmp = path.join(os.tmpdir(), 'biz-import.json'); fs.writeFileSync(tmp, imp
     await p.getByRole('button', { name: /New business/ }).first().click();
     const dlg = p.getByRole('dialog', { name: 'New business' });
     await dlg.getByLabel('Name').fill('Black Tea');
-    await dlg.getByLabel('Kind').click(); await dlg.getByRole('option', { name: 'Cafe', exact: true }).click();
+    await dlg.getByLabel('Kind').click(); if (process.env.SHOTS) await p.screenshot({ path: `${process.env.SHOTS}/${n}-biz-dropdown.png` }); await dlg.getByRole('option', { name: 'Cafe', exact: true }).click();
     await dlg.getByLabel('Owner household').click(); await dlg.getByRole('option').first().click();
     await shot('2-new');
     await dlg.getByRole('button', { name: 'Add business' }).click(); await p.waitForTimeout(800);
