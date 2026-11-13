@@ -36,7 +36,7 @@ const shot = (p, f) => p.screenshot({ path: `${out}/${f}.png` });
   await p.keyboard.press('Escape'); await p.waitForTimeout(200); ok(!(await bar.isVisible()), 'Esc closes');
   await p.locator('body').click({ position: { x: 1300, y: 800 } });
   await p.keyboard.press('/'); await bar.waitFor(); ok((await input.inputValue()) === '/', '"/" opens with slash');
-  ok((await rows().count()) === 17, `17 commands listed (got ${await rows().count()})`);
+  ok((await rows().count()) === 18, `18 commands listed (got ${await rows().count()})`);
   await shot(p, 'd2-slash');
   await input.fill('/hou'); await p.waitForTimeout(100);
   ok((await rows().count()) === 1 && /New household/.test(await rows().first().innerText()), '/hou finds /household');
@@ -104,7 +104,7 @@ const shot = (p, f) => p.screenshot({ path: `${out}/${f}.png` });
   await input.fill('Kai Osborne to cor'); await p.waitForTimeout(100); await p.keyboard.press('Enter'); await p.waitForTimeout(300);
   ok(/Moved Kai to Coriana household/.test(await p.locator('.toast').innerText()), `/move toast (${await p.locator('.toast').innerText()})`);
   // help + theme + settings
-  await open('/help '); ok((await bar.locator('.cb-help').count()) === 17, 'help lists 17'); await shot(p, 'd8-help');
+  await open('/help '); ok((await bar.locator('.cb-help').count()) === 18, 'help lists 18'); await shot(p, 'd8-help');
   await p.keyboard.press('Escape'); await p.waitForTimeout(200);
   await open('/theme dark'); await p.keyboard.press('Enter'); await p.waitForTimeout(300);
   ok((await p.evaluate(() => document.documentElement.dataset.sdTheme)) === 'dark', '/theme dark');

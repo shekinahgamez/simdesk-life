@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { CaretLeft, Plus, Trash, X } from '@phosphor-icons/react';
+import { Bell, CaretLeft, Plus, Trash, X } from '@phosphor-icons/react';
 import { Field, Modal, SearchBox, Seg, TextInput, Toggle, toast } from '../../components/ui';
 import { WhenField } from '../../components/WhenField';
 import { BLANK_FEELING, BLANK_SECRET, BLANK_STORYLINE, cleanTags, FEEL_KINDS, STATUSES, tagChoices, type BeatData, type FeelingData, type SecretData, type StorylineData } from '../../lib/storylines';
@@ -132,11 +132,11 @@ export function StoryForm({ ctx, id, name, onClose, onSaved }: { ctx: StoriesCtx
 }
 
 // ---------- beat ----------
-export function BeatForm({ ctx, id, storyline, onClose, onSaved }: { ctx: StoriesCtx; id: string | null; storyline?: string | null; onClose(): void; onSaved?(): void }) {
+export function BeatForm({ ctx, id, storyline, startPlanned, onClose, onSaved }: { ctx: StoriesCtx; id: string | null; storyline?: string | null; startPlanned?: boolean; onClose(): void; onSaved?(): void }) {
   const store = useStore();
   const { info } = ctx;
-  const rec = id ? ctx.beats.find((b) => b.id === id)?.b : undefined;
-  const [start] = useState<BeatData>(() => rec ?? { storyline: storyline ?? '', text: '', sims: [], day: info.track ? info.today : null, precision: 'day', video: false, secret: false, addedAt: '' });
+  const rec = id ? [...ctx.beats, ...ctx.planned].find((b) => b.id === id)?.b : undefined;
+  const [start] = useState<BeatData>(() => rec ?? { storyline: storyline ?? '', text: '', sims: [], day: info.track && !startPlanned ? info.today : null, precision: 'day', video: false, secret: false, planned: !!startPlanned, addedAt: '' });
   const [f, setF] = useState(start);
   const [view, setView] = useState<'form' | 'sims' | 'story'>('form');
   const [tried, setTried] = useState(false);
@@ -146,7 +146,7 @@ export function BeatForm({ ctx, id, storyline, onClose, onSaved }: { ctx: Storie
   const submit = () => {
     if (!f.text.trim() || !f.storyline) { setTried(true); return; }
     store.put('beat', { ...f, text: f.text.trim(), day: info.track ? f.day : null, addedAt: f.addedAt || new Date().toISOString() }, id ?? undefined);
-    toast(id ? 'Saved' : 'Beat added');
+    toast(id ? 'Saved' : f.planned ? 'Planned moment added' : 'Moment added');
     onSaved?.();
     onClose();
   };
@@ -155,21 +155,21 @@ export function BeatForm({ ctx, id, storyline, onClose, onSaved }: { ctx: Storie
     set({ storyline: sid });
     setView('form');
   };
-  const title = view === 'form' ? (id ? 'Edit beat' : 'Add beat') : backTitle(view === 'sims' ? 'Sims in this beat' : 'Storyline', () => setView('form'));
+  const title = view === 'form' ? (id ? 'Edit moment' : 'Add moment') : backTitle(view === 'sims' ? 'Sims in this moment' : 'Storyline', () => setView('form'));
   return (
     <Modal title={title} onClose={onClose} dirty={dirty} className="pinned ph-modal"
       footer={view === 'sims' ? <button type="button" className="btn primary" onClick={() => setView('form')}>{f.sims.length ? `Done · ${f.sims.length} selected` : 'Done'}</button> : view === 'story' ? undefined : (close) => (
         <>
-          {id && <button type="button" className="btn ghost danger" style={{ marginRight: 'auto' }} onClick={() => { store.moveToTrash(id, 'Beat'); onClose(); }}><Trash size={16} weight="duotone" /> Delete</button>}
+          {id && <button type="button" className="btn ghost danger" style={{ marginRight: 'auto' }} onClick={() => { store.moveToTrash(id, 'Moment'); onClose(); }}><Trash size={16} weight="duotone" /> Delete</button>}
           <button type="button" className="btn" onClick={close}>Cancel</button>
-          <button type="button" className="btn primary" onClick={submit}>Save beat</button>
+          <button type="button" className="btn primary" onClick={submit}>Save moment</button>
         </>
       )}>
       {view === 'sims' ? <SimChecklist ctx={ctx} value={f.sims} onChange={(sims) => set({ sims })} /> : view === 'story' ? (
         <StoryChecklist ctx={ctx} value={f.storyline} onPick={(sid) => { set({ storyline: sid }); setView('form'); }} onNew={newStory} />
       ) : (
         <form className="stack" style={{ gap: 14 }} onSubmit={(e) => { e.preventDefault(); submit(); }}>
-          <Field label="What happened">{(fid) => <textarea id={fid} className="textarea" rows={3} value={f.text} maxLength={600} autoFocus={!id} aria-invalid={tried && !f.text.trim()} placeholder="Corey and Kiana showed up at the door…" onChange={(e) => set({ text: e.target.value })} />}</Field>
+          <Field label={f.planned ? 'What will happen' : 'What happened'}>{(fid) => <textarea id={fid} className="textarea" rows={3} value={f.text} maxLength={600} autoFocus={!id} aria-invalid={tried && !f.text.trim()} placeholder="Corey and Kiana showed up at the door…" onChange={(e) => set({ text: e.target.value })} />}</Field>
           {tried && !f.text.trim() && <p className="hint err" role="alert">Say what happened.</p>}
           <PickRow label="Sims" text={f.sims.length ? namesText(ctx, f.sims) : 'No one picked'} empty={!f.sims.length} action={f.sims.length ? 'Change' : 'Choose'} onClick={() => setView('sims')} />
           <div className="row" style={{ gap: 8, flexWrap: 'nowrap', alignItems: 'flex-start' }}>
@@ -180,6 +180,7 @@ export function BeatForm({ ctx, id, storyline, onClose, onSaved }: { ctx: Storie
           </div>
           {tried && !f.storyline && <p className="hint err" role="alert">Pick a storyline.</p>}
           <div className="row" style={{ gap: 8 }}>
+            {(!ctx.streaming || f.planned) && <button type="button" className={`sl-chip plan ${f.planned ? 'on' : ''}`} aria-pressed={f.planned} onClick={() => set(!id && f.day === (f.planned ? null : info.today) ? { planned: !f.planned, day: f.planned ? (info.track ? info.today : null) : null } : { planned: !f.planned })}><Bell size={14} weight="duotone" /> Planned</button>}
             <button type="button" className={`sl-chip ${f.video ? 'on' : ''}`} aria-pressed={f.video} onClick={() => set({ video: !f.video })}>Content material</button>
             <button type="button" className={`sl-chip ${f.secret ? 'on' : ''}`} aria-pressed={f.secret} onClick={() => set({ secret: !f.secret })}>Secret</button>
           </div>

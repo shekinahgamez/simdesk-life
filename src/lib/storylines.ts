@@ -42,6 +42,8 @@ export type BeatData = {
   precision: Precision;
   video: boolean;
   secret: boolean;
+  /** Not happened yet. Old moments read as false. Planned moments stay out of the timeline until marked as happened. */
+  planned: boolean;
   /** Real date it was added (ISO). */
   addedAt: string;
 };
@@ -90,7 +92,7 @@ export function beatData(r: Rec | undefined): BeatData {
   return {
     storyline: str(d.storyline), text: str(d.text), sims: ids(d.sims), day: typeof d.day === 'number' && Number.isFinite(d.day) ? d.day : null,
     precision: d.precision === 'season' || d.precision === 'year' ? d.precision : 'day',
-    video: !!d.video, secret: !!d.secret, addedAt: str(d.addedAt),
+    video: !!d.video, secret: !!d.secret, planned: !!d.planned, addedAt: str(d.addedAt),
   };
 }
 
@@ -129,6 +131,15 @@ export const feelRows = (recs: Rec[]): FeelRow[] => recs.map((r) => ({ id: r.id,
 /** Newest first: by game day, then by the real day it was added. A beat with no game day sorts by when it was added. */
 export function sortBeats(rows: BeatRow[]): BeatRow[] {
   return [...rows].sort((a, b) => (b.b.day ?? -Infinity) - (a.b.day ?? -Infinity) || b.b.addedAt.localeCompare(a.b.addedAt));
+}
+
+/** Due: planned, has a date, and the day has come. Undated planned moments are never due. */
+export const isDue = (b: BeatData, today: number | null) => b.planned && b.day != null && today != null && b.day <= today;
+
+/** Planned moments in the order the Planned card and Today show them: due first, then soonest, then undated. */
+export function sortPlanned(rows: BeatRow[], today: number | null): BeatRow[] {
+  const rank = (r: BeatRow) => (isDue(r.b, today) ? 0 : r.b.day != null ? 1 : 2);
+  return [...rows].sort((a, b) => rank(a) - rank(b) || (a.b.day ?? 0) - (b.b.day ?? 0) || a.b.addedAt.localeCompare(b.b.addedAt));
 }
 
 /** Where a storyline last moved: the newest beat. */

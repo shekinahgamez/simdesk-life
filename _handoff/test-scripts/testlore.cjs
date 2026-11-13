@@ -113,16 +113,14 @@ const seed = (st) => {
     await p.getByRole('button', { name: /Who does Kiana want\?: open/ }).click(); await p.waitForTimeout(300);
     await p.waitForTimeout(1500);
     ok(rec('s1').data.questions[0].done === true, `${n} answers a question`);
-    await p.getByLabel('Episode notes').fill('Gossip angle'); await p.waitForTimeout(900);
-    await p.waitForTimeout(1500);
-    ok(rec('s1').data.notes === 'Gossip angle', `${n} episode notes autosave`);
+    ok(await p.getByLabel('Episode notes').count() === 0, `${n} no Episode notes card`);
     ok(await p.getByText('Pictures').first().isVisible(), `${n} Pictures card`);
     await shot('4-storyline');
     // add beat
-    await p.getByRole('button', { name: /Add beat/ }).first().click(); await p.waitForTimeout(400);
+    await p.getByRole('button', { name: /Add moment/ }).first().click(); await p.waitForTimeout(400);
     await p.getByLabel('What happened').fill('Everyone went home.');
     await p.getByRole('button', { name: /^Content material/ }).click();
-    await p.getByRole('button', { name: /^Save beat/ }).click(); await p.waitForTimeout(500);
+    await p.getByRole('button', { name: /^Save moment/ }).click(); await p.waitForTimeout(500);
     await p.waitForTimeout(1500);
     const nb = Object.values(st.records[SID]).filter((r) => r.kind === 'beat' && r.data.text === 'Everyone went home.');
     ok(nb.length === 1 && nb[0].data.storyline === 's1' && nb[0].data.video === true && nb[0].data.day === 14, `${n} new beat saved (storyline, video, today)`);

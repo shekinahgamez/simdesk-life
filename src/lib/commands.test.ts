@@ -4,10 +4,10 @@ import { available, COMMANDS, matchWord, opensBar, parseDays, parseMove, plainCo
 const all = { rotation: true, turn: true, date: true, clubs: true };
 
 describe('commands', () => {
-  it('has 17 one-word commands', () => {
-    expect(COMMANDS).toHaveLength(17);
+  it('has 18 one-word commands', () => {
+    expect(COMMANDS).toHaveLength(18);
     expect(COMMANDS.every((c) => /^[a-z]+$/.test(c.word))).toBe(true);
-    expect(new Set(COMMANDS.map((c) => c.word)).size).toBe(17);
+    expect(new Set(COMMANDS.map((c) => c.word)).size).toBe(18);
     expect(COMMANDS.find((c) => c.id === 'household')!.word).toBe('household');
   });
   it('hides commands the save cannot use', () => {
@@ -18,12 +18,12 @@ describe('commands', () => {
     expect(ids).not.toContain('club');
     expect(ids).toContain('sim');
     expect(ids).toContain('help');
-    expect(available(all)).toHaveLength(17);
+    expect(available(all)).toHaveLength(18);
   });
   it('matches the word by its start, exact first', () => {
     expect(matchWord('pl').map((c) => c.id)).toEqual(['play']);
     expect(matchWord('hou').map((c) => c.id)).toEqual(['household']);
-    expect(matchWord('').length).toBe(17);
+    expect(matchWord('').length).toBe(18);
     expect(matchWord('zz')).toEqual([]);
   });
   it('splits slash text', () => {
