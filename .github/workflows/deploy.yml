@@ -1,8 +1,8 @@
 # Builds SimDesk and publishes it to GitHub Pages on every push to main.
 # One-time setup: repo Settings → Pages → Source: "GitHub Actions".
 # It runs the automated tests and checks the code for type errors first; if either fails, nothing is deployed.
-# Paths are relative (vite base './'), so it works at /simdesk-life/ and on a custom domain later
-# with no changes. The Supabase address and publishable key live in src/config/supabase.ts.
+# Paths are relative (vite base ./), so it works at getsimdesk.com (the custom domain, set in repo Settings → Pages)
+# and at /simdesk-life/ with no changes. The Supabase address and publishable key live in src/config/supabase.ts.
 name: Deploy to GitHub Pages
 
 on:
