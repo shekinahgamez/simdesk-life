@@ -93,7 +93,7 @@ self.addEventListener('fetch', (e) => {
   };
 }
 
-// Relative paths, so the same build works on GitHub Pages (/simdesk-life/), a custom domain, or a preview link.
+// Relative paths, so the same build works at getsimdesk.com, the old GitHub Pages address (/simdesk-life/), or a preview link.
 export default defineConfig({
   base: './',
   plugins: [react(), appIdentity(), offlineCopy()],
