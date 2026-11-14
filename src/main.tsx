@@ -21,11 +21,12 @@ import './styles/gameimport.css';
 import './styles/businesses.css';
 import './styles/docs.css';
 import './styles/landing.css';
+import './styles/pricing.css';
 import { StyleGuide } from './pages/StyleGuide';
 import { STYLE_GUIDE_OWNERS } from './config/owners';
 import { AppSettings } from './pages/AppSettings';
 import { Auth } from './pages/Auth';
-import { LandingPage, BetaApplyPage } from './pages/landing/Landing';
+import { LandingPage, BetaApplyPage, PricingPage } from './pages/landing/Landing';
 import { isPretend, PretendApp, SetPassword, SignedIn } from './pages/AccountScreens';
 import { Toaster } from './components/ui';
 import { startTheme } from './lib/theme';
@@ -76,6 +77,7 @@ function App() {
     // Visitors see the public home page. Beta testers get the sign-in link (#/login) by email; there is no Log in button on the public pages.
     if (auth.confirmed || hash === '#/login') return <Auth confirmed={auth.confirmed} startLogin />;
     if (hash === '#/beta') return <BetaApplyPage />;
+    if (hash === '#/pricing') return <PricingPage />;
     return <LandingPage />;
   }
   return <SignedIn userId={auth.session.user.id} />;

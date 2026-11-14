@@ -68,6 +68,32 @@ async function submit(form: HTMLFormElement, kind: Kind) {
   }
 }
 
+/** Pricing page: Annual or Monthly price on the Obsessed card. */
+function setPlan(root: HTMLElement, annual: boolean) {
+  const set = (id: string, text: string) => { const el = root.querySelector(id); if (el) el.textContent = text; };
+  set('#amt', annual ? '$8' : '$10');
+  set('#bill', annual ? 'Billed $96 once a year. Save 20%.' : 'Billed monthly. Cancel any time.');
+  root.querySelectorAll<HTMLElement>('[data-plan]').forEach((b) => {
+    const on = (b.dataset.plan === 'a') === annual;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
+}
+
+/** Pricing page: opens and closes the comparison table. */
+function toggleCompare(root: HTMLElement) {
+  const box = root.querySelector<HTMLElement>('#cmpBox');
+  const btn = root.querySelector<HTMLElement>('[data-cmp]');
+  const label = root.querySelector<HTMLElement>('#cmpLbl');
+  const car = root.querySelector<HTMLElement>('#cmpCar');
+  if (!box || !btn) return;
+  const open = box.style.display === 'none';
+  box.style.display = open ? 'block' : 'none';
+  btn.setAttribute('aria-expanded', String(open));
+  if (label) label.textContent = open ? 'Hide the comparison ' : 'Compare all features ';
+  if (car) car.innerHTML = open ? '&#9652;' : '&#9662;';
+}
+
 /** Wires up a page whose markup lives in a plain HTML file: scroll links, chips and the Kit forms. */
 export function usePageBehavior() {
   const ref = useRef<HTMLDivElement>(null);
@@ -83,7 +109,10 @@ export function usePageBehavior() {
         return;
       }
       const chip = t.closest<HTMLElement>('[role=checkbox][data-field]');
-      if (chip) toggleChip(chip);
+      if (chip) { toggleChip(chip); return; }
+      const plan = t.closest<HTMLElement>('[data-plan]');
+      if (plan) { setPlan(root, plan.dataset.plan === 'a'); return; }
+      if (t.closest('[data-cmp]')) toggleCompare(root);
     };
     const onKey = (e: KeyboardEvent) => {
       const chip = (e.target as HTMLElement).closest<HTMLElement>('[role=checkbox][data-field]');

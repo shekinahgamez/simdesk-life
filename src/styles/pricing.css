@@ -1,0 +1,104 @@
+/* Simdesk pricing page. Scoped under .lpp so nothing leaks into the app. Built from the approved mockup. */
+.lpp{--pink:#B83C76;--cream:#FBF9F7;--ink:#1F1A1D;--mut:#6E6469;--line:#EADFE4;--card:#fff;--soft:#FBE3EE}
+.lpp *{box-sizing:border-box;margin:0}
+.lpp{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);font-size:17px;line-height:1.5}
+.lpp .wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+.lpp nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+.lpp nav img{height:32px}
+.lpp nav .r{display:flex;gap:24px;align-items:center;font-size:15px}
+.lpp nav a{text-decoration:none}
+.lpp .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 20px;border-radius:8px;background:var(--pink);color:#fff;font-weight:600;font-size:15px;border:0;font-family:inherit;text-decoration:none;cursor:pointer}
+.lpp .btn.out{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.lpp .btn.full{width:100%}
+.lpp .link{color:var(--ink);font-weight:500}
+.lpp .link.on{color:var(--pink);font-weight:600}
+.lpp em.ob{font-style:italic;font-weight:700;color:var(--pink)}
+.lpp h1{font-weight:700;letter-spacing:-.03em;line-height:1.04;font-size:60px}
+.lpp h2{font-weight:700;letter-spacing:-.02em;font-size:36px;line-height:1.1}
+.lpp h3{font-size:19px;font-weight:700}
+.lpp .sub{color:var(--mut);font-size:19px;max-width:560px}
+.lpp .hero{text-align:center;padding:48px 0 0}
+.lpp .hero .sub{margin:16px auto 0}
+.lpp .eyebrow{font-weight:500;color:var(--mut);margin-bottom:16px;font-size:18px}
+.lpp section{padding:56px 0}
+.lpp .col{max-width:980px;margin:0 auto}
+.lpp .head{margin-bottom:32px}
+.lpp .head p{color:var(--mut);font-size:18px;margin-top:8px}
+.lpp .tog{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:10px;padding:4px;margin-top:32px;gap:4px}
+.lpp .tog button{font:inherit;font-weight:600;font-size:15px;border:0;background:none;color:var(--mut);height:36px;padding:0 18px;border-radius:7px;cursor:pointer;display:flex;gap:8px;align-items:center}
+.lpp .tog button.on{background:var(--pink);color:#fff}
+.lpp .tog .save{font-size:12px;font-weight:700;background:var(--soft);color:var(--pink);padding:2px 8px;border-radius:999px}
+.lpp .tog button.on .save{background:rgba(255,255,255,.22);color:#fff}
+.lpp .plans{display:grid;grid-template-columns:1fr 1.12fr;gap:24px;align-items:stretch;max-width:980px;margin:40px auto 0;text-align:left}
+.lpp .plan{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:32px;display:flex;flex-direction:column}
+.lpp .plan.ob{border:2px solid var(--pink);box-shadow:0 24px 60px rgba(184,60,118,.16);position:relative}
+.lpp .plan .top{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.lpp .plan .name{font-size:22px;font-weight:700}
+.lpp .tag{margin-left:auto;background:var(--pink);color:#fff;font-size:13px;font-weight:600;padding:4px 12px;border-radius:999px;white-space:nowrap}
+.lpp .plan .line{color:var(--mut);font-size:16px;margin-top:2px;min-height:48px}
+.lpp .price{display:flex;align-items:baseline;gap:8px;margin-top:20px}
+.lpp .price b{font-size:56px;letter-spacing:-.03em;line-height:1}
+.lpp .price span{color:var(--mut);font-size:17px}
+.lpp .bill{color:var(--mut);font-size:14px;margin:6px 0 24px;min-height:22px}
+.lpp .plan .btn{height:46px;font-size:16px}
+.lpp .fine{font-size:14px;color:var(--mut);text-align:center;margin-top:10px;min-height:22px}
+.lpp .inc{margin-top:24px;padding-top:20px;border-top:1px solid var(--line);font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+.lpp .plan ul{list-style:none;padding:0;display:grid;gap:12px;margin-top:14px}
+.lpp .plan li{display:flex;gap:12px;align-items:flex-start;font-size:16px}
+.lpp .ck{flex:none;display:inline-flex;margin-top:1px}
+.lpp .found{max-width:980px;margin:24px auto 0;background:var(--soft);border-radius:16px;padding:20px 24px;display:flex;gap:16px;align-items:center}
+.lpp .found .tile{width:44px;height:44px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.lpp .found p{color:var(--mut);font-size:15px;margin-top:2px}
+.lpp .found b{font-size:17px}
+.lpp .found .btn{margin-left:auto;white-space:nowrap}
+.lpp .cmp{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.lpp .cmp th,.lpp .cmp td{padding:14px 20px;text-align:center;font-size:16px;border-bottom:1px solid var(--line)}
+.lpp .cmp th:first-child,.lpp .cmp td:first-child{text-align:left;width:56%}
+.lpp .cmp thead th{font-size:16px;background:#fff;padding:18px 20px}
+.lpp .cmp thead th.o{color:var(--pink)}
+.lpp .cmp tr.g td{background:var(--cream);font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);padding:10px 20px}
+.lpp .cmp tr:last-child td{border-bottom:0}
+.lpp .cmp .no{color:#B9AFB4}
+.lpp .cmp td .ck{margin:0 auto;display:flex;justify-content:center}
+.lpp .cmp td.sm{font-weight:600}
+.lpp .cmpbar{display:flex;justify-content:center}
+.lpp .cmpbar .btn{height:44px;font-size:16px}
+.lpp .faq{display:grid;grid-template-columns:1fr 1.6fr;gap:48px}
+.lpp .q{border-bottom:1px solid var(--line);padding:18px 0}
+.lpp .q:first-child{padding-top:0}
+.lpp .q h3{display:flex;justify-content:space-between;font-size:17px}
+.lpp .q h3 i{font-style:normal;color:var(--pink)}
+.lpp .q p{color:var(--mut);font-size:16px;margin-top:8px}
+.lpp .band{background:var(--pink);color:#fff;border-radius:20px;padding:48px;display:flex;align-items:center;gap:32px;justify-content:space-between}
+.lpp .band h2{color:#fff}
+.lpp .band p{opacity:.9;margin-top:8px;font-size:18px}
+.lpp .band .btn{background:#fff;color:var(--pink);height:46px;font-size:16px;white-space:nowrap}
+.lpp footer{border-top:1px solid var(--line);padding:32px 0 48px;color:var(--mut);font-size:14px}
+.lpp footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+@media(max-width:700px){.lpp{font-size:16px}
+.lpp .wrap{padding:0 16px}
+.lpp h1{font-size:40px}
+.lpp h2{font-size:28px}
+.lpp .sub{font-size:17px}
+.lpp nav .r{gap:16px}
+.lpp nav .r .hide{display:none}
+.lpp section{padding:40px 0}
+.lpp .plans{grid-template-columns:1fr;margin-top:28px}
+.lpp .plan{padding:24px}
+.lpp .plan.ob{order:-1}
+.lpp .plan .line{min-height:0}
+.lpp .price b{font-size:48px}
+.lpp .found{flex-wrap:wrap;padding:16px}
+.lpp .found .btn{margin-left:0;width:100%}
+.lpp .cmp th,.lpp .cmp td{padding:12px 10px;font-size:15px}
+.lpp .cmp th:first-child,.lpp .cmp td:first-child{width:auto}
+.lpp .cmp tr.g td{padding:10px}
+.lpp .faq{grid-template-columns:1fr;gap:24px}
+.lpp .band{flex-direction:column;align-items:flex-start;padding:28px 20px;border-radius:16px}
+.lpp .band .btn{width:100%}
+.lpp .tag{font-size:12px;padding:3px 10px}
+}
+
+.lpp a{color:inherit;text-decoration:none}.lpp img{display:inline}.lpp button{cursor:pointer}.lpp .btn{color:#fff}.lpp .btn.out{color:var(--ink)}.lpp .band .btn{color:var(--pink)}
+.lpp .tog button:focus-visible,.lpp .btn:focus-visible,.lpp .link:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+.lpp [hidden]{display:none!important}
