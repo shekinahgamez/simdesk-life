@@ -43,10 +43,10 @@ function collect(form: HTMLFormElement): FormData {
 
 async function submit(form: HTMLFormElement, kind: Kind) {
   const email = form.querySelector<HTMLInputElement>('input[type=email]');
-  if (!email || !email.value.trim() || !email.checkValidity()) { say(form, 'Add your email so I can reach you.', 'err'); email?.focus(); return; }
+  if (!email || !email.value.trim() || !email.checkValidity()) { say(form, 'Add your email so we can reach you.', 'err'); email?.focus(); return; }
   if (kind === 'beta') {
-    const missing = form.querySelector<HTMLElement>('[name=first_name]:invalid, [name="fields[sims_tracked]"]:invalid, [name="fields[quit_last_tracker]"]:invalid, [name="fields[save_description]"]:invalid');
-    if (missing) { say(form, 'Fill in the highlighted questions first.', 'err'); (missing as HTMLInputElement).focus(); return; }
+    const missing = form.querySelector<HTMLElement>('[name=first_name]:invalid, [name="fields[sims_tracked]"]:invalid, [name="fields[quit_last_tracker]"]:invalid, [name="fields[save_description]"]:invalid, [name="fields[beta_email_ok]"]:invalid');
+    if (missing) { say(form, 'Fill in the required questions and tick the first box first.', 'err'); (missing as HTMLInputElement).focus(); return; }
   }
   const url = KIT[kind];
   if (!url) { say(form, 'Sign-ups are not open yet. Check back soon.', 'err'); return; }
